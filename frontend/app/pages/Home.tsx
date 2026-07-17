@@ -1,0 +1,80 @@
+"use client";
+import Header from "../components/Header";
+import MessageList from "../components/MessageList";
+import PromptChips from "../components/PromptChips";
+import ChatInput from "../components/ChatInput";
+import { useState } from "react";
+import { getNews } from "../services/newsApi";
+import { Message } from "@/types/message";
+import { Article } from "@/types/article";
+
+export default function Home() {
+  const [message, setMessage] = useState("");
+  const [message1, setMessage1] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async (message: string) => {
+    if (!message.trim()) return;
+    setMessage1((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        content: message,
+      },
+    ]);
+
+    setLoading(true);
+
+    try {
+      const data: Article[] = await getNews();
+
+      setMessage1((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          articles: data,
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex h-screen flex-col bg-white text-black">
+      {/*header*/}
+      <Header />
+      {/*Chat Area*/}
+      <main className="flex-1 overflow-y-auto pb-40 pt-5 flex flex-col ">
+        {message1.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center ">
+            <p>
+              Start a conversation by selecting a prompt or typing a message.
+            </p>
+          </div>
+        ) : (
+          <MessageList message1={message1} loading={loading} />
+        )}
+      </main>
+
+      <footer className=" fixed bottom-0 left-0 right-0 bg-white ">
+        {message1.length === 0 && (
+          <div className=" flex  justify-center">
+            <PromptChips onSelectPrompt={setMessage} />
+          </div>
+        )}
+
+        <ChatInput
+          message={message}
+          setMessage={setMessage}
+          loading={loading}
+          onSend={handleSend}
+        />
+      </footer>
+    </div>
+  );
+}
