@@ -2,7 +2,7 @@
 
 import { Article } from "@/types/article";
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function getNews(): Promise<Article[]> {
   const response = await fetch(`${BASE_URL}/news/v1`);
@@ -11,7 +11,7 @@ export async function getNews(): Promise<Article[]> {
   }
 
   const data = response.json();
-  console.log(data);
+  // console.log(data);
 
   return data;
 }
