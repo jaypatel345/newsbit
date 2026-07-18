@@ -47,13 +47,14 @@ export default function MessageList({ loading, message1 }: MessageListProps) {
                 {/* <p className="font-semibold">Assistant</p> */}
                 {(message.articles ?? []).map((article, index) => (
                   <div key={article.url} className="mb-4">
-                    <h3 className="font-semibold"> ◦ {article.title}</h3>
-                    <p>{article.summary}</p>
+                    <h2 className="font-semibold text-lg">◦ {article.title}</h2>
+                    <p className="text-gray-700">{article.summary}</p>
                     <a
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-500 hover:text-gray-800 inline-flex items-center gap-1"
+                      aria-label={`Read full article: ${article.title}`}
                     >
                       {getDomainName(article.url)}
                       <ExternalLink size={14} />
