@@ -2,8 +2,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.db.database import AsyncSessionLocal
 from app.services.news_service import NewsService
+from zoneinfo import ZoneInfo
 
-scheduler = AsyncIOScheduler()
+scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
 
 async def run_news_fetch_job():
@@ -13,9 +14,7 @@ async def run_news_fetch_job():
 
 scheduler.add_job(
     run_news_fetch_job,
-    trigger="interval",
-    minutes=1,
-    # trigger="cron",
-    # hour=18,
-    # minute=30,
+    trigger="cron",
+    hour=6,
+    minute=0,
 )
