@@ -49,10 +49,10 @@ export default function Home() {
       {/*header*/}
       <Header />
       {/*Chat Area*/}
-      <main className="flex-1 overflow-y-auto pb-40 pt-5 flex flex-col ">
+      <main className="flex-1 overflow-y-auto pb-36 sm:pb-40 pt-5 flex flex-col px-2 sm:px-0">
         {message1.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center ">
-            <p>
+          <div className="flex flex-1 items-center justify-center px-4">
+            <p className="text-sm sm:text-base text-center">
               Start a conversation by selecting a prompt or typing a message.
             </p>
           </div>
@@ -61,9 +61,9 @@ export default function Home() {
         )}
       </main>
 
-      <footer className=" fixed bottom-0 left-0 right-0 bg-white ">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white">
         {message1.length === 0 && (
-          <div className=" flex  justify-center">
+          <div className="flex justify-center">
             <PromptChips onSelectPrompt={setMessage} />
           </div>
         )}
