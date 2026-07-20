@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
     default: "Newsbit AI - AI-Powered News Summaries in Minutes",
     template: "%s | Newsbit AI",
   },
-  description: "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI. Get today's most important news in minutes.",
-  keywords: ["AI news", "news summaries", "daily news", "artificial intelligence", "news aggregator", "quick news"],
+  description:
+    "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI. Get today's most important news in minutes.",
+  keywords: [
+    "AI news",
+    "news summaries",
+    "daily news",
+    "artificial intelligence",
+    "news aggregator",
+    "quick news",
+  ],
   authors: [{ name: "Newsbit AI" }],
   creator: "Newsbit AI",
   publisher: "Newsbit AI",
@@ -36,7 +34,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://www.newsbit.in",
     title: "Newsbit AI - AI-Powered News Summaries in Minutes",
-    description: "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI.",
+    description:
+      "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI.",
     siteName: "Newsbit AI",
     images: [
       {
@@ -50,7 +49,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Newsbit AI - AI-Powered News Summaries in Minutes",
-    description: "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI.",
+    description:
+      "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI.",
     images: ["/newsbit_graph.png"],
     creator: "@newsbitai",
   },
@@ -82,7 +82,8 @@ export default function RootLayout({
     "@type": "WebSite",
     name: "Newsbit AI",
     url: "https://www.newsbit.in",
-    description: "AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.",
+    description:
+      "AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.",
     potentialAction: {
       "@type": "SearchAction",
       target: "https://www.newsbit.in/?q={search_term_string}",
@@ -102,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
