@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 type ChatInputProps = {
   message: string;
@@ -41,14 +42,14 @@ export default function ChatInput({
       />
       <button
         disabled={loading || !message.trim()}
-        className={`rounded-full px-3 sm:px-4 py-2 text-white transition-colors text-sm sm:text-base ${
+        className={`w-9 h-9 rounded-full transition-colors flex items-center justify-center ${
           message.trim() && !loading
-            ? "bg-black hover:bg-gray-800"
+            ? "bg-black text-white hover:bg-gray-800"
             : "bg-gray-300 cursor-not-allowed"
         }`}
         onClick={handleSend}
       >
-        ↑
+        <ArrowRight size={16} />
       </button>
     </div>
   );

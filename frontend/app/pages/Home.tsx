@@ -9,21 +9,24 @@ import AICapabilities from "../components/AICapabilities";
 import TrustTransparency from "../components/TrustTransparency";
 import FinalCTA from "../components/FinalCTA";
 import Footer from "../components/Footer";
+import { PromptProvider } from "../context/PromptContext";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-black">
-      <NavigationBar />
-      <HeroSection />
-      <TodaysBrief />
-      <TodaysTopStories />
-      <WhyNewsbit />
-      <ProductDemo />
-      <ExploreByTopic />
-      <AICapabilities />
-      <TrustTransparency />
-      <FinalCTA />
-      <Footer />
-    </div>
+    <PromptProvider>
+      <div className="min-h-screen bg-white text-black">
+        <NavigationBar />
+        <HeroSection />
+        {/* <TodaysBrief />
+        <TodaysTopStories />
+        <WhyNewsbit />
+        <ProductDemo />
+        <ExploreByTopic />
+        <AICapabilities />
+        <TrustTransparency />
+        <FinalCTA /> */}
+        {/* <Footer /> */}
+      </div>
+    </PromptProvider>
   );
 }

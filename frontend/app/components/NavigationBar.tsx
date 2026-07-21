@@ -2,82 +2,69 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Bell, ChevronDown, Send } from "lucide-react";
+import { Bell, ChevronDown } from "lucide-react";
 
 export default function NavigationBar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setScrolled(scrollPosition > 300);
-      setShowSearch(scrollPosition > 300);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const handleScrollToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+  ) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between">
         {/* LEFT - Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">N</span>
-          </div>
-          <span className="font-semibold text-lg text-gray-900">Newsbit</span>
+          <span className="font-semibold  text-gray-900 text-xl">Newsbit</span>
         </Link>
 
         {/* CENTER - Navigation Links */}
         <div className="flex items-center gap-8">
-          <Link
-            href="/brief"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          <a
+            href="#todays-brief"
+            onClick={(e) => handleScrollToSection(e, "todays-brief")}
+            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Today's Brief
-          </Link>
-          <Link
-            href="/explore"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          </a>
+          <a
+            href="#explore"
+            onClick={(e) => handleScrollToSection(e, "explore")}
+            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Explore
-          </Link>
-
-          {/* Search Input - Animated */}
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              showSearch ? "w-64 opacity-100 ml-4" : "w-0 opacity-0"
-            }`}
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Ask today's news..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full h-10 pl-4 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition-all"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 transition-colors">
-                <Send size={16} />
-              </button>
-            </div>
-          </div>
+          </a>
         </div>
 
         {/* RIGHT - Account Actions */}
         <div className="flex items-center gap-4">
           {!isLoggedIn ? (
-            <button className="px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-              Sign In
-            </button>
+            <>
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                Sign Up
+              </Link>
+            </>
           ) : (
             <div className="flex items-center gap-3">
               <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">

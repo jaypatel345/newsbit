@@ -14,21 +14,21 @@ const categories = [
 
 export default function TodaysBrief() {
   return (
-    <section className="py-20 bg-white">
+    <section id="todays-brief" className="py-20 bg-white">
       <div className="max-w-300 mx-auto px-6 sm:px-8">
         {/* Header */}
         <div className="mb-12">
-          <span className="inline-block text-sm font-medium text-blue-600 mb-3">
+          <span className="inline-block text-sm font-medium mb-3" style={{ color: "#8A6A3F" }}>
             Daily AI Brief
           </span>
-          <h2 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
-            Today's Brief
+          <h2 className="text-4xl sm:text-5xl font-semibold mb-4" style={{ color: "#1E1E1E" }}>
+            Today&apos;s Brief
           </h2>
-          <p className="text-lg text-gray-600 mb-4">
+          <p className="text-lg mb-4" style={{ color: "#5B4C3A" }}>
             10 important stories selected and summarized by AI.
           </p>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Clock size={16} />
+          <div className="flex items-center gap-2 text-sm" style={{ color: "#5B4C3A" }}>
+            <Clock size={16} style={{ color: "#8A6A3F" }} />
             <span>Read time: 4 min</span>
           </div>
         </div>
@@ -36,19 +36,21 @@ export default function TodaysBrief() {
         {/* CTA */}
         <Link
           href="/brief"
-          className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 mb-12"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-medium hover:opacity-80 transition-all duration-200 mb-12"
+          style={{ backgroundColor: "#8A6A3F", color: "#FFFFFF" }}
         >
           Start Reading
           <ArrowRight size={20} />
         </Link>
 
         {/* Category Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+        <div className="rounded-2xl shadow-sm p-8" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5E7EB" }}>
           <div className="flex flex-wrap gap-3">
             {categories.map((category, index) => (
               <button
                 key={index}
-                className="px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                className="px-5 py-3 rounded-xl text-sm font-medium hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5E7EB", color: "#1E1E1E" }}
               >
                 <span className="mr-2">{category.icon}</span>
                 {category.name}

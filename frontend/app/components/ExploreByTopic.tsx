@@ -1,5 +1,7 @@
-import Link from "next/link";
+"use client";
+
 import { ArrowRight } from "lucide-react";
+import { usePrompt } from "../context/PromptContext";
 
 const topics = [
   {
@@ -77,8 +79,16 @@ const topics = [
 ];
 
 export default function ExploreByTopic() {
+  const { setPrompt } = usePrompt();
+
+  const handleTopicClick = (prompt: string) => {
+    setPrompt(prompt);
+    // Scroll to the floating input
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
   return (
-    <section className="py-28 bg-white">
+    <section id="explore" className="py-28 bg-white">
       <div className="max-w-300 mx-auto px-6 sm:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -97,10 +107,10 @@ export default function ExploreByTopic() {
         {/* Topic Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-16">
           {topics.map((topic, index) => (
-            <Link
+            <button
               key={index}
-              href={`/chat?prompt=${encodeURIComponent(topic.prompt)}`}
-              className="group bg-white border border-gray-200 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer"
+              onClick={() => handleTopicClick(topic.prompt)}
+              className="group bg-white border border-gray-200 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer text-left"
             >
               {/* Icon */}
               <div className="text-3xl mb-4">{topic.icon}</div>
@@ -122,20 +132,20 @@ export default function ExploreByTopic() {
                   className="group-hover:translate-x-1 transition-transform duration-300"
                 />
               </div>
-            </Link>
+            </button>
           ))}
         </div>
 
         {/* Bottom CTA */}
         <div className="text-center">
           <p className="text-gray-600 mb-4">Can't find your topic?</p>
-          <Link
-            href="/chat"
+          <button
+            onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
             className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200"
           >
             Start chatting
             <ArrowRight size={20} />
-          </Link>
+          </button>
         </div>
       </div>
     </section>

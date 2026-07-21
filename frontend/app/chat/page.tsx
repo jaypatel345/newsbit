@@ -2,15 +2,25 @@
 import MessageList from "../components/MessageList";
 import PromptChips from "../components/PromptChips";
 import ChatInput from "../components/ChatInput";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { getNews } from "../services/newsApi";
 import { Message } from "@/types/message";
 import { Article } from "@/types/article";
 
 export default function ChatPage() {
+  const searchParams = useSearchParams();
   const [message, setMessage] = useState("");
   const [message1, setMessage1] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Read prompt from URL and set in input
+  useEffect(() => {
+    const promptParam = searchParams.get("prompt");
+    if (promptParam) {
+      setMessage(decodeURIComponent(promptParam));
+    }
+  }, [searchParams]);
 
   const handleSend = async (message: string) => {
     if (!message.trim()) return;
@@ -44,7 +54,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-white text-black">
+    <div className="flex h-screen flex-col bg-white text-black animate-in fade-in duration-700">
       <header className="border-b border-gray-200 p-4 items-center justify-center">
         <h1 className="text-2xl sm:text-3xl font-semibold">Newsbit AI</h1>
       </header>

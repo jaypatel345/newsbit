@@ -1,72 +1,130 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
 const popularQuestions = [
+  "2-Minute Brief",
   "What happened today?",
-  "AI news",
-  "India",
-  "World",
-  "Explain inflation",
-  "Crypto",
+  "World news",
+  "What's trending?",
+  "Top Headlines",
 ];
 
 const examplePrompts = [
   "What happened today?",
-  "Why is oil increasing?",
-  "Explain today's AI news.",
-  "What affects the Indian market today?",
+  "Why are oil prices rising?",
+  "Explain inflation.",
+  "Catch me up in 2 minutes.",
+  "What's happening in India?",
+  "Tell me about AI this week.",
+  "Why is this trending?",
+  "Compare India and US tech news.",
 ];
 
 export default function HeroSection() {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  const [selectedPrompt, setSelectedPrompt] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPromptIndex((prev) => (prev + 1) % examplePrompts.length);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const playClickSound = () => {
+    try {
+      const AudioContextCtor =
+        window.AudioContext ||
+        (
+          window as Window &
+            typeof globalThis & { webkitAudioContext?: typeof AudioContext }
+        ).webkitAudioContext;
+
+      if (!AudioContextCtor) return;
+
+      const audioContext = new AudioContextCtor();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      const now = audioContext.currentTime;
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(2200, now);
+      oscillator.frequency.exponentialRampToValueAtTime(900, now + 0.018);
+      gainNode.gain.setValueAtTime(0.045, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.018);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.02);
+    } catch {
+      // Audio is optional; unsupported browsers should still select the prompt.
+    }
+  };
+
   const handleChipClick = (question: string) => {
+    playClickSound();
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+
+    setSelectedPrompt(question);
     setInputValue(question);
   };
 
-  return (
-    <main className="min-h-[85vh] flex items-center justify-center pt-16">
-      <div className="w-full max-w-225 px-6 sm:px-8 flex flex-col items-center justify-center animate-in fade-in duration-700">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full mb-8 border border-gray-100">
-          <Sparkles size={16} className="text-blue-600" />
-          <span className="text-sm font-medium text-gray-700">
-            AI-powered News Assistant
-          </span>
-        </div>
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+    const prompt = inputValue;
+    setTimeout(() => {
+      router.push(`/chat?prompt=${encodeURIComponent(prompt)}`);
+    }, 300);
+    setInputValue("");
+  };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSend();
+    }
+  };
+
+  return (
+    <main className="min-h-[85vh] flex items-center justify-center pt-16 bg-white">
+      <div className="w-full max-w-225 px-6 sm:px-8 flex flex-col items-center justify-center animate-in fade-in duration-700">
         {/* Main Heading */}
-        <h1 className="text-5xl sm:text-6xl font-semibold text-gray-900 mb-4 tracking-tight">
-          Newsbit
+        <h1
+          className="font-(family-name:--font-geist) text-6xl sm:text-7xl md:text-[70px] mb-12 tracking-tight leading-tight text-center whitespace-nowrap"
+          style={{ color: "#1E1E1E" }}
+        >
+          News{" "}
+          <span className="inline-block font-light not-italic -skew-x-12 ">
+            for
+          </span>{" "}
+          busy minds.
         </h1>
 
-        {/* Large Headline */}
-        <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 mb-4">
-          Understand today's news with AI.
-        </h2>
-
         {/* Supporting Text */}
-        <p className="text-lg text-gray-600 text-center max-w-2xl mb-12 leading-relaxed">
-          Summaries, explanations, context, and answers from today's biggest
-          stories in seconds.
+        <p
+          className="text-lg text-center max-w-2xl mb-3 leading-relaxed"
+          style={{ color: "#5B4C3A" }}
+        >
+          Think deeper. Read smarter. Stay informed.
         </p>
 
         {/* AI Prompt Input */}
-        <div className="w-full max-w-200 mb-8">
+        <div className="w-full max-w-160 mb-8">
           <div
-            className={`relative transition-all duration-300 ${
-              isFocused ? "shadow-lg" : "shadow-md"
-            }`}
+            className={`flex items-center gap-2 bg-white border rounded-2xl transition-all duration-300 ${
+              selectedPrompt ? "border-gray-400 bg-gray-50 scale-[1.02]" : "border-gray-200"
+            } ${isFocused ? "shadow-lg" : "shadow-md"}`}
+            style={{
+              backgroundColor: selectedPrompt ? "#F9FAFB" : "#FFFFFF",
+            }}
           >
             <input
               type="text"
@@ -79,31 +137,38 @@ export default function HeroSection() {
               onChange={(e) => setInputValue(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              className="w-full h-16 px-6 pr-14 bg-white border border-gray-200 rounded-2xl text-base focus:outline-none transition-all duration-300 placeholder:text-gray-400"
+              onKeyDown={handleKeyDown}
+              className="flex-1 h-14 px-6 bg-transparent text-base text-black focus:outline-none transition-all duration-300 placeholder:text-gray-400"
             />
             <button
-              className={`absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all duration-300 ${
+              onClick={handleSend}
+              disabled={!inputValue.trim()}
+              className={`mr-2 w-9 h-9 rounded-full transition-all duration-300 flex items-center justify-center ${
                 inputValue.trim()
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-100 text-gray-400 hover:bg-gray-200"
               }`}
             >
-              <Send size={20} />
+              <ArrowRight size={18} />
             </button>
           </div>
         </div>
 
         {/* Popular Questions */}
         <div className="w-full max-w-200 mb-12">
-          <h3 className="text-sm font-medium text-gray-500 mb-4 text-center">
-            Popular Questions
-          </h3>
           <div className="flex flex-wrap gap-3 justify-center">
             {popularQuestions.map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleChipClick(question)}
-                className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:-translate-y-0.5 transition-all duration-200"
+                className={`px-5 py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 active:scale-95 ${
+                  selectedPrompt === question ? "scale-[1.03]" : "scale-100"
+                }`}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #E5E7EB",
+                  color: "#1E1E1E",
+                }}
               >
                 {question}
               </button>
@@ -112,11 +177,17 @@ export default function HeroSection() {
         </div>
 
         {/* Bottom Metadata */}
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+        <div
+          className="flex items-center gap-2 text-sm"
+          style={{ color: "#5B4C3A" }}
+        >
+          <div
+            className="w-2 h-2 rounded-full animate-pulse"
+            style={{ backgroundColor: "#38BDF8" }}
+          />
           <span>Updated 5 minutes ago</span>
-          <span className="text-gray-300">•</span>
-          <span>12,400 articles analyzed today</span>
+          <span style={{ color: "#8A6A3F" }}>•</span>
+          <span>100+ articles analyzed today</span>
         </div>
       </div>
     </main>
