@@ -68,7 +68,7 @@ export default function MessageList({ loading, message1 }: MessageListProps) {
       ))}
 
       {loading && (
-        <p className="italic text-gray-500 flex items-center justify-center text-sm sm:text-base">
+        <p className="italic text-gray-500 flex items-center justify-start text-sm sm:text-base">
           Thinking...
         </p>
       )}

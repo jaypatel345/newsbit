@@ -20,14 +20,26 @@ export default function NavigationBar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white ">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between ">
         {/* LEFT - Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-95 transition-opacity"
         >
-          <span className="font-semibold  text-gray-900 text-xl">Newsbit</span>
+          <div className="flex items-center gap-3">
+            <img
+              src="/newsbit_logo/logo_without_bg.png"
+              alt="Newsbit Logo"
+              className="h-7 w-7"
+            />
+            <div className="flex flex-col">
+              <span className="text-[17px] font-medium text-gray-900">
+                Newsbit
+              </span>
+              <span className="text-[12px] text-gray-600">AI-Powered News</span>
+            </div>
+          </div>
         </Link>
 
         {/* CENTER - Navigation Links */}

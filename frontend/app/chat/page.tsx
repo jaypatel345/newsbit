@@ -5,6 +5,7 @@ import PromptChips from "../components/PromptChips";
 import ChatInput from "../components/ChatInput";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { getNews } from "../services/newsApi";
 import { Message } from "@/types/message";
 import { Article } from "@/types/article";
@@ -56,8 +57,20 @@ function ChatPageContent() {
 
   return (
     <div className="flex h-screen flex-col bg-white text-black animate-in fade-in duration-700">
-      <header className="border-b border-gray-200 p-4 items-center justify-center">
-        <h1 className="text-2xl sm:text-3xl font-semibold">Newsbit AI</h1>
+      <header className="p-2 ml-10 items-center justify-start">
+        <Link href="/" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
+          <img
+            src="/newsbit_logo/logo_without_bg.png"
+            alt="Newsbit Logo"
+            className="h-7 w-7"
+          />
+          <div className="flex flex-col">
+            <span className="text-[17px] font-medium text-gray-900">
+              Newsbit
+            </span>
+            <span className="text-[12px] text-gray-600">AI-Powered News</span>
+          </div>
+        </Link>
       </header>
       <main className="flex-1 overflow-y-auto pb-36 sm:pb-40 pt-5 flex flex-col px-2 sm:px-0">
         {message1.length === 0 ? (
@@ -91,7 +104,13 @@ function ChatPageContent() {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
       <ChatPageContent />
     </Suspense>
   );
