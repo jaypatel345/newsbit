@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { usePrompt } from "../context/PromptContext";
+import { usePrompt } from "../../context/PromptContext";
 
 const topics = [
   {

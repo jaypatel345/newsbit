@@ -33,11 +33,19 @@ export default function SignUpPage() {
         {/* Left Side - Branding */}
         <div className="hidden lg:block space-y-8">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-2xl font-semibold text-gray-900">
-                Newsbit
-              </span>
-            </div>
+            <Link href="/" className="flex items-center gap-3 mb-6 hover:opacity-95 transition-opacity">
+              <img
+                src="/newsbit_logo/logo_without_bg.png"
+                alt="Newsbit Logo"
+                className="h-7 w-7"
+              />
+              <div className="flex flex-col">
+                <span className="text-[17px] font-medium text-gray-900">
+                  Newsbit
+                </span>
+                <span className="text-[12px] text-gray-600">AI-Powered News</span>
+              </div>
+            </Link>
             <h1 className="text-4xl font-semibold text-gray-900 mb-4">
               Stay informed with AI-powered news summaries
             </h1>

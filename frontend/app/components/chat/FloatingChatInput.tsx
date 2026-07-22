@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { usePrompt } from "../context/PromptContext";
+import { usePrompt } from "../../context/PromptContext";
 
 export default function FloatingChatInput() {
   const [visible, setVisible] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 import { Suspense } from "react";
-import MessageList from "../components/MessageList";
-import PromptChips from "../components/PromptChips";
-import ChatInput from "../components/ChatInput";
+import MessageList from "@/app/components/chat/MessageList";
+import PromptChips from "@/app/components/chat/PromptChips";
+import ChatInput from "@/app/components/chat/ChatInput";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getNews } from "../services/newsApi";
+import { getNews } from "@/app/services/newsApi";
 import { Message } from "@/types/message";
 import { Article } from "@/types/article";
 

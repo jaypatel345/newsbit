@@ -3,3 +3,31 @@
 body {
   font-family: var(--font-geist), sans-serif;
 }
+
+@keyframes prompt-slide-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 0.375rem));
+  }
+}
+
+@keyframes prompt-slide-right {
+  from {
+    transform: translateX(calc(-50% - 0.375rem));
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-prompt-slide-left {
+  animation: prompt-slide-left 70s linear infinite;
+}
+
+.animate-prompt-slide-right {
+  animation: prompt-slide-right 70s linear infinite;
+}

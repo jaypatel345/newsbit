@@ -98,7 +98,7 @@ export default function HeroSection() {
       <div className="w-full max-w-225 px-6 sm:px-8 flex flex-col items-center justify-center animate-in fade-in duration-700">
         {/* Main Heading */}
         <h1
-          className="font-(family-name:--font-geist) text-6xl sm:text-7xl md:text-[70px] mb-12 tracking-tight leading-tight text-center whitespace-nowrap"
+          className="font-(family-name:--font-geist) text-6xl sm:text-7xl md:text-[63px] mb-12 tracking-tight leading-tight text-center whitespace-nowrap"
           style={{ color: "#1E1E1E" }}
         >
           News{" "}
@@ -120,7 +120,9 @@ export default function HeroSection() {
         <div className="w-full max-w-160 mb-8">
           <div
             className={`flex items-center gap-2 bg-white border rounded-2xl transition-all duration-300 ${
-              selectedPrompt ? "border-gray-400 bg-gray-50 scale-[1.02]" : "border-gray-200"
+              selectedPrompt
+                ? "border-gray-400 bg-gray-50 scale-[1.02]"
+                : "border-gray-200"
             } ${isFocused ? "shadow-lg" : "shadow-md"}`}
             style={{
               backgroundColor: selectedPrompt ? "#F9FAFB" : "#FFFFFF",
