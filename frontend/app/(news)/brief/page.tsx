@@ -3,7 +3,6 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import BriefHeader from "@/app/components/brief-preview/BriefHeader";
 import ExecutiveSummaryCard from "@/app/components/brief-preview/ExecutiveSummaryCard";
 import StoryCard from "@/app/components/brief-preview/StoryCard";
-import KeyTakeaways from "@/app/components/brief-preview/KeyTakeaways";
 import AskAICTA from "@/app/components/brief-preview/AskAICTA";
 
 export const metadata: Metadata = {
@@ -35,6 +34,8 @@ const mockStories = [
     whyItMatters:
       "This advancement could accelerate AI adoption in enterprise settings where complex decision-making is required, potentially transforming industries like healthcare, finance, and scientific research.",
     source: "TechCrunch",
+    sourceWebsite: "https://techcrunch.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 2,
@@ -46,6 +47,8 @@ const mockStories = [
     whyItMatters:
       "Lower interest rates typically boost economic activity by making borrowing cheaper, which could stimulate business investment and consumer spending in the coming months.",
     source: "Bloomberg",
+    sourceWebsite: "https://bloomberg.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 3,
@@ -57,6 +60,8 @@ const mockStories = [
     whyItMatters:
       "India's robust economic performance positions it as one of the world's fastest-growing major economies, attracting increased foreign investment and strengthening its global economic influence.",
     source: "Economic Times",
+    sourceWebsite: "https://economictimes.indiatimes.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 4,
@@ -68,6 +73,8 @@ const mockStories = [
     whyItMatters:
       "This agreement represents the most significant global climate action since the Paris Agreement, potentially setting the course for international environmental policy for the next decade.",
     source: "Reuters",
+    sourceWebsite: "https://reuters.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 5,
@@ -79,6 +86,8 @@ const mockStories = [
     whyItMatters:
       "This product could mainstream augmented reality technology, creating new opportunities for work, entertainment, and communication while potentially disrupting the smartphone market.",
     source: "The Verge",
+    sourceWebsite: "https://theverge.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 6,
@@ -90,6 +99,8 @@ const mockStories = [
     whyItMatters:
       "This discovery could provide a cost-effective tool for combating climate change, potentially making carbon capture viable for widespread industrial implementation.",
     source: "Nature",
+    sourceWebsite: "https://nature.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 7,
@@ -101,6 +112,8 @@ const mockStories = [
     whyItMatters:
       "The upset has captivated sports fans worldwide, demonstrating the unpredictable nature of competition and inspiring underdog stories across the sporting world.",
     source: "ESPN",
+    sourceWebsite: "https://espn.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 8,
@@ -112,6 +125,8 @@ const mockStories = [
     whyItMatters:
       "This agreement could reshape global trade patterns, potentially reducing economic tensions and creating new opportunities for businesses in both countries.",
     source: "Financial Times",
+    sourceWebsite: "https://ft.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 9,
@@ -123,6 +138,8 @@ const mockStories = [
     whyItMatters:
       "This breakthrough could dramatically reduce the time and cost of developing new medicines, potentially leading to treatments for currently incurable diseases.",
     source: "Science Daily",
+    sourceWebsite: "https://sciencedaily.com",
+    image: "/card_image.jpeg",
   },
   {
     storyNumber: 10,
@@ -134,6 +151,8 @@ const mockStories = [
     whyItMatters:
       "The rapid adoption of electric vehicles signals a significant shift in the automotive industry toward sustainable transportation, with implications for oil demand and manufacturing.",
     source: "Wall Street Journal",
+    sourceWebsite: "https://wsj.com",
+    image: "/card_image.jpeg",
   },
 ];
 
@@ -146,27 +165,41 @@ export default function BriefPage() {
           {/* Header */}
           <BriefHeader updatedTime="8:00 AM" storyCount={10} readTime="2 min" />
 
+          {/* Divider */}
+          <div className="mb-12 border-t border-gray-200"></div>
+
           {/* Executive Summary */}
           <ExecutiveSummaryCard />
 
+          {/* Divider */}
+          <div className="mb-12 border-t border-gray-200"></div>
+
+          {/* Top Stories Heading */}
+          <h2 className="text-3xl font-semibold mb-8" style={{ color: "#1E1E1E" }}>
+            Top Stories
+          </h2>
+
           {/* Story Cards */}
-          <div className="mb-12 space-y-6">
-            {mockStories.map((story) => (
-              <StoryCard
-                key={story.storyNumber}
-                storyNumber={story.storyNumber}
-                category={story.category}
-                headline={story.headline}
-                publishedTime={story.publishedTime}
-                summary={story.summary}
-                whyItMatters={story.whyItMatters}
-                source={story.source}
-              />
+          <div className="mb-12 rounded-3xl border border-gray-200 p-6">
+            {mockStories.map((story, index) => (
+              <div key={story.storyNumber}>
+                <StoryCard
+                  storyNumber={story.storyNumber}
+                  category={story.category}
+                  headline={story.headline}
+                  publishedTime={story.publishedTime}
+                  summary={story.summary}
+                  whyItMatters={story.whyItMatters}
+                  source={story.source}
+                  sourceWebsite={story.sourceWebsite}
+                  image={story.image}
+                />
+                {index < mockStories.length - 1 && (
+                  <div className="border-t border-gray-200"></div>
+                )}
+              </div>
             ))}
           </div>
-
-          {/* Key Takeaways */}
-          <KeyTakeaways />
 
           {/* Ask AI CTA */}
           <AskAICTA />

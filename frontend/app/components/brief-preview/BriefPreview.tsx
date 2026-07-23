@@ -5,7 +5,7 @@ export default function BriefPreview() {
   return (
     <section id="brief-preview" className="py-12">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 text-center">
         <h2 className="text-[30px] font-semibold text-gray-900 mb-3">
           Today&apos;s Brief
         </h2>

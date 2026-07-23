@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const topStories = [
   {
@@ -63,9 +64,9 @@ function getSourceLogoUrl(sourceWebsite: string) {
 
 export default function TodaysTopStories() {
   return (
-    <section className="py-12">
+    <section className="py-24">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 text-center">
         <h2 className="text-[30px] font-semibold text-gray-900 mb-4">
           Top Stories
         </h2>
@@ -75,7 +76,7 @@ export default function TodaysTopStories() {
       </div>
 
       {/* Stories Grid - 2 columns with 3 items each */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Left Column */}
         <div className="bg-white border border-gray-200 rounded-[2.5rem] p-6">
           {topStories.slice(0, 3).map((story, index) => (
@@ -108,34 +109,12 @@ export default function TodaysTopStories() {
                 </div>
 
                 {/* Image */}
-                <div className="flex w-32 flex-shrink-0 flex-col gap-2">
+                <div className="flex w-32 flex-shrink-0">
                   <img
                     src={story.image}
                     alt={story.headline}
                     className="w-32 h-24 object-cover rounded-lg"
                   />
-                  <Link
-                    href="/brief"
-                    className="flex items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-gray-600 hover:bg-gray-200 hover:text-gray-800"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m15 10 5 5-5 5" />
-                      <path d="M4 4v7a4 4 0 0 0 4 4h12" />
-                    </svg>
-                    <span className="text-xs font-medium whitespace-nowrap">
-                      See more
-                    </span>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -174,39 +153,28 @@ export default function TodaysTopStories() {
                 </div>
 
                 {/* Image */}
-                <div className="flex w-32 flex-shrink-0 flex-col gap-2">
+                <div className="flex w-32 flex-shrink-0">
                   <img
                     src={story.image}
                     alt={story.headline}
                     className="w-32 h-24 object-cover rounded-lg"
                   />
-                  <Link
-                    href="/brief"
-                    className="flex items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-gray-600 hover:bg-gray-200 hover:text-gray-800"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m15 10 5 5-5 5" />
-                      <path d="M4 4v7a4 4 0 0 0 4 4h12" />
-                    </svg>
-                    <span className="text-xs font-medium whitespace-nowrap">
-                      See more
-                    </span>
-                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* View All Button */}
+      <div className="text-center">
+        <Link
+          href="/brief"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+        >
+          View All Top Stories
+          <ArrowRight size={16} />
+        </Link>
       </div>
     </section>
   );

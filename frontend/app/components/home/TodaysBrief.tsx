@@ -14,7 +14,7 @@ const categories = [
 
 export default function TodaysBrief() {
   return (
-    <section id="todays-brief" className="py-20 bg-white">
+    <section id="todays-brief" className="py-24 bg-white">
       <div className="max-w-300 mx-auto px-6 sm:px-8">
         {/* Header */}
         <div className="mb-12">

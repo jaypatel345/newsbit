@@ -2,9 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Bell, ChevronDown } from "lucide-react";
 
+const navLinks = [
+  { href: "/brief", label: "Today's Brief" },
+  { href: "/explore/world", label: "Explore" },
+  { href: "/chat", label: "Ask AI" },
+];
+
 export default function NavigationBar() {
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -20,7 +28,7 @@ export default function NavigationBar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white ">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between ">
         {/* LEFT - Logo */}
         <Link
@@ -44,20 +52,20 @@ export default function NavigationBar() {
 
         {/* CENTER - Navigation Links */}
         <div className="flex items-center gap-8">
-          <a
-            href="#todays-brief"
-            onClick={(e) => handleScrollToSection(e, "todays-brief")}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-          >
-            Today's Brief
-          </a>
-          <a
-            href="#explore"
-            onClick={(e) => handleScrollToSection(e, "explore")}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-          >
-            Explore
-          </a>
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors ${
+                  isActive ? "text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* RIGHT - Account Actions */}

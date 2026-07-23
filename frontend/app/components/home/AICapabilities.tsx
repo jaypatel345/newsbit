@@ -23,7 +23,7 @@ const prompts = [
 ];
 
 const promptRows = Array.from({ length: 4 }, (_, rowIndex) =>
-  prompts.slice(rowIndex * 4, rowIndex * 4 + 4)
+  prompts.slice(rowIndex * 4, rowIndex * 4 + 4),
 );
 
 export default function AICapabilities() {
@@ -46,10 +46,10 @@ export default function AICapabilities() {
   };
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-24 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="mb-8 max-w-3xl">
+        <div className="mb-8 max-w-3xl mx-auto text-center">
           <h2 className="text-[30px] font-semibold text-gray-900 mb-4">
             Ask Newsbit anything.
           </h2>
@@ -76,7 +76,7 @@ export default function AICapabilities() {
                     key={`${rowIndex}-${promptIndex}`}
                     type="button"
                     onClick={() => sendPrompt(prompt)}
-                    className="w-64 flex-shrink-0 rounded-[2.5rem] border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    className="w-64 shrink-0 rounded-[2.5rem] border border-gray-200 bg-white px-6 py-4 text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
                   >
                     <span className="block truncate">{prompt}</span>
                   </button>

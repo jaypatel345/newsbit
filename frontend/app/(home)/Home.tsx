@@ -8,7 +8,6 @@ import ProductDemo from "@/app/components/home/ProductDemo";
 import ExploreByTopic from "@/app/components/home/ExploreByTopic";
 import AICapabilities from "@/app/components/home/AICapabilities";
 import TrustTransparency from "@/app/components/home/TrustTransparency";
-import FinalCTA from "@/app/components/home/FinalCTA";
 import Footer from "@/app/components/layout/Footer";
 import { PromptProvider } from "@/app/context/PromptContext";
 
@@ -24,15 +23,15 @@ export default function Home() {
           <BriefPreview />
           <TodaysTopStories />
           <TopicsSection />
-          <AICapabilities />
-        </div>
 
-        {/* <ProductDemo /> */}
-        {/* <ExploreByTopic /> */}
+          <ExploreByTopic />
+          <AICapabilities />
+          <ProductDemo />
+        </div>
 
         {/* <WhyNewsbit /> */}
         {/* <TrustTransparency /> */}
-        {/* <FinalCTA /> */}
+
         <Footer />
       </div>
     </PromptProvider>

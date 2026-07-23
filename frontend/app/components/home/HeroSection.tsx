@@ -32,7 +32,7 @@ export default function HeroSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPromptIndex((prev) => (prev + 1) % examplePrompts.length);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(interval);
   }, []);
 
@@ -140,7 +140,7 @@ export default function HeroSection() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onKeyDown={handleKeyDown}
-              className="flex-1 h-14 px-6 bg-transparent text-base text-black focus:outline-none transition-all duration-300 placeholder:text-gray-400"
+              className="flex-1 h-14 px-6 bg-transparent text-base text-black focus:outline-none transition-all duration-300 placeholder:text-gray-400 "
             />
             <button
               onClick={handleSend}

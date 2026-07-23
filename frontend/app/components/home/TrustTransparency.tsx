@@ -28,7 +28,7 @@ const trustItems = [
 
 export default function TrustTransparency() {
   return (
-    <section className="py-28 bg-white">
+    <section className="py-24 bg-white">
       <div className="max-w-300 mx-auto px-6 sm:px-8">
         {/* Header */}
         <div className="text-center mb-16">
