@@ -14,7 +14,7 @@ import { PromptProvider } from "@/app/context/PromptContext";
 export default function Home() {
   return (
     <PromptProvider>
-      <div className="min-h-screen bg-white text-black">
+      <div className="min-h-screen bg-white text-black overflow-x-hidden">
         <NavigationBar />
 
         {/* Common centered container for Today's Brief, Top Stories, and Topics */}

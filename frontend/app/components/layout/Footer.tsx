@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-100 pt-24 pb-6">
-      <div className="max-w-300 mx-auto px-6 sm:px-8">
+    <footer className="bg-gray-100 pt-16 sm:pt-20 md:pt-24 pb-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-12 sm:mb-16">
           {/* Left Section */}
           <div className="md:col-span-1">
             <img
@@ -177,12 +177,12 @@ export default function Footer() {
       <div className="" />
 
       {/* Bottom Row - Full Width */}
-      <div className="max-w-300 mx-auto px-6 sm:px-8 mt-5">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-5">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+          <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
             © 2026 Newsbit. All rights reserved.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-right">
             Built with AI • Made for curious readers
           </p>
         </div>

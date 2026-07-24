@@ -59,17 +59,17 @@ export default function ExploreByTopic() {
   };
 
   return (
-    <section id="explore" className="py-24 bg-white">
-      <div className="max-w-300 mx-auto px-6 sm:px-8">
+    <section id="explore" className="py-16 sm:py-20 md:py-24 bg-white">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h2 className="text-[30px] font-semibold text-gray-900 mb-4">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
             Chat by Topic
           </h2>
-          <p className="text-[16px] text-gray-600 mb-4">
+          <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600 mb-3 sm:mb-4">
             Choose a topic. Start a conversation.
           </p>
-          <p className="text-[16px] text-gray-600">
+          <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600">
             Select a news topic and ask AI anything about the latest stories.
             Newsbit will automatically use that topic as the conversation
             context.
@@ -77,29 +77,29 @@ export default function ExploreByTopic() {
         </div>
 
         {/* Topic Grid */}
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {topics.map((topic, index) => (
             <button
               key={index}
               onClick={() => handleTopicClick(topic.title)}
-              className="group bg-white border border-gray-200 rounded-3xl p-6 cursor-pointer text-left"
+              className="group bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer text-left"
             >
               {/* Title */}
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                 {topic.title}
               </h3>
 
               {/* Example Question */}
-              <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+              <p className="text-xs sm:text-sm text-gray-500 mb-3 line-clamp-2">
                 {topic.question}
               </p>
 
               {/* Open Chat */}
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">{topic.time}</span>
-                <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors duration-200">
+                <span className="text-[11px] sm:text-xs text-gray-400">{topic.time}</span>
+                <div className="flex items-center text-blue-600 text-xs sm:text-sm font-medium group-hover:text-blue-700 transition-colors duration-200">
                   Open Chat
-                  <ArrowRight size={16} className="ml-1" />
+                  <ArrowRight size={16} className="ml-1 w-4 h-4 sm:w-4 sm:h-4" />
                 </div>
               </div>
             </button>

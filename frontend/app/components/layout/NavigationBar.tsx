@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, Menu, X } from "lucide-react";
 
 const navLinks = [
   { href: "/brief", label: "Today's Brief" },
@@ -15,6 +15,7 @@ export default function NavigationBar() {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleScrollToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -29,29 +30,29 @@ export default function NavigationBar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* LEFT - Logo */}
         <Link
           href="/"
           className="flex items-center hover:opacity-95 transition-opacity"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <img
               src="/newsbit_logo/logo_without_bg.png"
               alt="Newsbit Logo"
-              className="h-7 w-7"
+              className="h-6 w-6 sm:h-7 sm:w-7"
             />
             <div className="flex flex-col">
-              <span className="text-[17px] font-medium text-gray-900">
+              <span className="text-[15px] sm:text-[17px] font-medium text-gray-900">
                 Newsbit
               </span>
-              <span className="text-[12px] text-gray-600">AI-Powered News</span>
+              <span className="text-[11px] sm:text-[12px] text-gray-600 hidden sm:block">AI-Powered News</span>
             </div>
           </div>
         </Link>
 
         {/* CENTER - Navigation Links */}
-        <div className="flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6 lg:gap-8">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -69,18 +70,26 @@ export default function NavigationBar() {
         </div>
 
         {/* RIGHT - Account Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
           {!isLoggedIn ? (
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="hidden sm:block px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
+                className="px-3 py-2 sm:px-4 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
               >
                 Sign Up
               </Link>
@@ -139,6 +148,40 @@ export default function NavigationBar() {
           )}
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="px-4 py-4 space-y-3">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors ${
+                    isActive ? "text-gray-900 bg-gray-100" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            {!isLoggedIn && (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

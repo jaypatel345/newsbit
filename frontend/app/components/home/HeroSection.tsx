@@ -61,11 +61,11 @@ export default function HeroSection() {
   };
 
   return (
-    <main className="min-h-[85vh] flex items-center justify-center pt-16 bg-white">
-      <div className="w-full max-w-225 px-6 sm:px-8 flex flex-col items-center justify-center animate-in fade-in duration-700">
+    <main className="min-h-[85vh] flex items-center justify-center pt-16 bg-white overflow-x-hidden">
+      <div className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-225 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center animate-in fade-in duration-700">
         {/* Main Heading */}
         <h1
-          className="font-(family-name:--font-geist) text-6xl sm:text-7xl md:text-[63px] mb-12 tracking-tight leading-tight text-center whitespace-nowrap"
+          className="font-(family-name:--font-geist) text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[63px] mb-8 sm:mb-10 lg:mb-12 tracking-tight leading-tight text-center"
           style={{ color: "#1E1E1E" }}
         >
           News{" "}
@@ -77,14 +77,14 @@ export default function HeroSection() {
 
         {/* Supporting Text */}
         <p
-          className="text-lg text-center max-w-2xl mb-3 leading-relaxed"
+          className="text-base sm:text-lg text-center max-w-2xl mb-3 leading-relaxed"
           style={{ color: "#5B4C3A" }}
         >
           Think deeper. Read smarter. Stay informed.
         </p>
 
         {/* AI Prompt Input */}
-        <div className="w-full max-w-160 mb-8">
+        <div className="w-full max-w-160 mb-6 sm:mb-8">
           <div
             className={`flex items-center gap-2 bg-white border rounded-2xl transition-all duration-300 ${
               selectedPrompt
@@ -107,12 +107,12 @@ export default function HeroSection() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onKeyDown={handleKeyDown}
-              className="flex-1 h-14 px-6 bg-transparent text-base text-black focus:outline-none transition-all duration-300 placeholder:text-gray-400 "
+              className="flex-1 h-12 sm:h-14 px-4 sm:px-6 bg-transparent text-sm sm:text-base text-black focus:outline-none transition-all duration-300 placeholder:text-gray-400 "
             />
             <button
               onClick={handleSend}
               disabled={!inputValue.trim()}
-              className={`mr-2 w-9 h-9 rounded-full transition-all duration-300 flex items-center justify-center ${
+              className={`mr-1 sm:mr-2 w-9 h-9 rounded-full transition-all duration-300 flex items-center justify-center ${
                 inputValue.trim()
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-100 text-gray-400 hover:bg-gray-200"
@@ -124,13 +124,13 @@ export default function HeroSection() {
         </div>
 
         {/* Popular Questions */}
-        <div className="w-full max-w-200 mb-12">
-          <div className="flex flex-wrap gap-3 justify-center">
+        <div className="w-full max-w-200 mb-8 sm:mb-12">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             {popularQuestions.map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleChipClick(question)}
-                className={`px-5 py-3 rounded-3xl text-sm font-medium cursor-pointer border border-gray-200  bg-white transition-all duration-200 active:scale-95  hover:bg-gray-50/90 ${
+                className={`px-4 py-2.5 sm:px-5 sm:py-3 rounded-3xl text-xs sm:text-sm font-medium cursor-pointer border border-gray-200  bg-white transition-all duration-200 active:scale-95  hover:bg-gray-50/90 ${
                   selectedPrompt === question ? "scale-[1.03]" : "scale-100"
                 }`}
                 // style={{

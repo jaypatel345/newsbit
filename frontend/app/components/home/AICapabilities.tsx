@@ -46,14 +46,14 @@ export default function AICapabilities() {
   };
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-16 sm:py-20 md:py-24 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="mb-8 max-w-3xl mx-auto text-center">
-          <h2 className="text-[30px] font-semibold text-gray-900 mb-4">
+        <div className="mb-6 sm:mb-8 max-w-3xl mx-auto text-center">
+          <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
             Ask Newsbit anything.
           </h2>
-          <p className="text-[16px] text-gray-600">
+          <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600">
             Go beyond reading the news. Ask follow-up questions, compare
             perspectives, understand context, and explore stories through
             conversation.
@@ -61,7 +61,7 @@ export default function AICapabilities() {
         </div>
 
         {/* Prompt Suggestions */}
-        <div className="mb-8 space-y-3 overflow-hidden">
+        <div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3 overflow-hidden">
           {promptRows.map((row, rowIndex) => (
             <div key={rowIndex} className="overflow-hidden">
               <div
@@ -76,7 +76,7 @@ export default function AICapabilities() {
                     key={`${rowIndex}-${promptIndex}`}
                     type="button"
                     onClick={() => sendPrompt(prompt)}
-                    className="w-64 shrink-0 rounded-[2.5rem] border border-gray-200 bg-white px-6 py-4 text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                    className="w-40 sm:w-48 md:w-56 lg:w-64 shrink-0 rounded-[2rem] sm:rounded-[2.5rem] border border-gray-200 bg-white px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 text-center text-[11px] sm:text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
                   >
                     <span className="block truncate">{prompt}</span>
                   </button>
@@ -88,10 +88,10 @@ export default function AICapabilities() {
 
         {/* Bottom CTA */}
         <div className="text-center">
-          <p className="text-[16px] text-gray-600 mb-4">
+          <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600 mb-3 sm:mb-4">
             Or ask your own question.
           </p>
-          <div className="w-full max-w-160 mx-auto">
+          <div className="w-full max-w-160 mx-auto px-2 sm:px-0">
             <div
               className={`flex items-center gap-2 rounded-2xl border bg-white shadow-md ${
                 isFocused ? "border-gray-300 shadow-lg" : "border-gray-200"
@@ -105,7 +105,7 @@ export default function AICapabilities() {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={handleKeyDown}
-                className="h-14 flex-1 bg-transparent px-6 text-base text-black placeholder:text-gray-400 focus:outline-none"
+                className="h-12 sm:h-14 flex-1 bg-transparent px-4 sm:px-6 text-sm sm:text-base text-black placeholder:text-gray-400 focus:outline-none"
               />
               <button
                 type="button"

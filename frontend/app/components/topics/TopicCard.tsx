@@ -8,13 +8,13 @@ interface TopicCardProps {
 
 export default function TopicCard({ topic }: TopicCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-6">
+    <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
       {/* Header: Name with Arrow */}
       <Link
         href={`/explore/${topic.id}`}
-        className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-200 group"
+        className="flex items-center gap-2 mb-4 sm:mb-5 pb-3 border-b border-gray-200 group"
       >
-        <h3 className="text-[19px] font-semibold text-gray-900">
+        <h3 className="text-[17px] sm:text-[18px] md:text-[19px] font-semibold text-gray-900">
           {topic.name}
         </h3>
         <svg
@@ -29,7 +29,7 @@ export default function TopicCard({ topic }: TopicCardProps) {
       </Link>
 
       {/* Articles List */}
-      <div className="space-y-1">
+      <div className="space-y-0.5 sm:space-y-1">
         {topic.articles.map((article) => (
           <TopicArticle key={article.id} article={article} />
         ))}

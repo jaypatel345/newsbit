@@ -13,18 +13,18 @@ export default function TopicArticle({ article }: TopicArticleProps) {
   return (
     <Link
       href={`/article/${article.id}`}
-      className="group flex items-start gap-3 py-3 px-2 -mx-2 rounded-lg focus:outline-none"
+      className="group flex items-start gap-2 sm:gap-3 py-2.5 sm:py-3 px-2 -mx-2 rounded-lg focus:outline-none"
     >
       <div className="min-w-0 flex-1">
-        <h4 className="text-[16px] font-medium text-gray-900 mb-1 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
+        <h4 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-1 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
           {article.headline}
         </h4>
-        <div className="flex min-w-0 items-center gap-2 text-[13px] text-gray-500">
-          <span className="flex min-w-0 items-center gap-1.5 font-medium text-gray-700">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2 text-[11px] sm:text-[12px] md:text-[13px] text-gray-500">
+          <span className="flex min-w-0 items-center gap-1 sm:gap-1.5 font-medium text-gray-700">
             <img
               src={getSourceLogoUrl(article.sourceWebsite)}
               alt=""
-              className="h-4 w-4 shrink-0 rounded-full object-cover"
+              className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 rounded-full object-cover"
             />
             <span className="truncate">{article.source}</span>
           </span>
@@ -32,12 +32,12 @@ export default function TopicArticle({ article }: TopicArticleProps) {
           <span className="shrink-0">{article.time}</span>
         </div>
         {article.author && (
-          <p className="text-[13px] text-gray-400 mt-1">{article.author}</p>
+          <p className="text-[11px] sm:text-[12px] md:text-[13px] text-gray-400 mt-1">{article.author}</p>
         )}
       </div>
       <span
         aria-hidden="true"
-        className="h-16 w-16 shrink-0 rounded-md bg-cover bg-center"
+        className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-md bg-cover bg-center"
         style={{ backgroundImage: `url(${article.image})` }}
       />
     </Link>
