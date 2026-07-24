@@ -1,17 +1,18 @@
+"use client";
+import { useTodaySummary } from "@/app/hooks/useTodaySummary";
+
 interface ExecutiveSummaryCardProps {
   summary?: string[];
 }
 
-export default function ExecutiveSummaryCard({
-  summary = [
-    "Today's news landscape is dominated by significant developments across technology, business, and global affairs.",
-    "The technology sector saw major announcements from leading AI companies, with breakthrough innovations in machine learning and natural language processing capturing investor attention.",
-    "Markets responded positively to these developments, with tech stocks leading gains across major indices.",
-    "In India, economic indicators showed strong performance, with manufacturing and services sectors contributing to robust GDP growth.",
-    "On the global stage, climate discussions intensified as world leaders gathered to discuss carbon reduction targets, while sports delivered unexpected outcomes that reshaped tournament standings.",
-    "Scientific breakthroughs in carbon capture technology offered promising solutions for environmental challenges, marking a significant step forward in sustainable innovation.",
-  ],
-}: ExecutiveSummaryCardProps) {
+export default function ExecutiveSummaryCard() {
+  const { data, isLoading, error } = useTodaySummary();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Something went wrong.</div>;
+  }
   return (
     <div
       className="mb-12 rounded-2xl p-8 shadow-sm"
@@ -37,7 +38,7 @@ export default function ExecutiveSummaryCard({
 
       {/* Summary Text - Bullet Points */}
       <ul className="text-gray-700 text-sm leading-relaxed space-y-2.5">
-        {summary.map((point, index) => (
+        {data?.summary.map((point, index) => (
           <li key={index} className="flex items-start gap-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"

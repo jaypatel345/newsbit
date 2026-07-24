@@ -8,7 +8,7 @@ interface TopicCardProps {
 
 export default function TopicCard({ topic }: TopicCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-[2.5rem] p-6">
+    <div className="bg-white border border-gray-200 rounded-3xl p-6">
       {/* Header: Name with Arrow */}
       <Link
         href={`/explore/${topic.id}`}

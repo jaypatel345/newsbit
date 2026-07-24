@@ -1,65 +1,17 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getTopStories } from "@/app/services/news.service";
+import { formatDistanceToNow } from "date-fns";
 
-const topStories = [
-  {
-    id: 1,
-    source: "India Today",
-    sourceWebsite: "https://www.indiatoday.in",
-    headline: "How a bloodied Rahul Gandhi gave Congress the image it wanted",
-    time: "6 hours ago",
-    author: "By Abhishek De",
-    image: "https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=400&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    source: "ICC",
-    sourceWebsite: "https://www.icc-cricket.com",
-    headline: "India trio close in on top ranking as England stars make gains",
-    time: "4 hours ago",
-    author: null,
-    image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    source: "The Times of India",
-    sourceWebsite: "https://timesofindia.indiatimes.com",
-    headline: "Running on rollovers: Pakistan's reserves get $27 billion foreign loans from Saudi, China",
-    time: "1 hour ago",
-    author: null,
-    image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=300&fit=crop",
-  },
-  {
-    id: 4,
-    source: "Bar and Bench",
-    sourceWebsite: "https://www.barandbench.com",
-    headline: "Supreme Court refuses to stay Speaker Om Birla's decision to clear Uddhav Sena MPs' merger with Shinde Sena",
-    time: "6 hours ago",
-    author: "By Ritwik Choudhury",
-    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop",
-  },
-  {
-    id: 5,
-    source: "blog.google",
-    sourceWebsite: "https://blog.google",
-    headline: "Introducing Gemini 3.6 Flash, 3.5 Flash-Lite, and 3.5 Flash Cyber",
-    time: "21 hours ago",
-    author: "By Tulsee Doshi",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop",
-  },
-  {
-    id: 6,
-    source: "Al Jazeera",
-    sourceWebsite: "https://www.aljazeera.com",
-    headline: "India protest: How Modi's refusal to sack education minister fits a pattern",
-    time: "8 hours ago",
-    author: null,
-    image: "https://images.unsplash.com/photo-1569163139599-0f4517e36f51?w=400&h=300&fit=crop",
-  },
-];
+const topStories = await getTopStories();
 
 function getSourceLogoUrl(sourceWebsite: string) {
   return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(sourceWebsite)}&sz=64`;
+}
+export function getRelativeTime(dateString: string) {
+  return formatDistanceToNow(new Date(dateString), {
+    addSuffix: true,
+  });
 }
 
 export default function TodaysTopStories() {
@@ -78,41 +30,52 @@ export default function TodaysTopStories() {
       {/* Stories Grid - 2 columns with 3 items each */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Left Column */}
-        <div className="bg-white border border-gray-200 rounded-[2.5rem] p-6">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6">
           {topStories.slice(0, 3).map((story, index) => (
-            <div key={story.id} className={`${index !== 2 ? 'pb-6 border-b border-gray-100 mb-6' : ''}`}>
+            <div
+              key={story.id}
+              className={`${index !== 2 ? "pb-6 border-b border-gray-100 mb-6" : ""}`}
+            >
               <div className="flex gap-4">
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Source */}
-                  <p className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-900">
+                  <p className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-900 ">
                     <img
-                      src={getSourceLogoUrl(story.sourceWebsite)}
+                      src={getSourceLogoUrl(story.domain)}
                       alt=""
                       className="h-5 w-5 rounded-full object-cover"
                     />
-                    {story.source}
+
+                    {story.source_name}
                   </p>
 
                   {/* Headline */}
                   <Link href="/brief" className="block">
                     <h3 className="text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                      {story.headline}
+                      {story.title}
                     </h3>
                   </Link>
 
                   {/* Time and Author */}
                   <div className="flex items-center gap-2 text-[12px] text-gray-500">
-                    <span>{story.time}</span>
-                    {story.author && <span>• {story.author}</span>}
+                    <span className="shrink-0">
+                      {getRelativeTime(story.published_at)}
+                    </span>
+
+                    {story.author && (
+                      <span className="max-w-40 truncate" title={story.author}>
+                        • {story.author}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Image */}
-                <div className="flex w-32 flex-shrink-0">
+                <div className="flex w-32 shrink-0">
                   <img
-                    src={story.image}
-                    alt={story.headline}
+                    src={story.image_url}
+                    alt={story.summary}
                     className="w-32 h-24 object-cover rounded-lg"
                   />
                 </div>
@@ -124,39 +87,42 @@ export default function TodaysTopStories() {
         {/* Right Column */}
         <div className="bg-white border border-gray-200 rounded-[2.5rem] p-6">
           {topStories.slice(3, 6).map((story, index) => (
-            <div key={story.id} className={`${index !== 2 ? 'pb-6 border-b border-gray-100 mb-6' : ''}`}>
+            <div
+              key={story.id}
+              className={`${index !== 2 ? "pb-6 border-b border-gray-100 mb-6" : ""}`}
+            >
               <div className="flex gap-4">
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Source */}
                   <p className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-900">
                     <img
-                      src={getSourceLogoUrl(story.sourceWebsite)}
+                      src={getSourceLogoUrl(story.domain)}
                       alt=""
                       className="h-5 w-5 rounded-full object-cover"
                     />
-                    {story.source}
+                    {story.source_name}
                   </p>
 
                   {/* Headline */}
                   <Link href="/brief" className="block">
                     <h3 className="text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                      {story.headline}
+                      {story.title}
                     </h3>
                   </Link>
 
                   {/* Time and Author */}
                   <div className="flex items-center gap-2 text-[12px] text-gray-500">
-                    <span>{story.time}</span>
+                    <span>{getRelativeTime(story.published_at)}</span>
                     {story.author && <span>• {story.author}</span>}
                   </div>
                 </div>
 
                 {/* Image */}
-                <div className="flex w-32 flex-shrink-0">
+                <div className="flex w-32 shrink-0">
                   <img
-                    src={story.image}
-                    alt={story.headline}
+                    src={story.image_url}
+                    alt={story.url}
                     className="w-32 h-24 object-cover rounded-lg"
                   />
                 </div>

@@ -36,40 +36,7 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  const playClickSound = () => {
-    try {
-      const AudioContextCtor =
-        window.AudioContext ||
-        (
-          window as Window &
-            typeof globalThis & { webkitAudioContext?: typeof AudioContext }
-        ).webkitAudioContext;
-
-      if (!AudioContextCtor) return;
-
-      const audioContext = new AudioContextCtor();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      const now = audioContext.currentTime;
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(2200, now);
-      oscillator.frequency.exponentialRampToValueAtTime(900, now + 0.018);
-      gainNode.gain.setValueAtTime(0.045, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.018);
-
-      oscillator.start(now);
-      oscillator.stop(now + 0.02);
-    } catch {
-      // Audio is optional; unsupported browsers should still select the prompt.
-    }
-  };
-
   const handleChipClick = (question: string) => {
-    playClickSound();
     if (navigator.vibrate) {
       navigator.vibrate(10);
     }
@@ -123,7 +90,7 @@ export default function HeroSection() {
               selectedPrompt
                 ? "border-gray-400 bg-gray-50 scale-[1.02]"
                 : "border-gray-200"
-            } ${isFocused ? "shadow-lg" : "shadow-md"}`}
+            } ${isFocused ? "shadow-lg" : "shadow-2xs"}`}
             style={{
               backgroundColor: selectedPrompt ? "#F9FAFB" : "#FFFFFF",
             }}
@@ -163,14 +130,14 @@ export default function HeroSection() {
               <button
                 key={index}
                 onClick={() => handleChipClick(question)}
-                className={`px-5 py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 active:scale-95 ${
+                className={`px-5 py-3 rounded-3xl text-sm font-medium cursor-pointer border border-gray-200  bg-white transition-all duration-200 active:scale-95  hover:bg-gray-50/90 ${
                   selectedPrompt === question ? "scale-[1.03]" : "scale-100"
                 }`}
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  border: "1px solid #E5E7EB",
-                  color: "#1E1E1E",
-                }}
+                // style={{
+                //   backgroundColor: "#FFFFFF",
+                //   border: "1px solid #E5E7EB",
+                //   color: "#1E1E1E",
+                // }}
               >
                 {question}
               </button>
@@ -179,7 +146,7 @@ export default function HeroSection() {
         </div>
 
         {/* Bottom Metadata */}
-        <div
+        {/* <div
           className="flex items-center gap-2 text-sm"
           style={{ color: "#5B4C3A" }}
         >
@@ -190,7 +157,7 @@ export default function HeroSection() {
           <span>Updated 5 minutes ago</span>
           <span style={{ color: "#8A6A3F" }}>•</span>
           <span>100+ articles analyzed today</span>
-        </div>
+        </div> */}
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -103,10 +104,7 @@ export default function RootLayout({
   };
 
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geist.variable} h-full antialiased`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script
@@ -114,7 +112,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

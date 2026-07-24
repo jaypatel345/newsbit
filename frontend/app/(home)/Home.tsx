@@ -16,10 +16,10 @@ export default function Home() {
     <PromptProvider>
       <div className="min-h-screen bg-white text-black">
         <NavigationBar />
-        <HeroSection />
 
         {/* Common centered container for Today's Brief, Top Stories, and Topics */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <HeroSection />
           <BriefPreview />
           <TodaysTopStories />
           <TopicsSection />

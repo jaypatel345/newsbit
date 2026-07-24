@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, func
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from app.db.database import Base
 
 
 class Article(Base):
@@ -14,11 +12,14 @@ class Article(Base):
     content = Column(Text)
 
     summary = Column(Text)
+    why_it_matters = Column(Text, nullable=True)
 
     author = Column(Text)
+    category = Column(String(100), nullable=True)
 
     source_id = Column(String(100))
     source_name = Column(String(255))
+    source_url = Column(Text)
 
     url = Column(String(500), unique=True)
     image_url = Column(String(500))

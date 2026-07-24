@@ -70,7 +70,9 @@ export default function ExploreByTopic() {
             Choose a topic. Start a conversation.
           </p>
           <p className="text-[16px] text-gray-600">
-            Select a news topic and ask AI anything about the latest stories. Newsbit will automatically use that topic as the conversation context.
+            Select a news topic and ask AI anything about the latest stories.
+            Newsbit will automatically use that topic as the conversation
+            context.
           </p>
         </div>
 
@@ -80,7 +82,7 @@ export default function ExploreByTopic() {
             <button
               key={index}
               onClick={() => handleTopicClick(topic.title)}
-              className="group bg-white border border-gray-200 rounded-2xl p-6 cursor-pointer text-left"
+              className="group bg-white border border-gray-200 rounded-3xl p-6 cursor-pointer text-left"
             >
               {/* Title */}
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -97,10 +99,7 @@ export default function ExploreByTopic() {
                 <span className="text-xs text-gray-400">{topic.time}</span>
                 <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors duration-200">
                   Open Chat
-                  <ArrowRight
-                    size={16}
-                    className="ml-1"
-                  />
+                  <ArrowRight size={16} className="ml-1" />
                 </div>
               </div>
             </button>

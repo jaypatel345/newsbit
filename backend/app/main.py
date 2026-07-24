@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api.v1.news import router as news_router
 from app.core.config import settings
+from .api.v1.admin_news import router as admin_news_router
 
 
 @asynccontextmanager
@@ -21,6 +22,7 @@ app = FastAPI(
 )
 
 app.include_router(news_router)
+app.include_router(admin_news_router)
 
 app.add_middleware(
     CORSMiddleware,
