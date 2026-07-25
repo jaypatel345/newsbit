@@ -1,7 +1,10 @@
-import { topicsData } from "../../data/topicsData";
+"use client";
+import { useCategories } from "@/app/hooks/useCategories";
 import TopicCard from "./TopicCard";
 
 export default function TopicsSection() {
+  const { data: categories, isLoading, error } = useCategories();
+
   return (
     <section className="py-8 sm:py-12">
       {/* Header */}
@@ -15,11 +18,21 @@ export default function TopicsSection() {
       </div>
 
       {/* Topics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {topicsData.map((topic) => (
-          <TopicCard key={topic.id} topic={topic} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600">Loading categories...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-600">Error loading categories</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {categories?.map((category: string) => (
+            <TopicCard key={category} category={category} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

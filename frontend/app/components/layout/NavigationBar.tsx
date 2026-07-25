@@ -7,7 +7,7 @@ import { Bell, ChevronDown, Menu, X } from "lucide-react";
 
 const navLinks = [
   { href: "/brief", label: "Today's Brief" },
-  { href: "/explore/world", label: "Explore" },
+  { href: "/explore", label: "Explore" },
   { href: "/chat", label: "Ask AI" },
 ];
 

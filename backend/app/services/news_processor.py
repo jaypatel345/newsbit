@@ -1,0 +1,105 @@
+from typing import List, Dict
+from app.services.llm_service import LLMService
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from datetime import datetime
+import logging
+
+from app.models.article import Article
+
+logger = logging.getLogger(__name__)
+
+
+def clean_title(title: str) -> str:
+    if " - " in title:
+        return title.rsplit(" - ", 1)[0]
+    return title
+
+
+class NewsProcessor:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.llm_service = LLMService()
+
+    async def process_articles(self, articles: List[Dict], source_type: str):
+        """
+        Unified pipeline for processing fetched articles.
+        Responsibilities:
+        1. Validate article data
+        2. Detect duplicates
+        3. Generate AI summary
+        4. Save article
+        5. Return processed articles
+        """
+        new_articles = []
+        saved_articles = []
+
+        for article in articles:
+            url = article.get("url")
+            if not url:
+                continue
+            db_result = await self.db.execute(select(Article).where(Article.url == url))
+            existing_article = db_result.scalar_one_or_none()
+
+            if existing_article:
+                continue
+
+            new_articles.append(article)
+
+            # 2. Call LLMService
+            try:
+                summary_result = await self.llm_service.generate_summary(article)
+            except Exception:
+                continue
+
+            article["summary"] = summary_result["summary"]
+            article["why_it_matters"] = summary_result["why_it_matters"]
+            article["category"] = summary_result["category"]
+            published_at_str = article.get("publishedAt")
+
+            if not published_at_str:
+                continue
+
+            published_at = datetime.fromisoformat(
+                published_at_str.replace("Z", "+00:00")
+            )
+
+            # 3. Save articles
+
+            db_article = Article(
+                title=clean_title(article["title"]),
+                url=article["url"],
+                content=article.get("content"),
+                author=article.get("author"),
+                source_id=article.get("source", {}).get("id"),
+                source_name=article.get("source", {}).get("name"),
+                image_url=article.get("image"),
+                description=article.get("description"),
+                summary=article.get("summary"),
+                why_it_matters=article.get("why_it_matters"),
+                category=article.get("category"),
+                published_at=published_at,
+                source_url=article.get("source", {}).get("url"),
+            )
+
+            self.db.add(db_article)
+
+            saved_articles.append(db_article)
+
+            logger.info(
+                "Processed %d articles, %d new",
+                len(articles),
+                len(new_articles),
+            )
+
+        if saved_articles:
+            try:
+                await self.db.commit()
+            except Exception:
+                await self.db.rollback()
+                raise
+
+        for article in saved_articles:
+            await self.db.refresh(article)
+
+        return saved_articles
