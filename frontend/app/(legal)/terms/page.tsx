@@ -3,11 +3,22 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Newsbit",
+  title: "Terms of Service - Newsbit AI",
   description: "Terms and conditions for using Newsbit.",
+  keywords: ["terms of service", "terms and conditions", "newsbit terms", "legal terms"],
   openGraph: {
-    title: "Terms of Service - Newsbit",
+    title: "Terms of Service - Newsbit AI",
     description: "Terms and conditions for using Newsbit.",
+    url: "https://www.newsbit.in/terms",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "Terms of Service - Newsbit AI",
+    description: "Terms and conditions for using Newsbit.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/terms",
   },
 };
 

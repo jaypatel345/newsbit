@@ -4,11 +4,26 @@ import Footer from "@/app/components/layout/Footer";
 import FeedbackForm from "./FeedbackForm";
 
 export const metadata: Metadata = {
-  title: "Feedback - Newsbit",
+  title: "Feedback - Newsbit AI",
   description: "Share your feedback with Newsbit to help us improve.",
+  keywords: ["feedback", "newsbit feedback", "user feedback", "suggestions"],
   openGraph: {
-    title: "Feedback - Newsbit",
+    title: "Feedback - Newsbit AI",
     description: "Share your feedback with Newsbit to help us improve.",
+    url: "https://www.newsbit.in/feedback",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "Feedback - Newsbit AI",
+    description: "Share your feedback with Newsbit to help us improve.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/feedback",
+  },
+  robots: {
+    index: false,
+    follow: true,
   },
 };
 

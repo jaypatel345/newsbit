@@ -3,11 +3,22 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Newsbit",
+  title: "Privacy Policy - Newsbit AI",
   description: "Learn about how Newsbit protects your privacy and handles your data.",
+  keywords: ["privacy policy", "data protection", "newsbit privacy", "user data"],
   openGraph: {
-    title: "Privacy Policy - Newsbit",
+    title: "Privacy Policy - Newsbit AI",
     description: "Learn about how Newsbit protects your privacy and handles your data.",
+    url: "https://www.newsbit.in/privacy",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "Privacy Policy - Newsbit AI",
+    description: "Learn about how Newsbit protects your privacy and handles your data.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/privacy",
   },
 };
 

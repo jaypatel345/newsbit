@@ -4,11 +4,22 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Contact - Newsbit",
+  title: "Contact - Newsbit AI",
   description: "Get in touch with the Newsbit team for inquiries, partnerships, or support.",
+  keywords: ["contact newsbit", "newsbit support", "newsbit email", "newsbit partnership"],
   openGraph: {
-    title: "Contact - Newsbit",
+    title: "Contact - Newsbit AI",
     description: "Get in touch with the Newsbit team for inquiries, partnerships, or support.",
+    url: "https://www.newsbit.in/contact",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "Contact - Newsbit AI",
+    description: "Get in touch with the Newsbit team for inquiries, partnerships, or support.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/contact",
   },
 };
 

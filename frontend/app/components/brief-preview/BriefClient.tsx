@@ -29,16 +29,16 @@ export default function BriefClient() {
       <main className="pt-24 pb-12 sm:pt-28 sm:pb-16">
         <div className="max-w-4xl mx-auto px-6 sm:px-8">
           {/* Header */}
-          <BriefHeader updatedTime="8:00 AM" storyCount={10} readTime="2 min" />
+          {/* <BriefHeader updatedTime="8:00 AM" storyCount={10} readTime="2 min" /> */}
 
           {/* Divider */}
-          <div className="mb-12 border-t border-gray-200"></div>
+          {/* <div className="mb-12 border-t border-gray-200"></div> */}
 
           {/* Executive Summary */}
-          <ExecutiveSummaryCard />
+          {/* <ExecutiveSummaryCard /> */}
 
           {/* Divider */}
-          <div className="mb-12 border-t border-gray-200"></div>
+          {/* <div className="mb-12 border-t border-gray-200"></div> */}
 
           {/* Top Stories Heading */}
           <h2
@@ -71,7 +71,7 @@ export default function BriefClient() {
           </div>
 
           {/* Ask AI CTA */}
-          <AskAICTA />
+          {/* <AskAICTA /> */}
         </div>
       </main>
     </div>

@@ -4,19 +4,52 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "About - Newsbit",
+  title: "About - Newsbit AI",
   description: "Learn about Newsbit's mission to make news understandable through AI-powered summaries and explanations.",
+  keywords: ["about newsbit", "newsbit mission", "AI news platform", "news summarization"],
   openGraph: {
-    title: "About - Newsbit",
+    title: "About - Newsbit AI",
     description: "Learn about Newsbit's mission to make news understandable through AI-powered summaries and explanations.",
+    url: "https://www.newsbit.in/about",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "About - Newsbit AI",
+    description: "Learn about Newsbit's mission to make news understandable through AI-powered summaries and explanations.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/about",
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Newsbit AI",
+  "url": "https://www.newsbit.in",
+  "logo": "https://www.newsbit.in/newsbit_logo/high-resolution-logo-grayscale (1).png",
+  "description": "AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.",
+  "sameAs": [
+    "https://github.com/jaypatel345/newsbit",
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "support@newsbit.in",
+    "contactType": "customer service",
   },
 };
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <NavigationBar />
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <div className="min-h-screen bg-white">
+        <NavigationBar />
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
         <div className="mb-16">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
@@ -158,5 +191,6 @@ export default function AboutPage() {
       </div>
       <Footer />
     </div>
+    </>
   );
 }

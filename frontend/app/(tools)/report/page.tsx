@@ -4,11 +4,26 @@ import Footer from "@/app/components/layout/Footer";
 import ReportForm from "./ReportForm";
 
 export const metadata: Metadata = {
-  title: "Report an Issue - Newsbit",
+  title: "Report an Issue - Newsbit AI",
   description: "Report bugs or issues to the Newsbit team.",
+  keywords: ["report issue", "bug report", "newsbit support", "issue tracking"],
   openGraph: {
-    title: "Report an Issue - Newsbit",
+    title: "Report an Issue - Newsbit AI",
     description: "Report bugs or issues to the Newsbit team.",
+    url: "https://www.newsbit.in/report",
+    images: ["/newsbit_graph.png"],
+  },
+  twitter: {
+    title: "Report an Issue - Newsbit AI",
+    description: "Report bugs or issues to the Newsbit team.",
+    images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/report",
+  },
+  robots: {
+    index: false,
+    follow: true,
   },
 };
 
