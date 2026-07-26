@@ -26,29 +26,37 @@ export default function ThinkingTimeline({
     const text = STEPS[currentStep];
     let index = 0;
 
-    const typing = setInterval(() => {
-      index++;
+    const startTyping = () => {
+      const typing = setInterval(() => {
+        index++;
 
-      setDisplayedText(text.slice(0, index));
+        setDisplayedText(text.slice(0, index));
 
-      if (index >= text.length) {
-        clearInterval(typing);
+        if (index >= text.length) {
+          clearInterval(typing);
 
-        setTimeout(() => {
-          if (currentStep === STEPS.length - 1) {
-            onComplete();
+          setTimeout(() => {
+            if (currentStep === STEPS.length - 1) {
+              onComplete();
 
-            return;
-          }
+              return;
+            }
 
-          setCurrentStep((prev) => prev + 1);
+            setCurrentStep((prev) => prev + 1);
 
-          setDisplayedText("");
-        }, 1000);
-      }
-    }, 35);
+            setDisplayedText("");
+          }, 1000);
+        }
+      }, 35);
+    };
 
-    return () => clearInterval(typing);
+    // Add delay for first step to simulate "thinking"
+    if (currentStep === 0) {
+      const delayTimer = setTimeout(startTyping, 1500);
+      return () => clearTimeout(delayTimer);
+    } else {
+      startTyping();
+    }
   }, [currentStep, onComplete]);
 
   return (
