@@ -1,26 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { topicsData } from "@/app/data/topicsData";
-import Link from "next/link";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
-import { useCategory } from "@/app/hooks/useCategory";
 import StoryCard from "@/app/components/brief-preview/StoryCard";
+import { useCategories } from "@/app/hooks/useCategories";
+import { Article } from "@/types/article";
+import { useCategoryNews } from "@/app/hooks/useCategoryNews";
+import { useEffect } from "react";
 
 export default function ExplorePage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
+
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, selectedCategory]);
   const {
-    data: categoryData,
+    data: articles = [],
     isLoading,
     error,
-  } = useCategory(selectedCategory === "all" ? "" : selectedCategory);
-
-  const selectedTopic =
-    selectedCategory === "all"
-      ? null
-      : topicsData.find((t) => t.id === selectedCategory);
+  } = useCategoryNews(selectedCategory === "all" ? "top" : selectedCategory);
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -29,59 +33,35 @@ export default function ExplorePage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12">
         {/* Category Navigation Row */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer ${
-                selectedCategory === "all"
-                  ? "text-gray-900 border-b-2 border-gray-900"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              All
-            </button>
-            {topicsData.map((topic) => (
+          <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {categories.map((topic: string) => (
               <button
-                key={topic.id}
-                onClick={() => setSelectedCategory(topic.id)}
-                className={`px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer ${
-                  selectedCategory === topic.id
+                key={topic}
+                onClick={() => setSelectedCategory(topic)}
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer  ${
+                  selectedCategory === topic
                     ? "text-gray-900 border-b-2 border-gray-900"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                {topic.name}
+                {topic}
               </button>
             ))}
           </div>
         </div>
 
         {/* Selected Category Header */}
-        <div className="mb-8">
-          {selectedCategory === "all" ? (
-            <div>
-              <h1 className="text-[30px] font-semibold text-gray-900 mb-2">
-                Explore All Topics
-              </h1>
-              <p className="text-[16px] text-gray-600">
-                Browse news from all categories
-              </p>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">{selectedTopic?.icon}</span>
-              <div>
-                <h1 className="text-[30px] font-semibold text-gray-900">
-                  {selectedTopic?.name}
-                </h1>
-                <p className="text-[16px] text-gray-600">
-                  Latest news and updates in {selectedTopic?.name.toLowerCase()}
-                  .
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* <div className="mb-8">
+          <div>
+            <h1 className="text-[30px] font-semibold text-gray-900">
+              {selectedCategory}
+            </h1>
+
+            <p className="text-[16px] text-gray-600">
+              Latest news and updates in {selectedCategory.toLowerCase()}.
+            </p>
+          </div>
+        </div> */}
 
         {/* Articles Grid */}
         <div className="mb-12 rounded-3xl border border-gray-200 p-6">
@@ -93,14 +73,14 @@ export default function ExplorePage() {
             <div className="text-center py-12">
               <p className="text-red-600">Error loading articles</p>
             </div>
-          ) : categoryData?.length === 0 ? (
+          ) : articles.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600">
                 No articles found for this category
               </p>
             </div>
           ) : (
-            categoryData?.map((article: any, index: number) => (
+            articles.map((article: Article, index: number) => (
               <div key={article.id}>
                 <StoryCard
                   storyNumber={index + 1}
@@ -110,10 +90,10 @@ export default function ExplorePage() {
                   summary={article.summary}
                   whyItMatters={article.why_it_matters}
                   source={article.source_name}
-                  sourceWebsite={article.source_url || article.url}
+                  sourceWebsite={article.url || article.url}
                   image={article.image_url}
                 />
-                {index < categoryData?.length - 1 && (
+                {index < articles.length - 1 && (
                   <div className="border-t border-gray-200"></div>
                 )}
               </div>

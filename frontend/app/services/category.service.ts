@@ -7,7 +7,17 @@ export async function getCategoryNews(category: string): Promise<Article[]> {
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch news by category");
+    throw new Error("Failed to fetch category news");
+  }
+
+  return response.json();
+}
+
+export async function getAllCategoryNews() {
+  const response = await fetch(`${BASE_URL}/api/v1/news/categories`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
   }
 
   return response.json();

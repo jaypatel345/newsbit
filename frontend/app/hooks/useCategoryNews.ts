@@ -1,10 +1,11 @@
 "use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { getCategoryNews } from "@/app/services/category.service";
 
-export function useCategory(category: string) {
+export function useCategoryNews(category: string) {
   return useQuery({
-    queryKey: ["CategoryNews", category],
+    queryKey: ["category-news", category],
     queryFn: () => getCategoryNews(category),
     enabled: !!category,
   });

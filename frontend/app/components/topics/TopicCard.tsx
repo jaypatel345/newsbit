@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
-import { useCategory } from "@/app/hooks/useCategory";
+import { useCategoryNews } from "@/app/hooks/useCategoryNews";
 
 interface TopicCardProps {
   category: string;
 }
 
 export default function TopicCard({ category }: TopicCardProps) {
-  const { data: articles, isLoading, error } = useCategory(category);
+  const { data: articles, isLoading, error } = useCategoryNews(category);
   console.log(articles);
 
   return (
