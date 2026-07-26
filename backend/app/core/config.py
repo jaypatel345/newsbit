@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str
     G_NEWS_API_URL: str
     G_NEWS_API_KEY: str
+    GROQ_API_KEY01: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

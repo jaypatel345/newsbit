@@ -5,6 +5,13 @@ import TopicCard from "./TopicCard";
 export default function TopicsSection() {
   const { data: categories, isLoading, error } = useCategories();
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (error instanceof Error) {
+    return <div>{error.message}</div>;
+  }
+
   return (
     <section className="py-8 sm:py-12">
       {/* Header */}
@@ -28,7 +35,7 @@ export default function TopicsSection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {categories?.map((category: string) => (
+          {categories?.slice(0, 9).map((category: string) => (
             <TopicCard key={category} category={category} />
           ))}
         </div>

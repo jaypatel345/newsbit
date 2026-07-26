@@ -32,7 +32,9 @@ export default function TopicArticle({ article }: TopicArticleProps) {
           <span className="shrink-0">{article.time}</span>
         </div>
         {article.author && (
-          <p className="text-[11px] sm:text-[12px] md:text-[13px] text-gray-400 mt-1">{article.author}</p>
+          <p className="text-[11px] sm:text-[12px] md:text-[13px] text-gray-400 mt-1">
+            {article.author}
+          </p>
         )}
       </div>
       <span

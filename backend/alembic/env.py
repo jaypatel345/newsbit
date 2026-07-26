@@ -9,6 +9,7 @@ from app.db.database import Base
 # Import all models so Alembic can detect them
 from app.models.article import Article
 from app.models.user import User
+from app.models.summary import Summary
 
 # Alembic Config object
 config = context.config
@@ -25,6 +26,8 @@ if config.config_file_name is not None:
 # Metadata for autogenerate
 print("Article module:", Article)
 print("User module:", User)
+print("Summary module:", Summary)
+
 
 # print("Tables:", Base.metadata.tables.keys())
 print(Base.metadata.tables.keys())

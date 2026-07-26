@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 from app.db.database import AsyncSessionLocal
 from app.services.gnews_service import GNewsService
+from app.services.news_service import NewsService
 
 scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
@@ -21,14 +22,18 @@ async def run_news_fetch_job():
     ]
 
     async with AsyncSessionLocal() as session:
-        service = GNewsService(session)
+        gnews_service = GNewsService(session)
 
         # Fetch Top Headlines
-        await service.sync_top_headlines()
+        await gnews_service.sync_top_headlines()
 
         # Fetch all categories
         for category in categories:
-            await service.sync_category(category)
+            await gnews_service.sync_category(category)
+
+        news_service = NewsService(session)
+
+        await news_service.generate_and_save_today_summary()
 
 
 scheduler.add_job(

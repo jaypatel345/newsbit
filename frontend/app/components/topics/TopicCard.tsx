@@ -8,6 +8,7 @@ interface TopicCardProps {
 
 export default function TopicCard({ category }: TopicCardProps) {
   const { data: articles, isLoading, error } = useCategory(category);
+  console.log(articles);
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
@@ -32,23 +33,45 @@ export default function TopicCard({ category }: TopicCardProps) {
 
       {/* Articles List */}
       <div className="space-y-0.5 sm:space-y-1">
-        {isLoading ? (
-          <p className="text-sm text-gray-500">Loading articles...</p>
-        ) : error ? (
-          <p className="text-sm text-red-500">Error loading articles</p>
-        ) : articles?.length === 0 ? (
-          <p className="text-sm text-gray-500">No articles available</p>
-        ) : (
-          articles?.slice(0, 3).map((article: any) => (
-            <Link
-              key={article.id}
-              href={`/article/${article.id}`}
-              className="block py-2 text-sm text-gray-700 hover:text-gray-900 hover:underline"
-            >
-              {article.title}
-            </Link>
-          ))
-        )}
+        {articles?.slice(0, 3).map((article: any) => (
+          <Link
+            key={article.id}
+            href={`/explore?category=${category}`}
+            className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
+          >
+            {/* Left Image */}
+            <img
+              src={article.image_url}
+              alt={article.title}
+              className="w-20 h-20 rounded-xl object-cover shrink-0"
+            />
+
+            {/* Right Content */}
+            <div className="flex-1 min-w-0">
+              {/* Source */}
+              <div className="flex items-center gap-2 mb-1">
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${article.source_url}&sz=64`}
+                  alt={article.source_name}
+                  className="w-4 h-4 rounded-sm"
+                />
+                <span className="text-xs text-gray-500 truncate">
+                  {article.source_name}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h4 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                {article.title}
+              </h4>
+
+              {/* Published Date */}
+              <p className="mt-2 text-xs text-gray-500">
+                {new Date(article.published_at).toLocaleDateString()}
+              </p>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -22,8 +22,8 @@ async def get_today_summary(db: DbSession) -> Dict[str, Any]:
 
 
 @router.get("/categories", response_model=None)
-async def get_categories() -> Dict[str, str]:
-    service = NewsService()
+async def get_categories(db: DbSession) -> Dict[str, str]:
+    service = NewsService(db)
     return await service.get_categories()
 
 
