@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
 from app.services.gnews_service import GNewsService
-from app.services.news_service import NewsService
 
 router = APIRouter(prefix="/api/v1/admin/news", tags=["admin"])
 
@@ -35,11 +34,3 @@ async def test_fetch(category: str, db: DbSession):
         "count": len(articles),
         "articles": articles,
     }
-
-
-@router.post("/summary", response_model=None)
-async def test_summaries(db: DbSession):
-    service = NewsService(db)
-
-    summary = await service.generate_and_save_today_summary()
-    return summary
