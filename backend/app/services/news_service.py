@@ -72,27 +72,26 @@ class NewsService:
             logger.error(f"Error in get_latest_news:{e}")
             raise HTTPException(status_code=500, detail="Failed to retrieve news")
 
+    async def get_today_summary(self):
 
-async def get_today_summary(self):
+        summary = await self.db.scalar(select(Summary))
 
-    summary = await self.db.scalar(select(Summary))
+        print(summary)
 
-    print(summary)
+        if summary is None:
 
-    if summary is None:
+            return {"message": "No summary found"}
 
-        return {"message": "No summary found"}
-
-    return {
-        "id": summary.id,
-        "headline": summary.headline,
-        "theme": summary.theme,
-        "summary": json.loads(summary.summary_json),
-        "key_takeaways": json.loads(summary.key_takeaways_json),
-        "categories": json.loads(summary.categories_json),
-        "created_at": summary.created_at,
-        "updated_at": summary.updated_at,
-    }
+        return {
+            "id": summary.id,
+            "headline": summary.headline,
+            "theme": summary.theme,
+            "summary": json.loads(summary.summary_json),
+            "key_takeaways": json.loads(summary.key_takeaways_json),
+            "categories": json.loads(summary.categories_json),
+            "created_at": summary.created_at,
+            "updated_at": summary.updated_at,
+        }
 
     async def get_categories(self):
         try:
