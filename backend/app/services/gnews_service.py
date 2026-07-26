@@ -74,10 +74,14 @@ class GNewsService:
         # Fetch Top Headlines
         articles = await self.fetch_top_headlines()
 
+        # Add feed type
+
+        for article in articles:
+            article["feed_types"] = "top_headlines"
+
         # Process articles
         return await self.processor.process_articles(
             articles=articles,
-            source_type="top_headlines",
         )
 
     async def sync_category(self, category: str):
@@ -85,8 +89,12 @@ class GNewsService:
         # Fetch category news
         articles = await self.fetch_category(category)
 
+        # Add feed type
+
+        for article in articles:
+            article["feed_types"] = f"category:{category}"
+
         # Process articles
         return await self.processor.process_articles(
             articles=articles,
-            source_type=category,
         )

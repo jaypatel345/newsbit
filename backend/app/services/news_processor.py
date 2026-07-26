@@ -17,11 +17,12 @@ def clean_title(title: str) -> str:
 
 
 class NewsProcessor:
+
     def __init__(self, db: AsyncSession):
         self.db = db
         self.llm_service = LLMService()
 
-    async def process_articles(self, articles: List[Dict], source_type: str):
+    async def process_articles(self, articles: List[Dict]):
         """
         Unified pipeline for processing fetched articles.
         Responsibilities:
@@ -33,15 +34,40 @@ class NewsProcessor:
         """
         new_articles = []
         saved_articles = []
+        seen_urls = set()
 
         for article in articles:
+
             url = article.get("url")
             if not url:
                 continue
-            db_result = await self.db.execute(select(Article).where(Article.url == url))
+            if url in seen_urls:
+                continue
+
+            seen_urls.add(url)
+
+            with self.db.no_autoflush:
+
+                db_result = await self.db.execute(
+                    select(Article).where(Article.url == url)
+                )
+
             existing_article = db_result.scalar_one_or_none()
 
             if existing_article:
+
+                if article["feed_types"] not in existing_article.feed_types:
+
+                    existing_article.feed_types.append(article["feed_types"])
+
+                existing_article.image_url = (
+                    article.get("image") or existing_article.image_url
+                )
+
+                existing_article.description = (
+                    article.get("description") or existing_article.description
+                )
+
                 continue
 
             new_articles.append(article)
@@ -68,6 +94,8 @@ class NewsProcessor:
 
             db_article = Article(
                 title=clean_title(article["title"]),
+                feed_types=[article["feed_types"]],
+                popularity_score=0.0,
                 url=article["url"],
                 content=article.get("content"),
                 author=article.get("author"),

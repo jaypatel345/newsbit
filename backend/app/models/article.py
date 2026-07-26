@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, func
+from sqlalchemy import Column, Integer, String, Text, DateTime, ARRAY, Float, func
 from app.db.database import Base
 
 
@@ -13,6 +13,14 @@ class Article(Base):
 
     summary = Column(Text)
     why_it_matters = Column(Text, nullable=True)
+
+    feed_types = Column(
+        ARRAY(String),
+        nullable=False,
+        default=list,
+        server_default="{}",
+    )
+    popularity_score = Column(Float, nullable=False, default=0.0, index=True)
 
     author = Column(Text)
     category = Column(String(100), nullable=True)

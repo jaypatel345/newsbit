@@ -1,9 +1,11 @@
 import { Message } from "@/types/message";
 import { ExternalLink } from "lucide-react";
+import ThinkingTimeline from "@/app/components/chat/ThinkingTimeline";
 
 type MessageListProps = {
-  loading: boolean;
   message1: Message[];
+  loading: boolean;
+  onThinkingComplete: () => void;
 };
 
 const today = new Date().toLocaleDateString("en-US", {
@@ -17,7 +19,11 @@ const getDomainName = (url: string) => {
   return new URL(url).hostname.replace("www.", "");
 };
 
-export default function MessageList({ loading, message1 }: MessageListProps) {
+export default function MessageList({
+  loading,
+  message1,
+  onThinkingComplete,
+}: MessageListProps) {
   return (
     <div className="flex flex-1 flex-col mx-auto w-full max-w-3xl px-2 sm:px-4">
       {message1.map((message) => (
@@ -45,10 +51,14 @@ export default function MessageList({ loading, message1 }: MessageListProps) {
                   Here's what's making news today, {today}.
                 </p>
                 {/* <p className="font-semibold">Assistant</p> */}
-                {(message.articles ?? []).map((article, index) => (
+                {(message.articles ?? []).map((article) => (
                   <div key={article.url} className="mb-3 sm:mb-4">
-                    <h2 className="font-semibold text-base sm:text-lg">◦ {article.title}</h2>
-                    <p className="text-gray-700 text-sm sm:text-base">{article.summary}</p>
+                    <h2 className="font-semibold text-base sm:text-lg">
+                      ◦ {article.title}
+                    </h2>
+                    <p className="text-gray-700 text-sm sm:text-base">
+                      {article.summary}
+                    </p>
                     <a
                       href={article.url}
                       target="_blank"
@@ -66,12 +76,7 @@ export default function MessageList({ loading, message1 }: MessageListProps) {
           </div>
         </div>
       ))}
-
-      {loading && (
-        <p className="italic text-gray-500 flex items-center justify-start text-sm sm:text-base">
-          Thinking...
-        </p>
-      )}
+      {loading && <ThinkingTimeline onComplete={onThinkingComplete} />}
     </div>
   );
 }

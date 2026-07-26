@@ -3,8 +3,7 @@ from sqlalchemy import select
 from groq import AsyncGroq
 from app.models.article import Article
 from app.models.summary import Summary
-
-
+from datetime import datetime, timedelta, timezone
 from app.prompts.news import TODAY_BRIEF_PROMPT
 import logging
 from fastapi import HTTPException
@@ -31,7 +30,7 @@ class NewsService:
         return f"{parsed.scheme}://{parsed.netloc}"
 
     async def get_top_stories(self):
-
+        today = datetime.now(timezone.utc) - timedelta(hours=24)
         try:
             result = await self.db.execute(
                 select(
@@ -45,8 +44,16 @@ class NewsService:
                     Article.image_url,
                     Article.why_it_matters,
                     Article.category,
+                    Article.popularity_score,
                 )
-                .order_by(Article.published_at.desc())
+                .where(
+                    Article.summary.is_not(None),
+                    Article.published_at >= today,
+                )
+                .order_by(
+                    Article.popularity_score.desc(),
+                    Article.published_at.desc(),
+                )
                 .limit(10)
             )
 
@@ -63,8 +70,9 @@ class NewsService:
                     "image_url": image_url,
                     "why_it_matters": why_it_matters,
                     "category": category,
+                    "popularity_score": popularity_score,
                 }
-                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category in result.all()
+                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score, in result.all()
             ]
 
             return articles
@@ -76,7 +84,7 @@ class NewsService:
 
         summary = await self.db.scalar(select(Summary))
 
-        print(summary)
+        # print(summary)
 
         if summary is None:
 
@@ -126,7 +134,7 @@ class NewsService:
 
     async def generate_and_save_today_summary(self):
         # 1. Fetch latest articles from DB
-
+        today = datetime.now(timezone.utc) - timedelta(hours=24)
         result = await self.db.execute(
             select(
                 Article.title,
@@ -136,8 +144,12 @@ class NewsService:
                 Article.published_at,
                 Article.source_name,
             )
-            .order_by(Article.published_at.desc())
-            .limit(10)
+            .where(
+                Article.summary.is_not(None),
+                Article.published_at >= today,
+            )
+            .order_by(Article.popularity_score.desc(), Article.published_at.desc())
+            .limit(15)
         )
         input = [
             {
@@ -154,7 +166,7 @@ class NewsService:
         # 2. Generate summary using LLM
 
         response = await groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {
                     "role": "system",

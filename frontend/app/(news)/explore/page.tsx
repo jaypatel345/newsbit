@@ -66,8 +66,12 @@ export default function ExplorePage() {
         {/* Articles Grid */}
         <div className="mb-12 rounded-3xl border border-gray-200 p-6">
           {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading articles...</p>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+              <div className="text-center">
+                <div className="h-10 w-10 mx-auto rounded-full border-4 border-gray-300 border-t-black animate-spin" />
+
+                <p className="mt-4 text-gray-600 text-sm">Loading...</p>
+              </div>
             </div>
           ) : error ? (
             <div className="text-center py-12">

@@ -9,12 +9,16 @@ import Link from "next/link";
 import { getNews } from "@/app/services/newsApi";
 import { Message } from "@/types/message";
 import { Article } from "@/types/article";
+import ThinkingTimeline from "@/app/components/chat/ThinkingTimeline";
 
 function ChatPageContent() {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState("");
   const [message1, setMessage1] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pendingArticles, setPendingArticles] = useState<Article[] | null>(
+    null,
+  );
 
   // Read prompt from URL and set in input
   useEffect(() => {
@@ -40,25 +44,20 @@ function ChatPageContent() {
     try {
       const data: Article[] = await getNews();
 
-      setMessage1((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          articles: data,
-        },
-      ]);
+      setPendingArticles(data);
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="flex h-screen flex-col bg-white text-black animate-in fade-in duration-700">
       <header className="p-2 ml-10 items-center justify-start">
-        <Link href="/" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
+        <Link
+          href="/"
+          className="flex items-center gap-3 hover:opacity-95 transition-opacity"
+        >
           <img
             src="/newsbit_logo/logo_without_bg.png"
             alt="Newsbit Logo"
@@ -80,7 +79,31 @@ function ChatPageContent() {
             </p>
           </div>
         ) : (
-          <MessageList message1={message1} loading={loading} />
+          <>
+            <MessageList
+              message1={message1}
+              loading={loading}
+              onThinkingComplete={() => {
+                if (!pendingArticles) return;
+
+                setMessage1((prev) => [
+                  ...prev,
+
+                  {
+                    id: crypto.randomUUID(),
+
+                    role: "assistant",
+
+                    articles: pendingArticles,
+                  },
+                ]);
+
+                setPendingArticles(null);
+
+                setLoading(false);
+              }}
+            />
+          </>
         )}
       </main>
 
@@ -106,8 +129,12 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center">
-          Loading...
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="h-10 w-10 mx-auto rounded-full border-4 border-gray-300 border-t-black animate-spin" />
+
+            <p className="mt-4 text-gray-600 text-sm">Loading...</p>
+          </div>
         </div>
       }
     >

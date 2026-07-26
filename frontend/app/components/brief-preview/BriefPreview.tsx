@@ -37,9 +37,9 @@ export default function BriefPreview() {
         {/* Preview Text - Bullet Points */}
 
         <ul className="text-gray-700 text-sm leading-relaxed mb-4 sm:mb-6 space-y-2 sm:space-y-2.5">
-          {data?.summary.map((item, index) => (
+          {data?.summary?.map((item: string, index: number) => (
             <div>
-              <li className="flex items-start gap-3">
+              <li key={index} className="flex items-start gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
