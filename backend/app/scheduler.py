@@ -53,8 +53,9 @@ async def run_news_fetch_job():
 
 scheduler.add_job(
     run_news_fetch_job,
-    trigger="interval",
-    minutes=10,
+    trigger="cron",
+    hour=6,
+    minute=0,
 )
 
 
