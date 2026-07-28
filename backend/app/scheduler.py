@@ -1,7 +1,7 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from zoneinfo import ZoneInfo
 import logging
-
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from app.db.database import AsyncSessionLocal
 from app.services.gnews_service import GNewsService
 from app.services.news_service import NewsService
@@ -13,6 +13,7 @@ scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
 
 async def run_news_fetch_job():
+    print("🔥 Scheduler fired")
     categories = [
         "technology",
         "business",
@@ -24,7 +25,7 @@ async def run_news_fetch_job():
         "nation",
         "general",
     ]
-
+    logger.info("🚀 Scheduler started fetching news...")
     async with AsyncSessionLocal() as session:
         gnews_service = GNewsService(session)
 
@@ -47,12 +48,28 @@ async def run_news_fetch_job():
         except Exception:
             logger.exception("Failed to generate today's summary")
 
-        logger.info("Scheduler job completed.")
+        logger.info("✅ Scheduler job completed.")
 
 
 scheduler.add_job(
     run_news_fetch_job,
     trigger="cron",
-    hour=6,
-    minute=0,
+    hour=9,
+    minute=30,
 )
+
+
+def job_listener(event):
+
+    if event.exception:
+
+        logger.error("❌ Scheduler job failed")
+
+    else:
+
+        logger.info("✅ Scheduler job executed successfully")
+
+    scheduler.add_listener(
+        job_listener,
+        EVENT_JOB_EXECUTED | EVENT_JOB_ERROR,
+    )

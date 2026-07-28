@@ -84,8 +84,6 @@ class NewsService:
 
         summary = await self.db.scalar(select(Summary))
 
-        # print(summary)
-
         if summary is None:
 
             return {"message": "No summary found"}

@@ -5,12 +5,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api.v1.news import router as news_router
 from app.core.config import settings
 from .api.v1.admin_news import router as admin_news_router
+from .api.v1.conversations import router as conversations_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    print("Starting scheduler...")
     scheduler.start()
+
+    print("Scheduler started")
+    print(scheduler.get_jobs())
+
     yield
+
+    print("Stopping scheduler...")
     scheduler.shutdown()
 
 
@@ -23,6 +32,7 @@ app = FastAPI(
 
 app.include_router(news_router)
 app.include_router(admin_news_router)
+app.include_router(conversations_router)
 
 app.add_middleware(
     CORSMiddleware,
