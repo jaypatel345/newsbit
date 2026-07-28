@@ -1,9 +1,8 @@
+"use client";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getTopStories } from "@/app/services/news.service";
+import { useTopStories } from "@/app/hooks/useTopStories";
 import { formatDistanceToNow } from "date-fns";
-
-const topStories = await getTopStories();
 
 function getSourceLogoUrl(sourceWebsite: string) {
   return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(sourceWebsite)}&sz=64`;
@@ -15,6 +14,27 @@ export function getRelativeTime(dateString: string) {
 }
 
 export default function TodaysTopStories() {
+  const { data: topStories, isLoading, error } = useTopStories();
+
+  if (isLoading) {
+    return (
+      <section className="py-16 sm:py-20 md:py-24">
+        <div className="text-center">
+          <div className="animate-pulse">Loading top stories...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !topStories) {
+    return (
+      <section className="py-16 sm:py-20 md:py-24">
+        <div className="text-center">
+          <div className="text-gray-500">Unable to load top stories at this time.</div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="py-16 sm:py-20 md:py-24">
       {/* Header */}
