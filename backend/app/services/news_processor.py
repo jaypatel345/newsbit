@@ -77,9 +77,9 @@ class NewsProcessor:
                 summary_result = await self.llm_service.generate_summary(article)
             except Exception:
                 continue
-
-            article["summary"] = summary_result["summary"]
-            article["why_it_matters"] = summary_result["why_it_matters"]
+            print(summary_result)
+            article["summary"] = summary_result.get("summary", "")
+            article["why_it_matters"] = summary_result.get("why_it_matters", "")
             article["category"] = summary_result["category"]
             published_at_str = article.get("publishedAt")
 

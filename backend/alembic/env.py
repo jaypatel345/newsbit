@@ -10,6 +10,8 @@ from app.db.database import Base
 from app.models.article import Article
 from app.models.user import User
 from app.models.summary import Summary
+from app.models.conversation import Conversation
+from app.models.message import Message
 
 # Alembic Config object
 config = context.config
@@ -27,6 +29,9 @@ if config.config_file_name is not None:
 print("Article module:", Article)
 print("User module:", User)
 print("Summary module:", Summary)
+print("Conversation module:", Conversation)
+print("Message module:", Message)
+print(Base.metadata.tables.keys())
 
 
 # print("Tables:", Base.metadata.tables.keys())

@@ -41,13 +41,11 @@ export default function ThinkingTimeline({
 
               return;
             }
-
             setCurrentStep((prev) => prev + 1);
-
             setDisplayedText("");
-          }, 1000);
+          }, 900);
         }
-      }, 35);
+      }, 20);
     };
 
     // Add delay for first step to simulate "thinking"

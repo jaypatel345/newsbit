@@ -2,8 +2,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.services.conversation_service import ConversationService
-from app.schemas.conversation import CreateConversationRequest
-from app.schemas.message import SendMessageRequest, MessageResponse
+from app.schemas.conversation import (
+    CreateConversationRequest,
+    UpdateConversationRequest,
+)
+from app.schemas.message import (
+    SendMessageRequest,
+    MessageResponse,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["conversation"])
 
@@ -32,7 +38,7 @@ async def create_conversation(
 
 @router.patch("/conversations/{conversation_id}")
 async def update_conversation(
-    request: CreateConversationRequest,
+    request: UpdateConversationRequest,
     conversation_id: int,
     service: ConversationService = Depends(get_conversation_service),
 ):

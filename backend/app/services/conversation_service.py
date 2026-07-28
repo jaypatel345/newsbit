@@ -20,7 +20,6 @@ class ConversationService:
                 Conversation.updated_at.desc(),
             )
         )
-        result = await self.db.execute(...)
 
         conversations = result.scalars().all()
 

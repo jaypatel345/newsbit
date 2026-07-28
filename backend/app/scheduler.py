@@ -13,7 +13,7 @@ scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
 
 async def run_news_fetch_job():
-    logger.info("🔥 Scheduler fired")
+    logger.info(" Scheduler fired")
     categories = [
         "technology",
         "business",
@@ -25,7 +25,7 @@ async def run_news_fetch_job():
         "nation",
         "general",
     ]
-    logger.info("🚀 Scheduler started fetching news...")
+    logger.info("Scheduler started fetching news...")
     async with AsyncSessionLocal() as session:
         gnews_service = GNewsService(session)
 
@@ -48,7 +48,7 @@ async def run_news_fetch_job():
         except Exception:
             logger.exception("Failed to generate today's summary")
 
-        logger.info("✅ Scheduler job completed.")
+        logger.info(" Scheduler job completed.")
 
 
 scheduler.add_job(
@@ -61,9 +61,9 @@ scheduler.add_job(
 
 def job_listener(event):
     if event.exception:
-        logger.error("❌ Scheduler job failed")
+        logger.error("Scheduler job failed")
     else:
-        logger.info("✅ Scheduler job executed successfully")
+        logger.info("Scheduler job executed successfully")
 
 
 scheduler.add_listener(
