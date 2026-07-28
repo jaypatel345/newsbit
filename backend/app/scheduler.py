@@ -13,7 +13,7 @@ scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
 
 async def run_news_fetch_job():
-    print("🔥 Scheduler fired")
+    logger.info("🔥 Scheduler fired")
     categories = [
         "technology",
         "business",
@@ -53,23 +53,19 @@ async def run_news_fetch_job():
 
 scheduler.add_job(
     run_news_fetch_job,
-    trigger="cron",
-    hour=9,
-    minute=30,
+    trigger="interval",
+    minutes=10,
 )
 
 
 def job_listener(event):
-
     if event.exception:
-
         logger.error("❌ Scheduler job failed")
-
     else:
-
         logger.info("✅ Scheduler job executed successfully")
 
-    scheduler.add_listener(
-        job_listener,
-        EVENT_JOB_EXECUTED | EVENT_JOB_ERROR,
-    )
+
+scheduler.add_listener(
+    job_listener,
+    EVENT_JOB_EXECUTED | EVENT_JOB_ERROR,
+)
