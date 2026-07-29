@@ -6,6 +6,7 @@ from .api.v1.news import router as news_router
 from app.core.config import settings
 from .api.v1.admin_news import router as admin_news_router
 from .api.v1.conversations import router as conversations_router
+from .api.v1.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -33,6 +34,7 @@ app = FastAPI(
 app.include_router(news_router)
 app.include_router(admin_news_router)
 app.include_router(conversations_router)
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,

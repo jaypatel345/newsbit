@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Check } from "lucide-react";
+import { useSignup } from "@/app/hooks/useAuth";
+import Cookies from "js-cookie";
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +15,8 @@ export default function SignUpPage() {
     agreeToTerms: false,
   });
 
+  const { mutate, isPending, error } = useSignup();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -21,10 +25,22 @@ export default function SignUpPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Sign up form submitted:", formData);
-    // Backend logic will be added later
+
+    mutate(formData, {
+      onSuccess: (data) => {
+        Cookies.set("access_token", data.access_token, {
+          expires: 1, // 1 day
+        });
+
+        console.log("Logged in");
+      },
+
+      onError: (error) => {
+        console.error(error);
+      },
+    });
   };
 
   return (
@@ -33,7 +49,10 @@ export default function SignUpPage() {
         {/* Left Side - Branding */}
         <div className="hidden lg:block space-y-8">
           <div>
-            <Link href="/" className="flex items-center gap-3 mb-6 hover:opacity-95 transition-opacity">
+            <Link
+              href="/"
+              className="flex items-center gap-3 mb-6 hover:opacity-95 transition-opacity"
+            >
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
@@ -43,7 +62,9 @@ export default function SignUpPage() {
                 <span className="text-[17px] font-medium text-gray-900">
                   Newsbit
                 </span>
-                <span className="text-[12px] text-gray-600">AI-Powered News</span>
+                <span className="text-[12px] text-gray-600">
+                  AI-Powered News
+                </span>
               </div>
             </Link>
             <h1 className="text-4xl font-semibold text-gray-900 mb-4">
