@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { useLogin } from "@/app/hooks/useAuth";
+import { useRouter } from "next/navigation";
+
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { mutate, error, isPending } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -23,16 +29,31 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login form submitted:", formData);
-    // Backend logic will be added later
+    mutate(formData, {
+      onSuccess: (data) => {
+        Cookies.set("access_token", data.access_token, {
+          expires: 1, // 1 day
+        });
+        router.push("/"); // or "/dashboard"
+        console.log("user created", data);
+      },
+
+      onError: (error) => {
+        console.error(error);
+      },
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-4 sm:p-8">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-white flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left Side - Branding */}
         <div className="hidden lg:block space-y-8">
           <div>
-            <Link href="/" className="flex items-center gap-3 mb-6 hover:opacity-95 transition-opacity">
+            <Link
+              href="/"
+              className="flex items-center gap-3 mb-6 hover:opacity-95 transition-opacity"
+            >
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
@@ -42,14 +63,17 @@ export default function LoginPage() {
                 <span className="text-[17px] font-medium text-gray-900">
                   Newsbit
                 </span>
-                <span className="text-[12px] text-gray-600">AI-Powered News</span>
+                <span className="text-[12px] text-gray-600">
+                  AI-Powered News
+                </span>
               </div>
             </Link>
             <h1 className="text-4xl font-semibold text-gray-900 mb-4">
               Welcome back to Newsbit
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Continue your journey with AI-powered news summaries. Stay informed with the latest stories tailored to your interests.
+              Continue your journey with AI-powered news summaries. Stay
+              informed with the latest stories tailored to your interests.
             </p>
           </div>
 
@@ -96,7 +120,10 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -119,7 +146,10 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
@@ -221,7 +251,10 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <p className="text-center text-gray-600 mt-8">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-gray-900 font-medium hover:underline">
+            <Link
+              href="/signup"
+              className="text-gray-900 font-medium hover:underline"
+            >
               Sign up
             </Link>
           </p>

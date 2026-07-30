@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Check } from "lucide-react";
 import { useSignup } from "@/app/hooks/useAuth";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -33,8 +35,8 @@ export default function SignUpPage() {
         Cookies.set("access_token", data.access_token, {
           expires: 1, // 1 day
         });
-
-        console.log("Logged in");
+        router.push("/"); // or "/dashboard"
+        console.log("user created", data);
       },
 
       onError: (error) => {

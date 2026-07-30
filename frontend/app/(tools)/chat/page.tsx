@@ -141,7 +141,11 @@ function ChatPageContent() {
             </div>
           ) : (
             <>
-              <MessageList loading={loading} messages={messages} onLoadingComplete={handleAnimationComplete} />
+              <MessageList
+                loading={loading}
+                messages={messages}
+                onLoadingComplete={handleAnimationComplete}
+              />
             </>
           )}
         </main>

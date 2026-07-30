@@ -2,9 +2,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.user import User
 from fastapi import HTTPException
-from app.utils.password import hash_password
+from app.utils.password import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token
 from app.schemas.auth import UserResponse
+import hashlib
+from fastapi import Depends, status
+from app.db.database import get_db
+from app.utils.jwt import verify_access_token, oauth2_scheme
+from fastapi import Response
 
 
 class AuthService:
@@ -66,13 +71,74 @@ class AuthService:
             "user": user_response,
         }
 
-    async def login(self):
+    async def login(self, request):
 
-        pass
+        # 1. Find the user by email.
 
-    async def logout(self):
+        existing_user = await self.db.execute(
+            select(User).where(User.email == request.email)
+        )
 
-        pass
+        user = existing_user.scalar_one_or_none()
+
+        # 2. User not found.
+
+        if not user:
+
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        # 3. Verify the password.
+
+        is_valid = verify_password(request.password, user.password_hash)
+
+        if not is_valid:
+
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        # 4. Generate tokens.
+
+        access_token = create_access_token({"user_id": user.id, "email": user.email})
+
+        refresh_token = create_refresh_token({"user_id": user.id})
+
+        # 5. Hash and save the refresh token.
+
+        user.refresh_token_hash = hashlib.sha256(
+            refresh_token.encode("utf-8")
+        ).hexdigest()
+
+        await self.db.commit()
+
+        await self.db.refresh(user)
+
+        # 6. Return the response.
+
+        return {
+            "message": "Login successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse.model_validate(user),
+        }
+
+    async def logout(
+        self,
+        response: Response,
+        current_user: User,
+    ):
+
+        current_user.refresh_token_hash = None
+
+        await self.db.commit()
+
+        response.delete_cookie(
+            key="refresh_token",
+            httponly=True,
+            secure=True,
+            samesite="lax",
+        )
+
+        return {"message": "Logged out successfully"}
 
     async def refresh(self):
 
@@ -81,3 +147,24 @@ class AuthService:
     async def me(self):
 
         pass
+
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+):
+
+    payload = verify_access_token(token)
+
+    result = await db.execute(select(User).where(User.id == payload["user_id"]))
+
+    user = result.scalar_one_or_none()
+
+    if user is None:
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+
+    return user

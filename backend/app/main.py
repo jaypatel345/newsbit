@@ -38,7 +38,11 @@ app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", settings.FRONTEND_URL],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        settings.FRONTEND_URL,
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

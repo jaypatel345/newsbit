@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, ChevronDown, Menu, X } from "lucide-react";
+import { useLogout, useMe } from "@/app/hooks/useAuth";
 
 const navLinks = [
   { href: "/brief", label: "Today's Brief" },
@@ -12,8 +13,11 @@ const navLinks = [
 ];
 
 export default function NavigationBar() {
+  const { data: user, isLoading } = useMe();
+  const { mutate: logout } = useLogout();
+  const isLoggedIn = !!user;
+
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -46,7 +50,9 @@ export default function NavigationBar() {
               <span className="text-[15px] sm:text-[17px] font-medium text-gray-900">
                 Newsbit
               </span>
-              <span className="text-[11px] sm:text-[12px] text-gray-600 hidden sm:block">AI-Powered News</span>
+              <span className="text-[11px] sm:text-[12px] text-gray-600 hidden sm:block">
+                AI-Powered News
+              </span>
             </div>
           </div>
         </Link>
@@ -60,7 +66,9 @@ export default function NavigationBar() {
                 key={link.href}
                 href={link.href}
                 className={`text-sm font-medium transition-colors ${
-                  isActive ? "text-gray-900 font-semibold" : "text-gray-600 hover:text-gray-900"
+                  isActive
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {link.label}
@@ -114,7 +122,7 @@ export default function NavigationBar() {
                 {showDropdown && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50">
                     <Link
-                      href="/chats"
+                      href="/chat"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       My Chats
@@ -138,7 +146,10 @@ export default function NavigationBar() {
                       Settings
                     </Link>
                     <hr className="my-2 border-gray-200" />
-                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button
+                      onClick={() => logout()}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
                       Logout
                     </button>
                   </div>
@@ -161,7 +172,9 @@ export default function NavigationBar() {
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors ${
-                    isActive ? "text-gray-900 bg-gray-100" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    isActive
+                      ? "text-gray-900 bg-gray-100"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
                   {link.label}

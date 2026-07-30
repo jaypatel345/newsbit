@@ -4,11 +4,9 @@ export interface SignupRequest {
   password: string;
 }
 
-export interface User {
-  id: number;
-  name: string;
+export interface LoginRequest {
   email: string;
-  avatar_url: string | null;
+  password: string;
 }
 
 export interface SignupResponse {
@@ -16,4 +14,21 @@ export interface SignupResponse {
   access_token: string;
   token_type: "bearer";
   user: User;
+}
+
+export interface LoginResponse {
+  message: string;
+  access_token: string;
+  token_type: "bearer";
+  user: User;
+}
+
+export interface User {
+  id: number;
+
+  name: string;
+
+  email: string;
+
+  avatar_url: string | null;
 }

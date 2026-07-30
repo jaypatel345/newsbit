@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import AuthInitializer from "./components/AuthInitializer";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -127,7 +128,10 @@ export default function RootLayout({
         />
       </head>
       <body className="h-full flex flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          <AuthInitializer />
+          {children}
+        </Providers>
       </body>
     </html>
   );
