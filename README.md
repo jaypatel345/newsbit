@@ -5,6 +5,7 @@
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.10-black.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Fetch News Scheduler](https://github.com/jaypatel345/newsbit/actions/workflows/fetch-news.yml/badge.svg)](https://github.com/jaypatel345/newsbit/actions/workflows/fetch-news.yml)
 
 > AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.
 
