@@ -1,0 +1,17 @@
+name: Fetch News Scheduler
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Fetch News API
+        run: |
+          curl --request POST \
+            --url "${{ secrets.FETCH_NEWS_URL }}" \
+            --header "Authorization: Bearer ${{ secrets.SCHEDULER_SECRET }}"
