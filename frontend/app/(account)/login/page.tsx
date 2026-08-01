@@ -28,23 +28,28 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login form submitted:", formData);
-    mutate({
-      email: formData.email,
-      password: formData.password,
-    }, {
-      onSuccess: (data) => {
-        Cookies.set("access_token", data.access_token, {
-          expires: 1, // 1 day
-        });
-        router.push("/"); // or "/dashboard"
-        console.log("user created", data);
+    // console.log("Login form submitted:", formData);
+    const guestId = localStorage.getItem("guest_id");
+    mutate(
+      {
+        email: formData.email,
+        password: formData.password,
+        guest_id: guestId ?? "",
       },
+      {
+        onSuccess: (data) => {
+          Cookies.set("access_token", data.access_token, {
+            expires: 1, // 1 day
+          });
+          router.push("/"); // or "/dashboard"
+          console.log("user created", data);
+        },
 
-      onError: (error) => {
-        console.error(error);
+        onError: (error) => {
+          console.error(error);
+        },
       },
-    });
+    );
   };
 
   return (
