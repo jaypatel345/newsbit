@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Check } from "lucide-react";
 import { useSignup } from "@/app/hooks/useAuth";
@@ -15,6 +15,7 @@ export default function SignUpPage() {
     email: "",
     password: "",
     agreeToTerms: false,
+    guest_id: "",
   });
 
   const { mutate, isPending, error } = useSignup();
@@ -26,6 +27,18 @@ export default function SignUpPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  useEffect(() => {
+    const guestId = localStorage.getItem("guest_id");
+
+    if (guestId) {
+      setFormData((prev) => ({
+        ...prev,
+
+        guest_id: guestId,
+      }));
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
