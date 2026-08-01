@@ -6,6 +6,12 @@ from app.schemas.conversation import (
     CreateConversationRequest,
     UpdateConversationRequest,
 )
+from fastapi import Header
+from app.services.auth_service import (
+    get_optional_current_user,
+)
+from app.models.user import User
+
 from app.schemas.message import (
     SendMessageRequest,
     MessageResponse,
@@ -22,18 +28,22 @@ def get_conversation_service(
 
 @router.get("/conversations")
 async def get_conversations(
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
-    return await service.get_conversations()
+    return await service.get_conversations(current_user, guest_id)
 
 
 @router.post("/conversations")
 async def create_conversation(
     request: CreateConversationRequest,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
 
-    return await service.create_conversation(request)
+    return await service.create_conversation(request, current_user, guest_id)
 
 
 @router.patch("/conversations/{conversation_id}")
@@ -57,20 +67,24 @@ async def delete_conversation(
 @router.get("/conversations/{conversation_id}/messages")
 async def get_messages(
     conversation_id: int,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
 
-    return await service.get_messages(conversation_id)
+    return await service.get_messages(conversation_id, current_user, guest_id)
 
 
 @router.post("/conversations/{conversation_id}/messages")
 async def send_message(
     request: SendMessageRequest,
     conversation_id: int,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ) -> MessageResponse:
 
-    return await service.send_message(request, conversation_id)
+    return await service.send_message(request, conversation_id, current_user, guest_id)
 
 
 @router.delete("/conversations/{conversation_id}/messages")

@@ -19,6 +19,7 @@ class SignupRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
+    guest_id: str | None = None
 
 
 class SignupResponse(BaseModel):
@@ -33,6 +34,7 @@ class LoginRequest(BaseModel):
 
     email: EmailStr
     password: str
+    guest_id: str | None = None
 
 
 class LoginResponse(BaseModel):

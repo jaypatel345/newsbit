@@ -1,15 +1,17 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.user import User
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 from app.utils.password import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token
 from app.schemas.auth import UserResponse
 import hashlib
 from fastapi import Depends, status
 from app.db.database import get_db
-from app.utils.jwt import verify_access_token, oauth2_scheme
-from fastapi import Response
+from app.utils.jwt import verify_access_token, oauth2_scheme, oauth2_scheme_optional
+from typing import Optional
+
+from app.services.conversation_service import ConversationService
 
 
 class AuthService:
@@ -18,7 +20,7 @@ class AuthService:
 
         self.db = db
 
-    async def signup(self, request):
+    async def signup(self, request, guest_id: str | None):
 
         # 2. Check if the email already exists.
 
@@ -46,6 +48,15 @@ class AuthService:
         await self.db.commit()
         await self.db.refresh(create_user)
 
+        if guest_id is not None:
+
+            conversation_service = ConversationService(self.db)
+
+            await conversation_service.migrate_guest_conversations(
+                guest_id=guest_id,
+                user_id=create_user.id,
+            )
+
         # 5. Generate an Access Token (JWT with user_id, email).
 
         access_token = create_access_token(
@@ -71,7 +82,7 @@ class AuthService:
             "user": user_response,
         }
 
-    async def login(self, request):
+    async def login(self, request, guest_id: str | None):
 
         # 1. Find the user by email.
 
@@ -94,6 +105,15 @@ class AuthService:
         if not is_valid:
 
             raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        if guest_id is not None:
+
+            conversation_service = ConversationService(self.db)
+
+            await conversation_service.migrate_guest_conversations(
+                guest_id=guest_id,
+                user_id=user.id,
+            )
 
         # 4. Generate tokens.
 
@@ -140,9 +160,12 @@ class AuthService:
 
         return {"message": "Logged out successfully"}
 
-    async def refresh(self):
-
-        pass
+    async def refresh(self, response: Response):
+        # This would need to be implemented to handle refresh token logic
+        # For now, raise an exception to indicate it's not implemented
+        raise HTTPException(
+            status_code=501, detail="Refresh token endpoint not implemented"
+        )
 
     async def me(self):
 
@@ -168,3 +191,19 @@ async def get_current_user(
         )
 
     return user
+
+
+async def get_optional_current_user(
+    token: str | None = Depends(oauth2_scheme_optional),
+    db: AsyncSession = Depends(get_db),
+) -> Optional[User]:
+
+    if token is None:
+
+        return None
+
+    payload = verify_access_token(token)
+
+    result = await db.execute(select(User).where(User.id == payload["user_id"]))
+
+    return result.scalar_one_or_none()

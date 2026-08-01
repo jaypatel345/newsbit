@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
 from app.db.database import Base
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -23,6 +24,10 @@ class User(Base):
         DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now(),
+    )
+    conversations = relationship(
+        "Conversation",
+        back_populates="user",
     )
 
     def __repr__(self):

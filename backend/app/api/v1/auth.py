@@ -6,18 +6,20 @@ from app.services.auth_service import AuthService
 from fastapi import Response
 from app.services.auth_service import get_current_user
 from app.models.user import User
+from fastapi import Header
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 
 @router.post("/signup")
 async def signup(
     request: SignupRequest,
     response: Response,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
     db: AsyncSession = Depends(get_db),
 ):
 
-    result = await AuthService(db).signup(request)
+    result = await AuthService(db).signup(request, guest_id)
     response.set_cookie(
         key="refresh_token",
         value=result["refresh_token"],
@@ -36,10 +38,11 @@ async def signup(
 async def login(
     request: LoginRequest,
     response: Response,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
     db: AsyncSession = Depends(get_db),
 ):
 
-    result = await AuthService(db).login(request)
+    result = await AuthService(db).login(request, guest_id)
 
     response.set_cookie(
         key="refresh_token",
@@ -66,9 +69,8 @@ async def logout(
 
 
 @router.post("/refresh")
-async def refresh():
-
-    return await AuthService().refresh()
+async def refresh(response: Response):
+    return await AuthService().refresh(response)
 
 
 @router.get("/me", response_model=UserResponse)

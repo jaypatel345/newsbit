@@ -1,14 +1,36 @@
 import { Message } from "@/types/message";
+import Cookies from "js-cookie";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getMessages(conversationId: number): Promise<Message[]> {
+  const token = Cookies.get("access_token");
+  const guestId = localStorage.getItem("guest_id");
+
+  const headers: Record<string, string> = {};
+
+  // Add authorization header for authenticated users
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Add guest ID header for unauthenticated users
+  if (!token && guestId) {
+    headers["X-Guest-ID"] = guestId;
+  }
+
   const response = await fetch(
     `${BASE_URL}/api/v1/conversations/${conversationId}/messages`,
+    {
+      headers,
+      credentials: "include",
+    },
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch messages");
+    const errorData = await response.json().catch(() => ({}));
+    console.error("Get messages error:", errorData);
+    throw new Error(errorData.detail || "Failed to fetch messages");
   }
 
   return response.json();
@@ -16,19 +38,31 @@ export async function getMessages(conversationId: number): Promise<Message[]> {
 
 export async function sendMessage(
   conversationId: number,
-
   content: string,
 ): Promise<Message> {
+  const token = Cookies.get("access_token");
+  const guestId = localStorage.getItem("guest_id");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Add authorization header for authenticated users
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Add guest ID header for unauthenticated users
+  if (!token && guestId) {
+    headers["X-Guest-ID"] = guestId;
+  }
+
   const response = await fetch(
     `${BASE_URL}/api/v1/conversations/${conversationId}/messages`,
-
     {
       method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
+      headers,
+      credentials: "include",
       body: JSON.stringify({
         content,
       }),
@@ -36,7 +70,9 @@ export async function sendMessage(
   );
 
   if (!response.ok) {
-    throw new Error("Failed to send message");
+    const errorData = await response.json().catch(() => ({}));
+    console.error("Send message error:", errorData);
+    throw new Error(errorData.detail || "Failed to send message");
   }
 
   return response.json();

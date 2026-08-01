@@ -2,11 +2,13 @@ export interface SignupRequest {
   name: string;
   email: string;
   password: string;
+  guest_id: string | null;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
+  guest_id: string | null;
 }
 
 export interface SignupResponse {
@@ -31,4 +33,9 @@ export interface User {
   email: string;
 
   avatar_url: string | null;
+}
+
+export interface RefreshResponse {
+  access_token: string;
+  token_type: "bearer";
 }

@@ -1,6 +1,8 @@
 from app.db.database import Base
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
 
 
 class Conversation(Base):
@@ -14,6 +16,16 @@ class Conversation(Base):
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
+    )
+    guest_id = Column(String(36), nullable=True, index=True)
+
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=True,
+    )
+    user = relationship(
+        "User",
+        back_populates="conversations",
     )
 
     updated_at = Column(

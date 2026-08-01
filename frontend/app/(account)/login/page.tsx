@@ -29,7 +29,10 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login form submitted:", formData);
-    mutate(formData, {
+    mutate({
+      email: formData.email,
+      password: formData.password,
+    }, {
       onSuccess: (data) => {
         Cookies.set("access_token", data.access_token, {
           expires: 1, // 1 day

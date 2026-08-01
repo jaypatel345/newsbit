@@ -10,6 +10,10 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl="/api/v1/auth/login",
+    auto_error=False,
+)
 
 
 def create_access_token(data: dict) -> str:

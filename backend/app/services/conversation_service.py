@@ -1,10 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import UUID, select
 from app.models.conversation import Conversation
 from app.models.message import Message
 from fastapi import HTTPException
 from app.core.llm import groq_client
 from sqlalchemy import func
+from app.models.user import User
+from app.schemas.conversation import CreateConversationRequest
+from typing import Optional
 
 
 class ConversationService:
@@ -13,32 +16,74 @@ class ConversationService:
 
         self.db = db
 
-    async def get_conversations(self) -> list:
-        result = await self.db.execute(
-            select(Conversation).order_by(
-                Conversation.is_pinned.desc(),
-                Conversation.updated_at.desc(),
+    async def get_conversations(
+        self, current_user: Optional[User], guest_id: Optional[str]
+    ) -> list:
+        if current_user is not None:
+            result = await self.db.execute(
+                select(Conversation)
+                .where(Conversation.user_id == current_user.id)
+                .order_by(
+                    Conversation.is_pinned.desc(),
+                    Conversation.updated_at.desc(),
+                )
             )
-        )
+        elif guest_id is not None:
+            result = await self.db.execute(
+                select(Conversation)
+                .where(Conversation.guest_id == guest_id)
+                .order_by(
+                    Conversation.is_pinned.desc(),
+                    Conversation.updated_at.desc(),
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
 
         conversations = result.scalars().all()
 
+        # Return empty list instead of 404 when no conversations exist
         return conversations
 
-    async def create_conversation(self, request):
+    async def create_conversation(
+        self,
+        request: CreateConversationRequest,
+        current_user: Optional[User],
+        guest_id: Optional[str],
+    ) -> Conversation:
+
         conversation = Conversation(
             title=request.title,
         )
+        print("guest_id =", guest_id)
+
+        print("current_user =", current_user)
+
+        if current_user is not None:
+            conversation.user_id = current_user.id
+        elif guest_id is not None:
+            conversation.guest_id = guest_id
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
+
         self.db.add(conversation)
         await self.db.commit()
-
         await self.db.refresh(conversation)
 
         return conversation
 
-    async def update_conversation(self, request, conversation_id):
+    async def update_conversation(self, request, conversation_id, current_user: User):
         conversation_exists = await self.db.execute(
-            select(Conversation).where(Conversation.id == conversation_id)
+            select(Conversation).where(
+                Conversation.id == conversation_id,
+                Conversation.user_id == current_user.id,
+            )
         )
         result = conversation_exists.scalar_one_or_none()
 
@@ -65,9 +110,12 @@ class ConversationService:
 
         return conversation
 
-    async def delete_conversation(self, conversation_id):
+    async def delete_conversation(self, conversation_id, current_user: User):
         result = await self.db.execute(
-            select(Conversation).where(Conversation.id == conversation_id)
+            select(Conversation).where(
+                Conversation.id == conversation_id,
+                Conversation.user_id == current_user.id,
+            )
         )
 
         conversation = result.scalar_one_or_none()
@@ -83,7 +131,33 @@ class ConversationService:
 
         return {"message": "Conversation deleted successfully"}
 
-    async def get_messages(self, conversation_id):
+    async def get_messages(
+        self, conversation_id, current_user: Optional[User], guest_id: Optional[str]
+    ):
+        if current_user is not None:
+            conversation = await self.db.scalar(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == current_user.id,
+                )
+            )
+        elif guest_id is not None:
+            conversation = await self.db.scalar(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.guest_id == guest_id,
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
+
+        if not conversation:
+
+            raise HTTPException(status_code=404, detail="Conversation not found")
+
         result = await self.db.execute(
             select(Message)
             .where(Message.conversation_id == conversation_id)
@@ -94,11 +168,33 @@ class ConversationService:
 
         return messages
 
-    async def send_message(self, request, conversation_id):
+    async def send_message(
+        self,
+        request,
+        conversation_id,
+        current_user: Optional[User],
+        guest_id: Optional[str],
+    ):
         # 1. Verify the conversation exists.
-        result = await self.db.execute(
-            select(Conversation).where(Conversation.id == conversation_id)
-        )
+        if current_user is not None:
+            result = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == current_user.id,
+                )
+            )
+        elif guest_id is not None:
+            result = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.guest_id == guest_id,
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
 
         conversation = result.scalar_one_or_none()
 
@@ -163,5 +259,24 @@ class ConversationService:
         }
 
     async def clear_messages(self, conversation_id):
-
         pass
+
+    async def migrate_guest_conversations(
+        self,
+        guest_id: str,
+        user_id: UUID,
+    ):
+        result = await self.db.execute(
+            select(Conversation).where(
+                Conversation.guest_id == guest_id,
+                Conversation.user_id.is_(None),
+            )
+        )
+
+        conversations = result.scalars().all()
+
+        for conversation in conversations:
+            conversation.user_id = user_id
+            conversation.guest_id = None
+
+        await self.db.commit()

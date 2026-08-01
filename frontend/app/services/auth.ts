@@ -5,11 +5,13 @@ import {
   SignupRequest,
   SignupResponse,
   User,
+  RefreshResponse,
 } from "@/types/auth";
 import Cookies from "js-cookie";
+import { apiFetch } from "../lib/apiFetch";
 
 export async function Signup(data: SignupRequest): Promise<SignupResponse> {
-  const response = await fetch(`${BASE_URL}/auth/signup`, {
+  const response = await apiFetch("/api/v1/auth/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,24 +27,26 @@ export async function Signup(data: SignupRequest): Promise<SignupResponse> {
 }
 
 export async function Login(data: LoginRequest): Promise<LoginResponse> {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
+  const response = await apiFetch("/api/v1/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include", //
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    throw new Error("Signup failed");
+    const errorData = await response.json().catch(() => ({}));
+    console.error("Login error:", errorData);
+    throw new Error(errorData.detail || "Login failed");
   }
 
   return response.json();
 }
 
 export async function getMe(accessToken: string): Promise<User> {
-  const response = await fetch(`${BASE_URL}/auth/me`, {
+  const response = await apiFetch("/api/v1/auth/me", {
     method: "GET",
 
     credentials: "include",
@@ -64,7 +68,7 @@ export async function getMe(accessToken: string): Promise<User> {
 export async function logout() {
   const token = Cookies.get("access_token");
 
-  const response = await fetch(`${BASE_URL}/auth/logout`, {
+  const response = await apiFetch("/api/v1/auth/logout", {
     method: "POST",
 
     credentials: "include",
@@ -76,6 +80,19 @@ export async function logout() {
 
   if (!response.ok) {
     throw new Error("Logout failed");
+  }
+
+  return response.json();
+}
+
+export async function refresh(): Promise<RefreshResponse> {
+  const response = await apiFetch("/api/v1/auth/refresh", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Refresh failed");
   }
 
   return response.json();

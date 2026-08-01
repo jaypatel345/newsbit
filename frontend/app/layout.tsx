@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import AuthInitializer from "./components/AuthInitializer";
+import GuestInitializer from "./components/GuestInitializer";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -130,6 +131,7 @@ export default function RootLayout({
       <body className="h-full flex flex-col">
         <Providers>
           <AuthInitializer />
+          <GuestInitializer />
           {children}
         </Providers>
       </body>
