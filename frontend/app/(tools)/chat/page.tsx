@@ -107,20 +107,20 @@ function ChatPageContent() {
         signal: abortControllerRef.current.signal,
       });
 
+      // Immediately add the response to messages to ensure it's always displayed
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        (oldMessages: Message[] = []) => [...oldMessages, response],
+      );
+      
+      // Still set pending response for animation but it's already in messages
       setPendingResponse(response);
       
-      // Fallback: Add response immediately to ensure it's always displayed
-      // This handles cases where timeline doesn't complete properly
+      // Clean up pending state after animation completes
       setTimeout(() => {
-        if (pendingResponse === response) {
-          queryClient.setQueryData(
-            ["messages", conversationId],
-            (oldMessages: Message[] = []) => [...oldMessages, response],
-          );
-          setPendingResponse(null);
-          setLoading(false);
-        }
-      }, 10000); // 10 second fallback
+        setPendingResponse(null);
+        setLoading(false);
+      }, 10000); // 10 second cleanup
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
@@ -202,7 +202,20 @@ function ChatPageContent() {
         signal: abortControllerRef.current.signal,
       });
 
+      // Immediately add the response to messages to ensure it's always displayed
+      queryClient.setQueryData(
+        ["messages", selectedConversationId],
+        (oldMessages: Message[] = []) => [...oldMessages, response],
+      );
+      
+      // Still set pending response for animation but it's already in messages
       setPendingResponse(response);
+      
+      // Clean up pending state after animation completes
+      setTimeout(() => {
+        setPendingResponse(null);
+        setLoading(false);
+      }, 10000); // 10 second cleanup
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
@@ -219,12 +232,8 @@ function ChatPageContent() {
   };
 
   const handleAnimationComplete = () => {
-    if (pendingResponse && selectedConversationId) {
-      queryClient.setQueryData(
-        ["messages", selectedConversationId],
-
-        (oldMessages: Message[] = []) => [...oldMessages, pendingResponse],
-      );
+    // Just clean up the pending state since response is already in messages
+    if (pendingResponse) {
       setPendingResponse(null);
     }
     setLoading(false);
