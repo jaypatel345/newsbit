@@ -5,9 +5,9 @@ from app.db.database import get_db
 from app.services.news_service import NewsService
 from app.services.ranking_service import RankingService
 from app.scheduler import run_news_fetch_job
+from app.core.config import settings
 import logging
 from fastapi import HTTPException, Header
-import os
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
 
@@ -49,7 +49,7 @@ async def rank_articles(db: DbSession):
 @router.post("/run-job")
 async def run_job(authorization: str = Header(None)):
 
-    expected = f"Bearer {os.getenv('SCHEDULER_SECRET')}"
+    expected = f"Bearer {settings.SCHEDULER_SECRET}"
 
     if authorization != expected:
 
