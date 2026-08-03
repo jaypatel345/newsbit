@@ -39,6 +39,7 @@ export async function getMessages(conversationId: number): Promise<Message[]> {
 export async function sendMessage(
   conversationId: number,
   content: string,
+  signal?: AbortSignal,
 ): Promise<Message> {
   const token = Cookies.get("access_token");
   const guestId = localStorage.getItem("guest_id");
@@ -66,6 +67,7 @@ export async function sendMessage(
       body: JSON.stringify({
         content,
       }),
+      signal,
     },
   );
 

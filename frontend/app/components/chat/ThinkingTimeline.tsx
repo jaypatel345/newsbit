@@ -45,7 +45,7 @@ export default function ThinkingTimeline({
             setDisplayedText("");
           }, 900);
         }
-      }, 20);
+      }, 5);
     };
 
     // Add delay for first step to simulate "thinking"

@@ -8,12 +8,12 @@ export function useSendMessage() {
   return useMutation({
     mutationFn: ({
       conversationId,
-
       content,
+      signal,
     }: {
       conversationId: number;
-
       content: string;
-    }) => sendMessage(conversationId, content),
+      signal?: AbortSignal;
+    }) => sendMessage(conversationId, content, signal),
   });
 }

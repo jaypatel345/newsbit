@@ -5,6 +5,7 @@ import PromptChips from "@/app/components/chat/PromptChips";
 import ChatInput from "@/app/components/chat/ChatInput";
 import ConversationMenu from "@/app/components/chat/ConversationMenu";
 import RenameDialog from "@/app/components/chat/RenameDialog";
+import ThinkingSection from "@/app/components/chat/ThinkingSection";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -41,6 +42,7 @@ function ChatPageContent() {
     conversationId: number | null;
     currentTitle: string;
   }>({ isOpen: false, conversationId: null, currentTitle: "" });
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSend = async (message: string) => {
     if (!message.trim()) return;
@@ -75,6 +77,9 @@ function ChatPageContent() {
     setLoading(true);
     setPendingResponse(null);
 
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     // Update conversation title if this is the first message (non-blocking)
     if (isFirstMessage) {
       const generatedTitle = generateTitleFromMessage(message);
@@ -98,15 +103,46 @@ function ChatPageContent() {
     try {
       const response = await sendMessage({
         conversationId: conversationId,
-
         content: message,
+        signal: abortControllerRef.current.signal,
       });
 
       setPendingResponse(response);
+      
+      // Fallback: Add response immediately to ensure it's always displayed
+      // This handles cases where timeline doesn't complete properly
+      setTimeout(() => {
+        if (pendingResponse === response) {
+          queryClient.setQueryData(
+            ["messages", conversationId],
+            (oldMessages: Message[] = []) => [...oldMessages, response],
+          );
+          setPendingResponse(null);
+          setLoading(false);
+        }
+      }, 10000); // 10 second fallback
     } catch (error) {
-      console.error(error);
+      // Check if the error is due to abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request was aborted');
+        // Remove the pending user message since we stopped the generation
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (oldMessages: Message[] = []) => oldMessages.slice(0, -1)
+        );
+      } else {
+        console.error(error);
+      }
       setLoading(false);
     }
+  };
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
   };
 
   const handleEditMessage = async (messageId: string, newContent: string) => {
@@ -156,18 +192,29 @@ function ChatPageContent() {
     setLoading(true);
     setPendingResponse(null);
 
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     try {
       const response = await sendMessage({
         conversationId: selectedConversationId,
         content: newContent,
+        signal: abortControllerRef.current.signal,
       });
 
       setPendingResponse(response);
     } catch (error) {
-      console.error(error);
+      // Check if the error is due to abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request was aborted');
+        // Revert the changes if the send was aborted
+        queryClient.setQueryData(["messages", selectedConversationId], messages);
+      } else {
+        console.error(error);
+        // Revert the changes if the send fails
+        queryClient.setQueryData(["messages", selectedConversationId], messages);
+      }
       setLoading(false);
-      // Revert the changes if the send fails
-      queryClient.setQueryData(["messages", selectedConversationId], messages);
     }
   };
 
@@ -188,6 +235,8 @@ function ChatPageContent() {
     setSelectedConversationId(conversation.id);
     queryClient.setQueryData(["messages", conversation.id], []);
     setInputMessage("");
+    // Clear any existing abort controller
+    abortControllerRef.current = null;
   };
 
   const handlePinConversation = (conversationId: number, isPinned: boolean) => {
@@ -258,6 +307,12 @@ function ChatPageContent() {
       if (selectedConversationId === conversationId) {
         setSelectedConversationId(null);
         queryClient.setQueryData(["messages"], []);
+        // Abort any ongoing request for this conversation
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+          abortControllerRef.current = null;
+        }
+        setLoading(false);
       }
       
       // Try to delete on the server in background (fire and forget)
@@ -367,7 +422,15 @@ function ChatPageContent() {
                 }`}
               >
                 <button
-                  onClick={() => setSelectedConversationId(conversation.id)}
+                  onClick={() => {
+                    // Abort any ongoing request when switching conversations
+                    if (abortControllerRef.current) {
+                      abortControllerRef.current.abort();
+                      abortControllerRef.current = null;
+                    }
+                    setLoading(false);
+                    setSelectedConversationId(conversation.id);
+                  }}
                   className="flex-1 flex items-center gap-2 text-left truncate"
                 >
                   {conversation.is_pinned && <Pin className="h-3 w-3 text-stone-500 shrink-0" />}
@@ -389,25 +452,7 @@ function ChatPageContent() {
       <div className="flex flex-1 flex-col h-full bg-white text-stone-900 animate-in fade-in duration-700">
         <main className="flex-1 overflow-y-auto pb-36 sm:pb-40 pt-8 flex flex-col px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto w-full">
-            {selectedConversationId && messages.length === 0 ? (
-              // Skeleton loading for messages when conversation is selected but no messages yet
-              <div className="space-y-4 px-4 py-8">
-                <div className="flex justify-end">
-                  <div className="bg-neutral-900 rounded-2xl p-4 max-w-[85%] animate-pulse">
-                    <div className="h-4 bg-white/20 rounded w-48" />
-                  </div>
-                </div>
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 rounded-2xl p-4 max-w-[85%] animate-pulse">
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-300 rounded w-full" />
-                      <div className="h-4 bg-gray-300 rounded w-5/6" />
-                      <div className="h-4 bg-gray-300 rounded w-4/6" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : messages.length === 0 ? (
+            {messages.length === 0 ? (
               <div className="flex flex-1 items-center justify-center px-4 py-12">
                 <p className="text-sm sm:text-base text-center text-stone-600 leading-relaxed">
                   Start a conversation by selecting a prompt or typing a message.
@@ -439,6 +484,7 @@ function ChatPageContent() {
               setMessage={setInputMessage}
               loading={loading}
               onSend={handleSend}
+              onStop={handleStop}
             />
           </div>
         </footer>

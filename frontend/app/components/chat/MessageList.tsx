@@ -1,6 +1,6 @@
 import { Message } from "@/types/message";
 import { ExternalLink, Copy, Edit2, Check, X } from "lucide-react";
-import ThinkingTimeline from "./ThinkingTimeline";
+import ThinkingSection from "./ThinkingSection";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -157,7 +157,7 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
         </div>
       ))}
 
-      {loading && onLoadingComplete && <ThinkingTimeline onComplete={onLoadingComplete} />}
+      {loading && onLoadingComplete && <ThinkingSection onComplete={onLoadingComplete} isThinking={loading} />}
     </div>
   );
 }
