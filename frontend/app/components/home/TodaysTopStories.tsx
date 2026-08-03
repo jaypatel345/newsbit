@@ -14,27 +14,8 @@ export function getRelativeTime(dateString: string) {
 }
 
 export default function TodaysTopStories() {
-  const { data: topStories, isLoading, error } = useTopStories();
+  const { data: topStories, isLoading, error } = useTopStories(500); // 500ms delay for home page
 
-  if (isLoading) {
-    return (
-      <section className="py-16 sm:py-20 md:py-24">
-        <div className="text-center">
-          <div className="animate-pulse">Loading top stories...</div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error || !topStories) {
-    return (
-      <section className="py-16 sm:py-20 md:py-24">
-        <div className="text-center">
-          <div className="text-gray-500">Unable to load top stories at this time.</div>
-        </div>
-      </section>
-    );
-  }
   return (
     <section className="py-16 sm:py-20 md:py-24">
       {/* Header */}
@@ -48,109 +29,155 @@ export default function TodaysTopStories() {
       </div>
 
       {/* Stories Grid - 2 columns with 3 items each */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        {/* Left Column */}
-        <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
-          {topStories.slice(0, 3).map((story, index) => (
-            <div
-              key={story.id}
-              className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
-            >
-              <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
-                {/* Image */}
-                <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
-                  <img
-                    src={story.image_url}
-                    alt={story.summary}
-                    className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
-                  />
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          {[1, 2].map((col) => (
+            <div key={col} className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+              {[1, 2, 3].map((index) => (
+                <div
+                  key={index}
+                  className={`${index !== 3 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                >
+                  <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
+                    {/* Image Skeleton */}
+                    <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                      <div className="w-full h-40 lg:w-32 lg:h-24 bg-gray-200 rounded-lg animate-pulse" />
+                    </div>
+
+                    {/* Content Skeleton */}
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
+                    </div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : error || !topStories ? (
+        <div className="text-center">
+          <div className="text-gray-500">Unable to load top stories at this time.</div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          {/* Left Column */}
+          <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+            {topStories.slice(0, 3).map((story, index) => (
+              <div
+                key={story.id}
+                className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+              >
+                <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
+                  {/* Image */}
+                  {story.image_url && (
+                    <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                      <img
+                        src={story.image_url}
+                        alt={story.summary}
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
+                        onError={(e) => {
+                          // Use a placeholder image when the original fails to load
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96"%3E%3Crect fill="%23f3f4f6" width="128" height="96"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                        }}
+                      />
+                    </div>
+                  )}
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Source */}
-                  <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900 ">
-                    <img
-                      src={getSourceLogoUrl(story.domain)}
-                      alt=""
-                      className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
-                    />
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Source */}
+                    <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900 ">
+                      <img
+                        src={getSourceLogoUrl(story.domain)}
+                        alt=""
+                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
+                      />
 
-                    {story.source_name}
-                  </p>
+                      {story.source_name}
+                    </p>
 
-                  {/* Headline */}
-                  <Link href="/brief" className="block">
-                    <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                      {story.title}
-                    </h3>
-                  </Link>
+                    {/* Headline */}
+                    <Link href="/brief" className="block">
+                      <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
+                        {story.title}
+                      </h3>
+                    </Link>
 
-                  {/* Time and Author */}
-                  <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
-                    <span className="shrink-0">
-                      {getRelativeTime(story.published_at)}
-                    </span>
-
-                    {story.author && (
-                      <span className="max-w-32 sm:max-w-40 truncate" title={story.author}>
-                        • {story.author}
+                    {/* Time and Author */}
+                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
+                      <span className="shrink-0">
+                        {getRelativeTime(story.published_at)}
                       </span>
-                    )}
+
+                      {story.author && (
+                        <span className="max-w-32 sm:max-w-40 truncate" title={story.author}>
+                          • {story.author}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Right Column */}
-        <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6">
-          {topStories.slice(3, 6).map((story, index) => (
-            <div
-              key={story.id}
-              className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
-            >
-              <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
-                {/* Image */}
-                <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
-                  <img
-                    src={story.image_url}
-                    alt={story.url}
-                    className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
-                  />
-                </div>
+          {/* Right Column */}
+          <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6">
+            {topStories.slice(3, 6).map((story, index) => (
+              <div
+                key={story.id}
+                className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+              >
+                <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
+                  {/* Image */}
+                  {story.image_url && (
+                    <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                      <img
+                        src={story.image_url}
+                        alt={story.url}
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
+                        onError={(e) => {
+                          // Use a placeholder image when the original fails to load
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96"%3E%3Crect fill="%23f3f4f6" width="128" height="96"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                        }}
+                      />
+                    </div>
+                  )}
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Source */}
-                  <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900">
-                    <img
-                      src={getSourceLogoUrl(story.domain)}
-                      alt=""
-                      className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
-                    />
-                    {story.source_name}
-                  </p>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Source */}
+                    <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900">
+                      <img
+                        src={getSourceLogoUrl(story.domain)}
+                        alt=""
+                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
+                      />
+                      {story.source_name}
+                    </p>
 
-                  {/* Headline */}
-                  <Link href="/brief" className="block">
-                    <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                      {story.title}
-                    </h3>
-                  </Link>
+                    {/* Headline */}
+                    <Link href="/brief" className="block">
+                      <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
+                        {story.title}
+                      </h3>
+                    </Link>
 
-                  {/* Time and Author */}
-                  <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
-                    <span>{getRelativeTime(story.published_at)}</span>
-                    {story.author && <span>• {story.author}</span>}
+                    {/* Time and Author */}
+                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
+                      <span>{getRelativeTime(story.published_at)}</span>
+                      {story.author && <span>• {story.author}</span>}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* View All Button */}
       <div className="text-center">

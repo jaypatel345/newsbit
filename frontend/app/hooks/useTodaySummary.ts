@@ -6,5 +6,9 @@ export function useTodaySummary() {
   return useQuery({
     queryKey: ["TopSummary"],
     queryFn: getTopSummary,
+    // Stagger the initial load - no delay for first section
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 }

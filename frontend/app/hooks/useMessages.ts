@@ -11,5 +11,8 @@ export function useMessages(conversationId: number | null) {
     queryFn: () => getMessages(conversationId!),
 
     enabled: !!conversationId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 }

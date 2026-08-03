@@ -8,5 +8,8 @@ export function useConversations() {
   return useQuery<Conversation[]>({
     queryKey: ["conversations"],
     queryFn: getConversations,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 }

@@ -6,13 +6,6 @@ import { useTodaySummary } from "@/app/hooks/useTodaySummary";
 export default function BriefPreview() {
   const { data, isLoading, error } = useTodaySummary();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Something went wrong.</div>;
-  }
-
   return (
     <section id="brief-preview" className="py-8 sm:py-12">
       {/* Header */}
@@ -35,10 +28,23 @@ export default function BriefPreview() {
         </div>
 
         {/* Preview Text - Bullet Points */}
-
-        <ul className="text-gray-700 text-sm leading-relaxed mb-4 sm:mb-6 space-y-2 sm:space-y-2.5">
-          {data?.summary?.map((item: string, index: number) => (
-            <div>
+        {isLoading ? (
+          <div className="space-y-3 sm:space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-3.5 h-3.5 rounded-full bg-gray-200 mt-0.5 shrink-0 animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-gray-500">Unable to load brief at this time.</div>
+        ) : (
+          <ul className="text-gray-700 text-sm leading-relaxed mb-4 sm:mb-6 space-y-2 sm:space-y-2.5">
+            {data?.summary?.map((item: string, index: number) => (
               <li key={index} className="flex items-start gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -56,9 +62,9 @@ export default function BriefPreview() {
                 </svg>
                 <span>{item}</span>
               </li>
-            </div>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        )}
 
         {/* Footer with metadata and CTA */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pt-3 sm:pt-4 border-t border-gray-100">
