@@ -14,8 +14,8 @@ export async function getMessages(conversationId: number): Promise<Message[]> {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  // Add guest ID header for unauthenticated users
-  if (!token && guestId) {
+  // Add guest ID header as fallback for expired tokens
+  if (guestId) {
     headers["X-Guest-ID"] = guestId;
   }
 
@@ -52,8 +52,8 @@ export async function sendMessage(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  // Add guest ID header for unauthenticated users
-  if (!token && guestId) {
+  // Add guest ID header as fallback for expired tokens
+  if (guestId) {
     headers["X-Guest-ID"] = guestId;
   }
 

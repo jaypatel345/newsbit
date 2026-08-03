@@ -40,11 +40,17 @@ export default function TopicCard({ category }: TopicCardProps) {
             className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
           >
             {/* Left Image */}
-            <img
-              src={article.image_url}
-              alt={article.title}
-              className="w-20 h-20 rounded-xl object-cover shrink-0"
-            />
+            {article.image_url && (
+              <img
+                src={article.image_url}
+                alt={article.title}
+                className="w-20 h-20 rounded-xl object-cover shrink-0"
+                onError={(e) => {
+                  // Use a placeholder image when the original fails to load
+                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23f3f4f6" width="80" height="80"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="10" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                }}
+              />
+            )}
 
             {/* Right Content */}
             <div className="flex-1 min-w-0">

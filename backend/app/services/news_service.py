@@ -1,5 +1,5 @@
 from app.core.config import settings
-from sqlalchemy import select
+from sqlalchemy import select, func
 from groq import AsyncGroq
 from app.models.article import Article
 from app.models.summary import Summary
@@ -49,6 +49,8 @@ class NewsService:
                 .where(
                     Article.summary.is_not(None),
                     Article.published_at >= today,
+                    Article.image_url.is_not(None),
+                    Article.image_url != '',
                 )
                 .order_by(
                     Article.popularity_score.desc(),
@@ -102,7 +104,10 @@ class NewsService:
     async def get_categories(self):
         try:
             result = await self.db.execute(
-                select(Article.category).distinct().order_by(Article.category)
+                select(Article.category)
+                .group_by(Article.category)
+                .having(func.count(Article.id) >= 3)
+                .order_by(Article.category)
             )
             categories = [row[0] for row in result.all() if row[0]]
             return categories
@@ -115,7 +120,11 @@ class NewsService:
         try:
             result = await self.db.execute(
                 select(Article)
-                .where(Article.category.ilike(category))
+                .where(
+                    Article.category.ilike(category),
+                    Article.image_url.is_not(None),
+                    Article.image_url != '',
+                )
                 .order_by(Article.published_at.desc())
                 .limit(10)
             )
@@ -145,6 +154,8 @@ class NewsService:
             .where(
                 Article.summary.is_not(None),
                 Article.published_at >= today,
+                Article.image_url.is_not(None),
+                Article.image_url != '',
             )
             .order_by(Article.popularity_score.desc(), Article.published_at.desc())
             .limit(15)

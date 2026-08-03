@@ -58,9 +58,6 @@ class ConversationService:
         conversation = Conversation(
             title=request.title,
         )
-        print("guest_id =", guest_id)
-
-        print("current_user =", current_user)
 
         if current_user is not None:
             conversation.user_id = current_user.id

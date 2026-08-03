@@ -10,6 +10,7 @@ from fastapi import Depends, status
 from app.db.database import get_db
 from app.utils.jwt import verify_access_token, oauth2_scheme, oauth2_scheme_optional
 from typing import Optional
+import jwt
 
 from app.services.conversation_service import ConversationService
 
@@ -202,7 +203,12 @@ async def get_optional_current_user(
 
         return None
 
-    payload = verify_access_token(token)
+    try:
+        payload = verify_access_token(token)
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, HTTPException):
+        # Return None for expired or invalid tokens instead of raising 401
+        # This allows guest users to continue even with expired tokens
+        return None
 
     result = await db.execute(select(User).where(User.id == payload["user_id"]))
 

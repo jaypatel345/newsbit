@@ -44,6 +44,12 @@ class NewsProcessor:
             if url in seen_urls:
                 continue
 
+            # Filter out articles without valid images
+            image_url = article.get("image")
+            if not image_url or image_url.strip() == "":
+                logger.info(f"Skipping article without image: {article.get('title', 'Unknown')}")
+                continue
+
             seen_urls.add(url)
 
             with self.db.no_autoflush:

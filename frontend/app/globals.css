@@ -2,4 +2,25 @@
 
 body {
   font-family: var(--font-geist), sans-serif;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+/* Reading-focused typography improvements */
+@layer base {
+  * {
+    @apply border-stone-200;
+  }
+  
+  body {
+    @apply text-stone-900 bg-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-stone-800 tracking-tight;
+  }
+  
+  p {
+    @apply leading-relaxed text-stone-700;
+  }
 }

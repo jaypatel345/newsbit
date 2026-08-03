@@ -6,7 +6,8 @@ from app.services.news_service import NewsService
 from app.services.ranking_service import RankingService
 from app.scheduler import run_news_fetch_job
 import logging
-from fastapi import HTTPException
+from fastapi import HTTPException, Header
+import os
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
 
@@ -46,7 +47,13 @@ async def rank_articles(db: DbSession):
 
 
 @router.post("/run-job")
-async def run_job():
+async def run_job(authorization: str = Header(None)):
+
+    expected = f"Bearer {os.getenv('SCHEDULER_SECRET')}"
+
+    if authorization != expected:
+
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         logger.info("Manual scheduler started")
         await run_news_fetch_job()
