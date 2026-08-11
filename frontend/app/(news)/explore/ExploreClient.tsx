@@ -122,6 +122,7 @@ export default function ExploreClient({
           articles.map((article: Article, index: number) => (
             <div key={article.id}>
               <StoryCard
+                id={article.id}
                 storyNumber={index + 1}
                 category={article.category}
                 headline={article.title}
