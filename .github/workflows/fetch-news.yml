@@ -24,6 +24,43 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-scheduler.txt
 
+      - name: Check required secrets
+        run: |
+          echo "Checking GitHub Secrets configuration..."
+          missing_secrets=()
+          
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then missing_secrets+=("DATABASE_URL"); fi
+          if [ -z "${{ secrets.NEWS_API_URL }}" ]; then missing_secrets+=("NEWS_API_URL"); fi
+          if [ -z "${{ secrets.NEWS_API_KEY }}" ]; then missing_secrets+=("NEWS_API_KEY"); fi
+          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then missing_secrets+=("GROQ_API_KEY"); fi
+          if [ -z "${{ secrets.G_NEWS_API_URL }}" ]; then missing_secrets+=("G_NEWS_API_URL"); fi
+          if [ -z "${{ secrets.G_NEWS_API_KEY }}" ]; then missing_secrets+=("G_NEWS_API_KEY"); fi
+          if [ -z "${{ secrets.FRONTEND_URL }}" ]; then missing_secrets+=("FRONTEND_URL"); fi
+          
+          if [ ${#missing_secrets[@]} -gt 0 ]; then
+            echo "❌ Error: The following GitHub Secrets are not configured:"
+            for secret in "${missing_secrets[@]}"; do
+              echo "  - $secret"
+            done
+            echo ""
+            echo "To fix this:"
+            echo "1. Go to your GitHub repository"
+            echo "2. Navigate to Settings > Secrets and variables > Actions"
+            echo "3. Click 'New repository secret' and add each missing secret"
+            echo ""
+            echo "Required secrets:"
+            echo "  - DATABASE_URL (PostgreSQL connection string)"
+            echo "  - NEWS_API_URL (News API endpoint)"
+            echo "  - NEWS_API_KEY (News API key)"
+            echo "  - GROQ_API_KEY (Groq API key for LLM)"
+            echo "  - G_NEWS_API_URL (GNews API endpoint)"
+            echo "  - G_NEWS_API_KEY (GNews API key)"
+            echo "  - FRONTEND_URL (Frontend application URL)"
+            echo "  - SCHEDULER_SECRET (Secret for scheduler authentication)"
+            exit 1
+          fi
+          echo "✓ All required secrets are configured"
+
       - name: Run scheduler job
         working-directory: ./backend
         env:
@@ -36,10 +73,6 @@ jobs:
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           SCHEDULER_SECRET: ${{ secrets.SCHEDULER_SECRET }}
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "Error: DATABASE_URL is not set"
-            exit 1
-          fi
           python -c "
           import asyncio
           import sys
