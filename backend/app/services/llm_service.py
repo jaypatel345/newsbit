@@ -1,39 +1,98 @@
 import json
 import logging
+
 from app.core.llm import groq_client
 from app.prompts.news import NEWS_SUMMARY_PROMPT
+from app.prompts.sufficient_prompt import SUFFICIENT_PROMPT
 
 logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    async def generate_summary(self, article: dict) -> dict:
-        try:
-            chat_completion = await groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": NEWS_SUMMARY_PROMPT,
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""
-                        Title: {article['title']}
-                        Description: {article.get('description', '')}
-                         Content: {article.get('content', '')}
+	async def generate_summary(self, article: dict) -> dict:
+		try:
+			chat_completion = await groq_client.chat.completions.create(
+				model="llama-3.1-8b-instant",
+				messages=[
+					{
+						"role": "system",
+						"content": NEWS_SUMMARY_PROMPT,
+					},
+					{
+						"role": "user",
+						"content": f"""
+						Title: {article['title']}
+						Description: {article.get('description', '')}
+						 Content: {article.get('content', '')}
 
-                         """,
-                    },
-                ],
-            )
-            return json.loads(chat_completion.choices[0].message.content)
+						 """,
+					},
+				],
+			)
+			return json.loads(chat_completion.choices[0].message.content)
 
-        except Exception:
+		except Exception:
 
-            logger.exception(
-                "Error generating summary for article: %s",
-                article.get("url"),
-            )
+			logger.exception(
+				"Error generating summary for article: %s",
+				article.get("url"),
+			)
 
-            raise
+			raise
+
+
+	async def generate(
+		self,
+		prompt: str,
+		model: str = "llama-3.1-8b-instant",
+		temperature: float = 0.0,
+
+	) -> str:
+
+		try:
+
+			chat_completion = await groq_client.chat.completions.create(
+
+				model=model,
+
+				temperature=temperature,
+
+				messages=[
+					{
+						"role": "user",
+						"content": prompt,
+					}
+				],
+
+			)
+
+			return chat_completion.choices[0].message.content.strip()
+
+		except Exception:
+			logger.exception("Error generating LLM response")
+			raise
+
+
+	async def context_sufficiency(self, article_context: list[str]) -> bool:
+		try:
+			chat_completion = await groq_client.chat.completions.create(
+				model="llama-3.1-8b-instant",
+				messages=[
+					{
+						"role": "system",
+						"content": SUFFICIENT_PROMPT,
+					},
+					{
+						"role": "user",
+						"content": article_context,
+					},
+				],
+			)
+			result = chat_completion.choices[0].message.content
+			return result
+		except Exception:
+			logger.exception(
+				"Error generating prompt is sufficient or not : %s",
+				article_context,
+			)
+			raise

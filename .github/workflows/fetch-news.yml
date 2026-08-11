@@ -2,7 +2,7 @@ name: Fetch News Scheduler
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 0,6,12,18 * * *"  # Every 6 hours at UTC 00:00, 06:00, 12:00, 18:00 (IST 05:30, 11:30, 17:30, 23:30)
   workflow_dispatch:
 
 jobs:
@@ -10,8 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call Fetch News API
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        working-directory: ./backend
         run: |
-          curl --request POST \
-            --url "${{ secrets.FETCH_NEWS_URL }}" \
-            --header "Authorization: Bearer ${{ secrets.SCHEDULER_SECRET }}"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scheduler job
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEWS_API_URL: ${{ secrets.NEWS_API_URL }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          G_NEWS_API_URL: ${{ secrets.G_NEWS_API_URL }}
+          G_NEWS_API_KEY: ${{ secrets.G_NEWS_API_KEY }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          SCHEDULER_SECRET: ${{ secrets.SCHEDULER_SECRET }}
+        run: |
+          python -c "
+          import asyncio
+          import sys
+          sys.path.insert(0, '.')
+          from app.scheduler import run_news_fetch_job
+          asyncio.run(run_news_fetch_job())
+          "

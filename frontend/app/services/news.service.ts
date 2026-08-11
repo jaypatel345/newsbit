@@ -20,3 +20,4 @@ export async function getTopSummary(): Promise<TodaySummary> {
 
   return response.json();
 }
+

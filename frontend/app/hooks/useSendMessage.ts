@@ -10,10 +10,12 @@ export function useSendMessage() {
       conversationId,
       content,
       signal,
+      articleIds,
     }: {
       conversationId: number;
       content: string;
       signal?: AbortSignal;
-    }) => sendMessage(conversationId, content, signal),
+      articleIds?: number[];
+    }) => sendMessage(conversationId, content, signal, articleIds),
   });
 }

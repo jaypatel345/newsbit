@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, func
 from app.db.database import Base
+from sqlalchemy import Column, DateTime, Integer, String, Text, func
 
 
 class Summary(Base):

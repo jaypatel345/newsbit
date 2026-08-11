@@ -1,7 +1,8 @@
+from datetime import UTC, datetime
+
 from app.models.article import Article
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import datetime, timezone
+from sqlalchemy.ext.asyncio import AsyncSession
 
 CATEGORY_PRIORITY = {
     "AI": 10,
@@ -54,23 +55,22 @@ class RankingService:
 
     def freshness_score(self, article: Article) -> float:
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         age_hours = (now - article.published_at).total_seconds() / 3600
 
         if age_hours <= 6:
             return 10
 
-        elif age_hours <= 12:
+        if age_hours <= 12:
             return 8
 
-        elif age_hours <= 24:
+        if age_hours <= 24:
             return 6
 
-        elif age_hours <= 48:
+        if age_hours <= 48:
             return 3
 
-        else:
-            return 1
+        return 1
 
     def overlap_score(self, article: Article) -> int:
 
@@ -79,7 +79,7 @@ class RankingService:
         if count >= 3:
             return 8
 
-        elif count == 2:
+        if count == 2:
             return 5
 
         return 0

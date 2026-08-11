@@ -1,11 +1,12 @@
-from typing import List, Dict
-from app.services.llm_service import LLMService
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from datetime import datetime
+import asyncio
 import logging
+from datetime import datetime
 
 from app.models.article import Article
+from app.services.entity_service import EntityService
+from app.services.llm_service import LLMService
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,9 @@ class NewsProcessor:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.llm_service = LLMService()
+        self.entity_service = EntityService()
 
-    async def process_articles(self, articles: List[Dict]):
+    async def process_articles(self, articles: list[dict]):
         """
         Unified pipeline for processing fetched articles.
         Responsibilities:
@@ -80,7 +82,19 @@ class NewsProcessor:
 
             # 2. Call LLMService
             try:
-                summary_result = await self.llm_service.generate_summary(article)
+                summary_result, entities = await asyncio.gather(
+
+                self.llm_service.generate_summary(article),
+
+                self.entity_service.extract_entities(
+
+                title=clean_title(article["title"]),
+
+                content=article.get("content", ""),
+
+                ),
+
+                )
             except Exception:
                 continue
             print(summary_result)
@@ -115,8 +129,18 @@ class NewsProcessor:
                 published_at=published_at,
                 source_url=article.get("source", {}).get("url"),
             )
-
             self.db.add(db_article)
+            await self.db.flush()
+
+            # Save entities using the normalized entity service
+            await self.entity_service.save_entities(
+                db=self.db,
+                article_id=db_article.id,
+                entities=entities,
+            )
+
+            # Mark entities as processed
+            db_article.entities_processed = True
 
             saved_articles.append(db_article)
 

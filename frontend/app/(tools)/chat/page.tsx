@@ -20,6 +20,7 @@ import { useMessages } from "@/app/hooks/useMessages";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendMessage } from "@/app/hooks/useSendMessage";
 import { generateTitleFromMessage } from "@/app/utils/titleGenerator";
+import { useArticle } from "@/app/hooks/useArticle";
 
 function ChatPageContent() {
   const searchParams = useSearchParams();
@@ -43,6 +44,24 @@ function ChatPageContent() {
     currentTitle: string;
   }>({ isOpen: false, conversationId: null, currentTitle: "" });
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const articleIdParam = searchParams.get("articleId");
+
+  const articleId = articleIdParam
+
+    ? Number(articleIdParam)
+
+    : undefined;
+
+  const [selectedArticles, setSelectedArticles] = useState<any[]>([]);
+
+  const { data: article, isLoading } = useArticle(articleId);
+
+  useEffect(() => {
+    if (article) {
+      setSelectedArticles([article]);
+    }
+  }, [article]);
 
   const handleSend = async (message: string) => {
     if (!message.trim()) return;
@@ -105,6 +124,7 @@ function ChatPageContent() {
         conversationId: conversationId,
         content: message,
         signal: abortControllerRef.current.signal,
+        articleIds: selectedArticles.map((article) => article.id),
       });
 
       // Immediately add the response to messages to ensure it's always displayed
@@ -112,10 +132,10 @@ function ChatPageContent() {
         ["messages", conversationId],
         (oldMessages: Message[] = []) => [...oldMessages, response],
       );
-      
+
       // Still set pending response for animation but it's already in messages
       setPendingResponse(response);
-      
+
       // Clean up pending state after animation completes
       setTimeout(() => {
         setPendingResponse(null);
@@ -200,6 +220,7 @@ function ChatPageContent() {
         conversationId: selectedConversationId,
         content: newContent,
         signal: abortControllerRef.current.signal,
+        articleIds: selectedArticles.map((article) => article.id),
       });
 
       // Immediately add the response to messages to ensure it's always displayed
@@ -207,10 +228,10 @@ function ChatPageContent() {
         ["messages", selectedConversationId],
         (oldMessages: Message[] = []) => [...oldMessages, response],
       );
-      
+
       // Still set pending response for animation but it's already in messages
       setPendingResponse(response);
-      
+
       // Clean up pending state after animation completes
       setTimeout(() => {
         setPendingResponse(null);
@@ -312,7 +333,7 @@ function ChatPageContent() {
       const filtered = previousConversations.filter((conv) => conv.id !== conversationId);
       queryClient.setQueryData(["conversations"], filtered);
       console.log("Removed from UI, remaining:", filtered.length);
-      
+
       if (selectedConversationId === conversationId) {
         setSelectedConversationId(null);
         queryClient.setQueryData(["messages"], []);
@@ -323,7 +344,7 @@ function ChatPageContent() {
         }
         setLoading(false);
       }
-      
+
       // Try to delete on the server in background (fire and forget)
       deleteConversation(conversationId).catch((error) => {
         console.error("Failed to delete conversation on server:", error);
@@ -347,7 +368,7 @@ function ChatPageContent() {
         .map((conv) => {
           const localTitle = localStorage.getItem(`conversation_title_${conv.id}`);
           const localPinned = localStorage.getItem(`conversation_pinned_${conv.id}`);
-          
+
           // Apply localStorage updates
           const updates: any = {};
           if (localTitle && conv.title === "New Chat") {
@@ -356,17 +377,17 @@ function ChatPageContent() {
           if (localPinned) {
             updates.is_pinned = localPinned === "true";
           }
-          
+
           return Object.keys(updates).length > 0 ? { ...conv, ...updates } : conv;
         });
-      
+
       // Check if we need to update (either content changed or conversations were removed)
-      const hasChanges = updatedConversations.length !== conversations.length || 
+      const hasChanges = updatedConversations.length !== conversations.length ||
         updatedConversations.some((conv: any, i: number) => {
           const original = conversations[i];
           return conv.title !== original.title || conv.is_pinned !== original.is_pinned;
         });
-      
+
       if (hasChanges) {
         queryClient.setQueryData(["conversations"], updatedConversations);
       }
@@ -422,39 +443,38 @@ function ChatPageContent() {
                 return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
               })
               .map((conversation) => (
-              <div
-                key={conversation.id}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2.5 transition-colors group ${
-                  selectedConversationId === conversation.id
+                <div
+                  key={conversation.id}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2.5 transition-colors group ${selectedConversationId === conversation.id
                     ? "bg-stone-200/60"
                     : "hover:bg-stone-100/60"
-                }`}
-              >
-                <button
-                  onClick={() => {
-                    // Abort any ongoing request when switching conversations
-                    if (abortControllerRef.current) {
-                      abortControllerRef.current.abort();
-                      abortControllerRef.current = null;
-                    }
-                    setLoading(false);
-                    setSelectedConversationId(conversation.id);
-                  }}
-                  className="flex-1 flex items-center gap-2 text-left truncate"
+                    }`}
                 >
-                  {conversation.is_pinned && <Pin className="h-3 w-3 text-stone-500 shrink-0" />}
-                  <span className="truncate text-sm text-stone-800 cursor-pointer hover:text-stone-900">
-                    {conversation.title}
-                  </span>
-                </button>
-                <ConversationMenu
-                  conversation={conversation}
-                  onPin={handlePinConversation}
-                  onRename={handleRenameConversation}
-                  onDelete={handleDeleteConversation}
-                />
-              </div>
-            ))
+                  <button
+                    onClick={() => {
+                      // Abort any ongoing request when switching conversations
+                      if (abortControllerRef.current) {
+                        abortControllerRef.current.abort();
+                        abortControllerRef.current = null;
+                      }
+                      setLoading(false);
+                      setSelectedConversationId(conversation.id);
+                    }}
+                    className="flex-1 flex items-center gap-2 text-left truncate"
+                  >
+                    {conversation.is_pinned && <Pin className="h-3 w-3 text-stone-500 shrink-0" />}
+                    <span className="truncate text-sm text-stone-800 cursor-pointer hover:text-stone-900">
+                      {conversation.title}
+                    </span>
+                  </button>
+                  <ConversationMenu
+                    conversation={conversation}
+                    onPin={handlePinConversation}
+                    onRename={handleRenameConversation}
+                    onDelete={handleDeleteConversation}
+                  />
+                </div>
+              ))
           )}
         </div>
       </aside>
@@ -468,14 +488,12 @@ function ChatPageContent() {
                 </p>
               </div>
             ) : (
-              <>
-                <MessageList
-                  loading={loading}
-                  messages={messages}
-                  onLoadingComplete={handleAnimationComplete}
-                  onEditMessage={handleEditMessage}
-                />
-              </>
+              <MessageList
+                loading={loading}
+                messages={messages}
+                onLoadingComplete={handleAnimationComplete}
+                onEditMessage={handleEditMessage}
+              />
             )}
           </div>
         </main>
@@ -485,6 +503,27 @@ function ChatPageContent() {
             {messages.length === 0 && (
               <div className="flex justify-center py-4">
                 <PromptChips onSelectPrompt={setInputMessage} />
+              </div>
+            )}
+            {selectedArticles.length > 0 && (
+              <div className="mb-3 space-y-2">
+                <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Context</p>
+                {selectedArticles.map((article) => (
+                  <div
+                    key={article.id}
+                    className="flex items-center justify-between gap-2 rounded-lg bg-stone-100 px-3 py-2 text-sm"
+                  >
+                    <span className="truncate flex-1 text-stone-700">
+                      {article.title || 'No title available'}
+                    </span>
+                    <button
+                      onClick={() => setSelectedArticles(selectedArticles.filter((a) => a.id !== article.id))}
+                      className="text-stone-400 hover:text-stone-600 transition-colors text-lg leading-none"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
 

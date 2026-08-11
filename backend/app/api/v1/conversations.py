@@ -1,29 +1,47 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
-from app.services.conversation_service import ConversationService
+from app.models.user import User
 from app.schemas.conversation import (
     CreateConversationRequest,
     UpdateConversationRequest,
 )
-from fastapi import Header
+from app.schemas.message import (
+    MessageResponse,
+    SendMessageRequest,
+)
+from app.services.article_service import ArticleService
 from app.services.auth_service import (
     get_optional_current_user,
 )
-from app.models.user import User
-
-from app.schemas.message import (
-    SendMessageRequest,
-    MessageResponse,
-)
+from app.services.conversation_service import ConversationService
+from app.services.llm_service import LLMService
+from app.services.search_service import SearchService
+from fastapi import APIRouter, Depends, Header
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1", tags=["conversation"])
 
 
+def get_article_service(
+    db: AsyncSession = Depends(get_db),
+) -> ArticleService:
+    return ArticleService(db)
+
+
+def get_llm_service() -> LLMService:
+    return LLMService()
+
+
+def get_search_service() -> SearchService:
+    return SearchService()
+
+
 def get_conversation_service(
     db: AsyncSession = Depends(get_db),
+    article_service: ArticleService = Depends(get_article_service),
+    llm_service: LLMService = Depends(get_llm_service),
+    search_service: SearchService = Depends(get_search_service),
 ) -> ConversationService:
-    return ConversationService(db)
+    return ConversationService(db, article_service, llm_service, search_service)
 
 
 @router.get("/conversations")
@@ -50,18 +68,21 @@ async def create_conversation(
 async def update_conversation(
     request: UpdateConversationRequest,
     conversation_id: int,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
-    return await service.update_conversation(request, conversation_id)
+    return await service.update_conversation(request, conversation_id, current_user, guest_id)
 
 
 @router.delete("/conversations/{conversation_id}")
 async def delete_conversation(
     conversation_id: int,
+    guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
+    current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
-
-    return await service.delete_conversation(conversation_id)
+    return await service.delete_conversation(conversation_id, current_user, guest_id)
 
 
 @router.get("/conversations/{conversation_id}/messages")
@@ -70,6 +91,7 @@ async def get_messages(
     guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
     current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
+
 ):
 
     return await service.get_messages(conversation_id, current_user, guest_id)

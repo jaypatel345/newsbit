@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Dict, Any, Annotated
+import logging
+from typing import Annotated, Any
+
+from app.core.config import settings
 from app.db.database import get_db
+from app.scheduler import run_news_fetch_job
 from app.services.news_service import NewsService
 from app.services.ranking_service import RankingService
-from app.scheduler import run_news_fetch_job
-from app.core.config import settings
-import logging
-from fastapi import HTTPException, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
 
@@ -16,25 +16,25 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/top-stories", response_model=None)
-async def get_top_stories(db: DbSession) -> List[Dict[str, Any]]:
+async def get_top_stories(db: DbSession) -> list[dict[str, Any]]:
     service = NewsService(db)
     return await service.get_top_stories()
 
 
 @router.get("/today-summary", response_model=None)
-async def get_today_summary(db: DbSession) -> Dict[str, Any]:
+async def get_today_summary(db: DbSession) -> dict[str, Any]:
     service = NewsService(db)
     return await service.get_today_summary()
 
 
 @router.get("/categories", response_model=None)
-async def get_categories(db: DbSession) -> Dict[str, str]:
+async def get_categories(db: DbSession) -> dict[str, str]:
     service = NewsService(db)
     return await service.get_categories()
 
 
 @router.get("/categories/{category}", response_model=None)
-async def get_category_news(category: str, db: DbSession) -> List[Dict[str, Any]]:
+async def get_category_news(category: str, db: DbSession) -> list[dict[str, Any]]:
     service = NewsService(db)
     return await service.get_news_by_category(category)
 

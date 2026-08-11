@@ -1,10 +1,10 @@
+import logging
+
+from app.core.config import settings
+from app.services.news_processor import NewsProcessor
 from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, TimeoutException
-import logging
-from typing import List, Dict
-from app.core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.services.news_processor import NewsProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ class GNewsService:
         self.processor = NewsProcessor(db)
 
     async def _fetch_articles(
-        self, params: Dict[str, str], error_context: str
-    ) -> List[Dict]:
+        self, params: dict[str, str], error_context: str
+    ) -> list[dict]:
         """Shared method to fetch articles with error handling."""
         try:
             async with AsyncClient(timeout=self.timeout) as client:
@@ -52,12 +52,12 @@ class GNewsService:
                 status_code=502, detail=f"Failed to fetch news: {str(e)}"
             )
 
-    async def fetch_top_headlines(self) -> List[Dict]:
+    async def fetch_top_headlines(self) -> list[dict]:
         """Fetch top headlines in English."""
         params = {"lang": "en", "apikey": self.api_key}
         return await self._fetch_articles(params, "top headlines")
 
-    async def fetch_category(self, category: str) -> List[Dict]:
+    async def fetch_category(self, category: str) -> list[dict]:
         """Fetch articles by category."""
         if not category or not category.strip():
             raise HTTPException(status_code=400, detail="Category cannot be empty")
@@ -90,7 +90,6 @@ class GNewsService:
         articles = await self.fetch_category(category)
 
         # Add feed type
-
         for article in articles:
             article["feed_types"] = f"category:{category}"
 

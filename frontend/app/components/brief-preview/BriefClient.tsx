@@ -80,6 +80,7 @@ export default function BriefClient() {
               data?.map((story, index) => (
                 <div key={story.id}>
                   <StoryCard
+                    id={story.id}
                     storyNumber={index + 1}
                     category={story.category}
                     headline={story.title}

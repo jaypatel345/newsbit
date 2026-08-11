@@ -23,9 +23,9 @@ export default function Home() {
           <BriefPreview />
           <TodaysTopStories />
           <TopicsSection />
-          {/* <ExploreByTopic /> */}
-          {/* <AICapabilities />
-          <ProductDemo /> */}
+          <ExploreByTopic />
+          <AICapabilities />
+          {/* <ProductDemo /> */}
         </div>
 
         {/* <WhyNewsbit /> */}

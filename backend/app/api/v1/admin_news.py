@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends
-from app.db.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
+from app.db.database import get_db
 from app.services.gnews_service import GNewsService
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1/admin/news", tags=["admin"])
 

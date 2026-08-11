@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class SendMessageRequest(BaseModel):
 
     content: str
+    article_ids: list[int] = []
 
 
 class MessageResponse(BaseModel):

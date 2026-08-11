@@ -1,14 +1,15 @@
+import json
+import logging
+from datetime import UTC, datetime, timedelta
+from urllib.parse import urlparse
+
 from app.core.config import settings
-from sqlalchemy import select, func
-from groq import AsyncGroq
 from app.models.article import Article
 from app.models.summary import Summary
-from datetime import datetime, timedelta, timezone
 from app.prompts.news import TODAY_BRIEF_PROMPT
-import logging
 from fastapi import HTTPException
-from urllib.parse import urlparse
-import json
+from groq import AsyncGroq
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
@@ -30,7 +31,7 @@ class NewsService:
         return f"{parsed.scheme}://{parsed.netloc}"
 
     async def get_top_stories(self):
-        today = datetime.now(timezone.utc) - timedelta(hours=24)
+        today = datetime.now(UTC) - timedelta(days=7)
         try:
             result = await self.db.execute(
                 select(
@@ -141,7 +142,7 @@ class NewsService:
 
     async def generate_and_save_today_summary(self):
         # 1. Fetch latest articles from DB
-        today = datetime.now(timezone.utc) - timedelta(hours=24)
+        today = datetime.now(UTC) - timedelta(hours=24)
         result = await self.db.execute(
             select(
                 Article.title,

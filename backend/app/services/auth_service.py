@@ -1,18 +1,21 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.models.user import User
-from fastapi import HTTPException, Response
-from app.utils.password import hash_password, verify_password
-from app.utils.jwt import create_access_token, create_refresh_token
-from app.schemas.auth import UserResponse
 import hashlib
-from fastapi import Depends, status
-from app.db.database import get_db
-from app.utils.jwt import verify_access_token, oauth2_scheme, oauth2_scheme_optional
-from typing import Optional
-import jwt
 
+import jwt
+from app.db.database import get_db
+from app.models.user import User
+from app.schemas.auth import UserResponse
 from app.services.conversation_service import ConversationService
+from app.utils.jwt import (
+    create_access_token,
+    create_refresh_token,
+    oauth2_scheme,
+    oauth2_scheme_optional,
+    verify_access_token,
+)
+from app.utils.password import hash_password, verify_password
+from fastapi import Depends, HTTPException, Response, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AuthService:
@@ -197,7 +200,7 @@ async def get_current_user(
 async def get_optional_current_user(
     token: str | None = Depends(oauth2_scheme_optional),
     db: AsyncSession = Depends(get_db),
-) -> Optional[User]:
+) -> User | None:
 
     if token is None:
 

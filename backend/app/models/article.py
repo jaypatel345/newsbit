@@ -1,5 +1,17 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ARRAY, Float, func
 from app.db.database import Base
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import (
+    ARRAY,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    Text,
+    func,
+)
+from sqlalchemy.orm import relationship
 
 
 class Article(Base):
@@ -41,6 +53,17 @@ class Article(Base):
 
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+    embedding = Column(Vector(384), nullable=True)
+    entities_processed = Column(Boolean, nullable=False, default=False)
+    article_entities = relationship(
+
+    "ArticleEntity",
+
+    back_populates="article",
+
+    cascade="all, delete-orphan",
+
     )
 
     def __repr__(self):

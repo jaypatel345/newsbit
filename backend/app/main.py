@@ -7,6 +7,9 @@ from app.core.config import settings
 from .api.v1.admin_news import router as admin_news_router
 from .api.v1.conversations import router as conversations_router
 from .api.v1.auth import router as auth_router
+from .api.v1.entities import router as entities_router
+from .api.v1.search import router as search_router
+from .api.v1.article import router as article_router
 
 
 @asynccontextmanager
@@ -35,12 +38,17 @@ app.include_router(news_router)
 app.include_router(admin_news_router)
 app.include_router(conversations_router)
 app.include_router(auth_router)
+app.include_router(entities_router)
+app.include_router(search_router)
+app.include_router(article_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
         settings.FRONTEND_URL,
     ],
     allow_credentials=True,

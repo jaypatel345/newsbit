@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY01: str
     SCHEDULER_SECRET: str = "default_secret_change_in_production"
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 settings = Settings()

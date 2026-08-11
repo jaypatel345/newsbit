@@ -1,23 +1,34 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import UUID, select
+import json
+
+from app.core.llm import groq_client
 from app.models.conversation import Conversation
 from app.models.message import Message
-from fastapi import HTTPException
-from app.core.llm import groq_client
-from sqlalchemy import func
 from app.models.user import User
+from app.prompts.news import NEWSBIT_CHAT_PROMPT
 from app.schemas.conversation import CreateConversationRequest
-from typing import Optional
+from app.services.article_service import ArticleService
+from app.services.context_builder import BuildArticle
+from app.services.llm_service import LLMService
+from app.services.search_service import SearchService
+from app.services.semantic_search_service import SemanticSearchService
+from app.tools.search_articles import SEARCH_ARTICLES_TOOL
+from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
+from fastapi import HTTPException
+from sqlalchemy import UUID, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class ConversationService:
 
-    def __init__(self, db: AsyncSession):
-
+    def __init__(self, db: AsyncSession, article_service: ArticleService, llm_service: LLMService, search_service: SearchService, semantic_search_service: SemanticSearchService):
         self.db = db
+        self.article_service = article_service
+        self.llm_service = llm_service
+        self.search_service = search_service
+        self.semantic_search_service = semantic_search_service
 
     async def get_conversations(
-        self, current_user: Optional[User], guest_id: Optional[str]
+        self, current_user: User | None, guest_id: str | None
     ) -> list:
         if current_user is not None:
             result = await self.db.execute(
@@ -43,16 +54,15 @@ class ConversationService:
                 detail="Either user authentication or guest ID is required",
             )
 
-        conversations = result.scalars().all()
+        return result.scalars().all()
 
         # Return empty list instead of 404 when no conversations exist
-        return conversations
 
     async def create_conversation(
         self,
         request: CreateConversationRequest,
-        current_user: Optional[User],
-        guest_id: Optional[str],
+        current_user: User | None,
+        guest_id: str | None,
     ) -> Conversation:
 
         conversation = Conversation(
@@ -75,17 +85,30 @@ class ConversationService:
 
         return conversation
 
-    async def update_conversation(self, request, conversation_id, current_user: User):
-        conversation_exists = await self.db.execute(
-            select(Conversation).where(
-                Conversation.id == conversation_id,
-                Conversation.user_id == current_user.id,
+    async def update_conversation(self, request, conversation_id, current_user: User | None = None, guest_id: str | None = None):
+        if current_user is not None:
+            conversation_exists = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == current_user.id,
+                )
             )
-        )
+        elif guest_id is not None:
+            conversation_exists = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.guest_id == guest_id,
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
+
         result = conversation_exists.scalar_one_or_none()
 
         if result is None:
-
             raise HTTPException(
                 status_code=404,
                 detail="Conversation not found",
@@ -94,26 +117,36 @@ class ConversationService:
         conversation = result
 
         if request.title is not None:
-
             conversation.title = request.title
 
         if request.is_pinned is not None:
-
             conversation.is_pinned = request.is_pinned
 
         await self.db.commit()
-
         await self.db.refresh(conversation)
 
         return conversation
 
-    async def delete_conversation(self, conversation_id, current_user: User):
-        result = await self.db.execute(
-            select(Conversation).where(
-                Conversation.id == conversation_id,
-                Conversation.user_id == current_user.id,
+    async def delete_conversation(self, conversation_id, current_user: User | None = None, guest_id: str | None = None):
+        if current_user is not None:
+            result = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == current_user.id,
+                )
             )
-        )
+        elif guest_id is not None:
+            result = await self.db.execute(
+                select(Conversation).where(
+                    Conversation.id == conversation_id,
+                    Conversation.guest_id == guest_id,
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either user authentication or guest ID is required",
+            )
 
         conversation = result.scalar_one_or_none()
 
@@ -129,7 +162,7 @@ class ConversationService:
         return {"message": "Conversation deleted successfully"}
 
     async def get_messages(
-        self, conversation_id, current_user: Optional[User], guest_id: Optional[str]
+        self, conversation_id, current_user: User | None, guest_id: str | None
     ):
         if current_user is not None:
             conversation = await self.db.scalar(
@@ -161,16 +194,15 @@ class ConversationService:
             .order_by(Message.created_at)
         )
 
-        messages = result.scalars().all()
+        return result.scalars().all()
 
-        return messages
 
     async def send_message(
         self,
         request,
         conversation_id,
-        current_user: Optional[User],
-        guest_id: Optional[str],
+        current_user: User | None,
+        guest_id: str | None,
     ):
         # 1. Verify the conversation exists.
         if current_user is not None:
@@ -212,24 +244,88 @@ class ConversationService:
         await self.db.commit()
         await self.db.refresh(user_message)
 
-        # 3. Call the LLM.
+        # 3. Fetch articles if provided
+        article = []
+        if request.article_ids:
+            # Fetch articles from the provided IDs
+            for article_id in request.article_ids:
+                article_data = await self.article_service.get_article_by_id(article_id)
+                if article_data:
+                    article.append(article_data)
+
+        article_context = BuildArticle.build_article_context(article) if article else None
+
+        # 4. Build messages for LLM
+        system_content = NEWSBIT_CHAT_PROMPT
+
+        if article_context:
+            system_content += f"\n\nHere is some relevant article context:\n{article_context}"
+
+        messages = [
+            {
+                "role": "system",
+                "content": system_content,
+            },
+            {
+                "role": "user",
+                "content": user_message.content,
+            },
+        ]
+
+        # 5. Call the LLM with tool support
         chat_completion = await groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "xyz",
-                },
-                {
-                    "role": "user",
-                    "content": user_message.content,
-                },
-            ],
+            messages=messages,
+            tools=[SEARCH_ARTICLES_TOOL , SEMANTIC_SEARCH_TOOL],
         )
 
-        llm_result = chat_completion.choices[0].message.content
+        message = chat_completion.choices[0].message
+        llm_result = message.content  # Default to direct response
 
-        # 4. Save the assistant's reply.
+        # 6. Handle tool calls
+        if message.tool_calls:
+            # Add the assistant's tool-call message
+            messages.append(message)
+
+            for tool_call in message.tool_calls:
+                tool_name = tool_call.function.name
+                arguments = json.loads(tool_call.function.arguments)
+
+                if tool_name == "search_articles":
+                    query = arguments["query"]
+                    tool_result = await self.search_service.search_articles(
+                        db=self.db,
+                        query=query,
+                    )
+                elif tool_name == "semantic_search":
+                    query = arguments["query"]
+                    top_k = arguments.get("top_k", 5)
+                    tool_result = await self.semantic_search_service.search(
+                        query=query,
+                        top_k=top_k,
+                    )
+                else:
+                    tool_result = {
+                        "error": f"Unknown tool: {tool_name}"
+                    }
+
+                # Add backend tool result
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": json.dumps(tool_result, default=str),
+                })
+
+            # Send all tool results back to Groq
+            final_completion = await groq_client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=messages,
+            )
+
+            final_message = final_completion.choices[0].message
+            llm_result = final_message.content
+
+        # 7. Save the assistant's reply.
         assistant_message = Message(
             conversation_id=conversation_id,
             role="assistant",
@@ -238,7 +334,7 @@ class ConversationService:
 
         self.db.add(assistant_message)
 
-        # 5. Update the conversation timestamp.
+        # 8. Update the conversation timestamp.
         conversation.updated_at = func.now()
 
         await self.db.commit()
@@ -246,7 +342,7 @@ class ConversationService:
         await self.db.refresh(assistant_message)
         await self.db.refresh(conversation)
 
-        # 6. Return the assistant message.
+        # 9. Return the assistant message.
         return {
             "id": assistant_message.id,
             "conversation_id": assistant_message.conversation_id,

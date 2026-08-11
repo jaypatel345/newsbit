@@ -1,7 +1,10 @@
+"use client";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface StoryCardProps {
+  id: number;
   storyNumber: number;
   category: string;
   headline: string;
@@ -14,6 +17,7 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({
+  id,
   storyNumber,
   category,
   headline,
@@ -24,6 +28,10 @@ export default function StoryCard({
   sourceWebsite,
   image,
 }: StoryCardProps) {
+  const router =useRouter();
+  const sendArticleId = () => {
+    router.push(`/chat?articleId=${id}`)
+  }
   const getSourceLogoUrl = (website: string) => {
     return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(website)}&sz=64`;
   };
@@ -107,12 +115,12 @@ export default function StoryCard({
         </a>
 
         {/* Right: Ask AI Button */}
-        <Link href="/chat">
-          <button className="px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:opacity-80 bg-gray-900 text-white flex items-center gap-2 cursor-pointer">
-            Ask AI
-            <ArrowRight size={16} />
-          </button>
-        </Link>
+
+        <button onClick={sendArticleId} className="px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:opacity-80 bg-gray-900 text-white flex items-center gap-2 cursor-pointer">
+          Ask AI
+          <ArrowRight size={16} />
+        </button>
+
       </div>
     </div>
   );
