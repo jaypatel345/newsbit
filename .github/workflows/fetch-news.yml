@@ -36,6 +36,10 @@ jobs:
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           SCHEDULER_SECRET: ${{ secrets.SCHEDULER_SECRET }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Error: DATABASE_URL is not set"
+            exit 1
+          fi
           python -c "
           import asyncio
           import sys

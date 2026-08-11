@@ -14,18 +14,39 @@ class Base(DeclarativeBase):
 
 
 def _build_async_database_url(url: str) -> str:
-    if url.startswith("postgresql://") and "+asyncpg" not in url:
+    if not url:
+        raise ValueError("DATABASE_URL is empty or not set")
+    
+    # Handle various database URL formats
+    if url.startswith("postgresql://"):
+        if "+asyncpg" not in url:
+            return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+    elif url.startswith("postgres://"):
+        if "+asyncpg" not in url:
+            return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url.replace("postgres://", "postgresql://", 1)
+    elif "+asyncpg" in url:
+        return url
+    
+    # Default assumption: try to add asyncpg if it's a postgres URL
+    if "postgres" in url.lower():
         return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    
     return url
 
 
-engine = create_async_engine(
-    _build_async_database_url(settings.DATABASE_URL),
-    echo=True,
-    connect_args={"statement_cache_size": 0},
-    pool_pre_ping=True,
-    pool_recycle=3600,
-)
+try:
+    db_url = _build_async_database_url(settings.DATABASE_URL)
+    engine = create_async_engine(
+        db_url,
+        echo=True,
+        connect_args={"statement_cache_size": 0},
+        pool_pre_ping=True,
+        pool_recycle=3600,
+    )
+except Exception as e:
+    raise ValueError(f"Failed to create database engine: {e}. DATABASE_URL may be malformed or empty.")
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
