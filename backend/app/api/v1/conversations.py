@@ -12,11 +12,18 @@ from app.services.article_service import ArticleService
 from app.services.auth_service import (
     get_optional_current_user,
 )
-from app.services.conversation_service import ConversationService
+from app.services.conversation_service import ConversationService, SEMANTIC_SEARCH_AVAILABLE
 from app.services.llm_service import LLMService
 from app.services.search_service import SearchService
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy.ext.asyncio import AsyncSession
+
+try:
+    from app.services.semantic_search_service import SemanticSearchService
+    from app.services.embedding_service import EmbeddingService
+except ImportError:
+    SemanticSearchService = None
+    EmbeddingService = None
 
 router = APIRouter(prefix="/api/v1", tags=["conversation"])
 
@@ -41,7 +48,14 @@ def get_conversation_service(
     llm_service: LLMService = Depends(get_llm_service),
     search_service: SearchService = Depends(get_search_service),
 ) -> ConversationService:
-    return ConversationService(db, article_service, llm_service, search_service)
+    semantic_search_service = None
+    if SEMANTIC_SEARCH_AVAILABLE and SemanticSearchService and EmbeddingService:
+        try:
+            embedding_service = EmbeddingService()
+            semantic_search_service = SemanticSearchService(db, embedding_service)
+        except ImportError:
+            pass  # ML dependencies not available
+    return ConversationService(db, article_service, llm_service, search_service, semantic_search_service)
 
 
 @router.get("/conversations")

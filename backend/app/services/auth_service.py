@@ -54,7 +54,7 @@ class AuthService:
 
         if guest_id is not None:
 
-            conversation_service = ConversationService(self.db)
+            conversation_service = ConversationService(self.db, None, None, None)
 
             await conversation_service.migrate_guest_conversations(
                 guest_id=guest_id,
@@ -112,7 +112,7 @@ class AuthService:
 
         if guest_id is not None:
 
-            conversation_service = ConversationService(self.db)
+            conversation_service = ConversationService(self.db, None, None, None)
 
             await conversation_service.migrate_guest_conversations(
                 guest_id=guest_id,

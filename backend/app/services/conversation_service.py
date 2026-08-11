@@ -10,17 +10,24 @@ from app.services.article_service import ArticleService
 from app.services.context_builder import BuildArticle
 from app.services.llm_service import LLMService
 from app.services.search_service import SearchService
-from app.services.semantic_search_service import SemanticSearchService
 from app.tools.search_articles import SEARCH_ARTICLES_TOOL
-from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
 from fastapi import HTTPException
 from sqlalchemy import UUID, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+try:
+    from app.services.semantic_search_service import SemanticSearchService
+    from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
+    SEMANTIC_SEARCH_AVAILABLE = True
+except ImportError:
+    SEMANTIC_SEARCH_AVAILABLE = False
+    SemanticSearchService = None
+    SEMANTIC_SEARCH_TOOL = None
+
 
 class ConversationService:
 
-    def __init__(self, db: AsyncSession, article_service: ArticleService, llm_service: LLMService, search_service: SearchService, semantic_search_service: SemanticSearchService):
+    def __init__(self, db: AsyncSession, article_service: ArticleService, llm_service: LLMService, search_service: SearchService, semantic_search_service: SemanticSearchService = None):
         self.db = db
         self.article_service = article_service
         self.llm_service = llm_service
@@ -298,12 +305,17 @@ class ConversationService:
                         query=query,
                     )
                 elif tool_name == "semantic_search":
-                    query = arguments["query"]
-                    top_k = arguments.get("top_k", 5)
-                    tool_result = await self.semantic_search_service.search(
-                        query=query,
-                        top_k=top_k,
-                    )
+                    if not SEMANTIC_SEARCH_AVAILABLE or self.semantic_search_service is None:
+                        tool_result = {
+                            "error": "Semantic search is not available in this environment. Use metadata search instead."
+                        }
+                    else:
+                        query = arguments["query"]
+                        top_k = arguments.get("top_k", 5)
+                        tool_result = await self.semantic_search_service.search(
+                            query=query,
+                            top_k=top_k,
+                        )
                 else:
                     tool_result = {
                         "error": f"Unknown tool: {tool_name}"

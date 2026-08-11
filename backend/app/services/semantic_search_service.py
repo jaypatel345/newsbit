@@ -1,13 +1,19 @@
 from app.models import Article
-from app.services.embedding_service import EmbeddingService
+from app.services.embedding_service import EmbeddingService, SENTENCE_TRANSFORMERS_AVAILABLE
 from sqlalchemy import select
 
 
 class SemanticSearchService:
 
-    def __init__(self, db, embedding_service :EmbeddingService ):
+    def __init__(self, db, embedding_service :EmbeddingService = None):
         self.db = db
         self.embedding_service = embedding_service
+        if not SENTENCE_TRANSFORMERS_AVAILABLE:
+            raise ImportError(
+                "Semantic search requires sentence-transformers. "
+                "This feature is not available in the production web service. "
+                "Use the GitHub Actions scheduler for embedding generation."
+            )
 
     async def search(
         self,
