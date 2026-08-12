@@ -8,17 +8,17 @@ import { useCategoryNews } from "@/app/hooks/useCategoryNews";
 import { useEffect } from "react";
 
 interface ExploreClientProps {
-  initialCategories: string[];
-  initialArticles: Article[];
-  initialCategory: string;
+  initialCategories?: string[];
+  initialArticles?: Article[];
+  initialCategory?: string;
 }
 
 export default function ExploreClient({
   initialCategories,
   initialArticles,
   initialCategory,
-}: ExploreClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+}: ExploreClientProps = {}) {
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "");
 
   const { data: categories = [] } = useCategories(initialCategories);
 
@@ -34,7 +34,7 @@ export default function ExploreClient({
     error,
   } = useCategoryNews(
     selectedCategory === "all" ? "top" : selectedCategory,
-    selectedCategory === initialCategory ? initialArticles : undefined
+    initialCategory && selectedCategory === initialCategory ? initialArticles : undefined
   );
 
   return (
