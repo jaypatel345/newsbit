@@ -23,7 +23,8 @@ async def run_news_fetch_job():
     logger.info("Scheduler fired")
 
     # Use lowercase versions of allowed categories for GNews API
-    categories = [cat.lower() for cat in ALLOWED_CATEGORIES if cat != "Other"]
+    # Exclude categories that might not be supported by GNews
+    categories = [cat.lower() for cat in ALLOWED_CATEGORIES if cat not in ["Other", "AI", "Education", "Space"]]
 
     async with AsyncSessionLocal() as session:
 

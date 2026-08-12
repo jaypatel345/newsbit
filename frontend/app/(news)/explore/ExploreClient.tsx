@@ -7,6 +7,9 @@ import { Article } from "@/types/article";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
 import { useEffect } from "react";
 
+// Categories to exclude from display
+const EXCLUDED_CATEGORIES = ["India", "Nation", "Other"];
+
 interface ExploreClientProps {
   initialCategories?: string[];
   initialArticles?: Article[];
@@ -22,11 +25,16 @@ export default function ExploreClient({
 
   const { data: categories = [] } = useCategories(initialCategories);
 
+  // Filter out excluded categories
+  const filteredCategories = categories.filter(
+    (category: string) => !EXCLUDED_CATEGORIES.includes(category)
+  );
+
   useEffect(() => {
-    if (categories.length > 0 && !selectedCategory) {
-      setSelectedCategory(categories[0]);
+    if (filteredCategories.length > 0 && !selectedCategory) {
+      setSelectedCategory(filteredCategories[0]);
     }
-  }, [categories, selectedCategory]);
+  }, [filteredCategories, selectedCategory]);
 
   const {
     data: articles = [],
@@ -42,7 +50,7 @@ export default function ExploreClient({
       {/* Category Navigation Row */}
       <div className="mb-8">
         <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {categories.map((topic: string) => (
+          {filteredCategories.map((topic: string) => (
             <button
               key={topic}
               onClick={() => setSelectedCategory(topic)}

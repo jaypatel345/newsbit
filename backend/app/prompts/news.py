@@ -25,6 +25,9 @@ Category:
   - World
   - Nation
   - Other
+  - AI
+  - Education
+  - Space
 - Choose the single best matching category.
 - Do not create new categories.
 - Return ONLY the category name.

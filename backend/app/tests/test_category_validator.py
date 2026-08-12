@@ -97,6 +97,9 @@ class TestCategoryValidator:
             "World",
             "Nation",
             "Other",
+            "AI",
+            "Education",
+            "Space",
         }
         assert ALLOWED_CATEGORIES == expected_categories
 
@@ -138,6 +141,9 @@ class TestCategoryValidator:
             ("World", "World"),
             ("Nation", "Nation"),
             ("Other", "Other"),
+            ("AI", "AI"),
+            ("Education", "Education"),
+            ("Space", "Space"),
         ]
         
         for input_category, expected in test_cases:

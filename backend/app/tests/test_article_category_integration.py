@@ -66,6 +66,26 @@ class TestArticleCategoryIntegration:
         
         for category in ALLOWED_CATEGORIES:
             assert len(category) <= 100, f"Category '{category}' exceeds VARCHAR(100) limit"
+    
+    def test_new_categories_work(self):
+        """Test that newly added categories (AI, Education, Space) work correctly."""
+        new_categories = ["AI", "Education", "Space"]
+        
+        for category in new_categories:
+            result = normalize_and_validate_category(category)
+            assert result == category, f"New category '{category}' should pass through unchanged"
+            
+            article = Article(
+                title="Test Article",
+                url="https://example.com/test-article",
+                image_url="https://example.com/image.jpg",
+                published_at=datetime.now(timezone.utc),
+                feed_types=["top_headlines"],
+                category=category
+            )
+            
+            assert article.category == category
+            assert len(article.category) <= 100
 
     def test_article_with_none_category(self):
         """Test that Article can be created with None category (nullable field)."""

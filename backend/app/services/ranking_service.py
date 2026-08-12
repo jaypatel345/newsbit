@@ -6,11 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 CATEGORY_PRIORITY = {
     "Technology": 10,
+    "AI": 10,
     "Politics": 10,
     "World": 10,
     "Business": 8,
     "Science": 7,
     "Health": 6,
+    "Education": 6,
+    "Space": 5,
     "Nation": 5,
     "Entertainment": 3,
     "Sports": 3,

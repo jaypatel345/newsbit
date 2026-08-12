@@ -2,8 +2,16 @@
 import { useCategories } from "@/app/hooks/useCategories";
 import TopicCard from "./TopicCard";
 
+// Categories to exclude from display
+const EXCLUDED_CATEGORIES = ["India", "Nation", "Other"];
+
 export default function TopicsSection() {
   const { data: categories, isLoading, error } = useCategories();
+
+  // Filter out excluded categories
+  const filteredCategories = categories?.filter(
+    (category: string) => !EXCLUDED_CATEGORIES.includes(category)
+  );
 
   return (
     <section className="py-8 sm:py-12">
@@ -33,7 +41,7 @@ export default function TopicsSection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {categories?.slice(0, 9).map((category: string) => (
+          {filteredCategories?.slice(0, 9).map((category: string) => (
             <TopicCard key={category} category={category} />
           ))}
         </div>

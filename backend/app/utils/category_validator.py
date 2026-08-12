@@ -14,6 +14,9 @@ ALLOWED_CATEGORIES = {
     "World",
     "Nation",
     "Other",
+    "AI",
+    "Education",
+    "Space",
 }
 
 
