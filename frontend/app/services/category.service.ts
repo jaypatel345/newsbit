@@ -14,7 +14,9 @@ export async function getCategoryNews(category: string): Promise<Article[]> {
 }
 
 export async function getAllCategoryNews() {
-  const response = await fetch(`${BASE_URL}/api/v1/news/categories`);
+  const response = await fetch(`${BASE_URL}/api/v1/news/categories`, {
+    keepalive: true,
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch categories");

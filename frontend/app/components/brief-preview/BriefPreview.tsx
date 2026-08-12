@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTodaySummary } from "@/app/hooks/useTodaySummary";
+import ArticleSourceButton from "./ArticleSourceButton";
+import { SummaryItem } from "@/types/todaySummary";
 
 export default function BriefPreview() {
   const { data, isLoading, error } = useTodaySummary();
@@ -44,7 +46,7 @@ export default function BriefPreview() {
           <div className="text-center py-8 text-gray-500">Unable to load brief at this time.</div>
         ) : (
           <ul className="text-gray-700 text-sm leading-relaxed mb-4 sm:mb-6 space-y-2 sm:space-y-2.5">
-            {data?.summary?.map((item: string, index: number) => (
+            {data?.summary?.map((item: string | SummaryItem, index: number) => (
               <li key={index} className="flex items-start gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +62,12 @@ export default function BriefPreview() {
                 >
                   <circle cx="12" cy="12" r="6" />
                 </svg>
-                <span>{item}</span>
+                <div className="flex-1">
+                  <span>{typeof item === 'string' ? item : item.text}</span>
+                  {typeof item === 'object' && item.article_url && item.source_name && (
+                    <ArticleSourceButton articleUrl={item.article_url} sourceName={item.source_name} />
+                  )}
+                </div>
               </li>
             ))}
           </ul>

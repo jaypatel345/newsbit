@@ -1,5 +1,8 @@
+import { SummaryItem } from "@/types/todaySummary";
+import ArticleSourceButton from "./ArticleSourceButton";
+
 interface BriefSummaryCardProps {
-  summary: string[];
+  summary: (string | SummaryItem)[];
 }
 
 export default function BriefSummaryCard({ summary }: BriefSummaryCardProps) {
@@ -34,7 +37,12 @@ export default function BriefSummaryCard({ summary }: BriefSummaryCardProps) {
               className="mt-1.5 w-1 h-1 rounded-full shrink-0"
               style={{ backgroundColor: "#8A6A3F" }}
             />
-            <span>{line}</span>
+            <div className="flex-1">
+              <span>{typeof line === 'string' ? line : line.text}</span>
+              {typeof line === 'object' && line.article_url && line.source_name && (
+                <ArticleSourceButton articleUrl={line.article_url} sourceName={line.source_name} />
+              )}
+            </div>
           </li>
         ))}
       </ul>

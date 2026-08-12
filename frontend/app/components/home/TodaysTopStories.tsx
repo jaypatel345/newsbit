@@ -14,7 +14,7 @@ export function getRelativeTime(dateString: string) {
 }
 
 export default function TodaysTopStories() {
-  const { data: topStories, isLoading, error } = useTopStories(500); // 500ms delay for home page
+  const { data: topStories, isLoading, error } = useTopStories(0); // No delay for optimal performance
 
   return (
     <section className="py-16 sm:py-20 md:py-24">

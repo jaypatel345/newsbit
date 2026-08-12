@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from app.scheduler import scheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from .api.v1.news import router as news_router
 from app.core.config import settings
 from .api.v1.admin_news import router as admin_news_router
@@ -41,6 +42,9 @@ app.include_router(auth_router)
 app.include_router(entities_router)
 app.include_router(search_router)
 app.include_router(article_router)
+
+# Add GZip compression for faster response times
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
     CORSMiddleware,

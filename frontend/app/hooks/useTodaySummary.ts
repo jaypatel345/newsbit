@@ -6,9 +6,12 @@ export function useTodaySummary() {
   return useQuery({
     queryKey: ["TopSummary"],
     queryFn: getTopSummary,
-    // Stagger the initial load - no delay for first section
+    // Optimized for speed - load immediately with highest priority
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    // Enable background refetching for instant updates
+    refetchOnReconnect: true,
   });
 }

@@ -1,8 +1,10 @@
 "use client";
 import { useTodaySummary } from "@/app/hooks/useTodaySummary";
+import ArticleSourceButton from "./ArticleSourceButton";
+import { SummaryItem } from "@/types/todaySummary";
 
 interface ExecutiveSummaryCardProps {
-  summary?: string[];
+  summary?: (string | SummaryItem)[];
 }
 
 export default function ExecutiveSummaryCard() {
@@ -54,7 +56,12 @@ export default function ExecutiveSummaryCard() {
             >
               <circle cx="12" cy="12" r="6" />
             </svg>
-            <span>{point}</span>
+            <div className="flex-1">
+              <span>{typeof point === 'string' ? point : point.text}</span>
+              {typeof point === 'object' && point.article_url && point.source_name && (
+                <ArticleSourceButton articleUrl={point.article_url} sourceName={point.source_name} />
+              )}
+            </div>
           </li>
         ))}
       </ul>

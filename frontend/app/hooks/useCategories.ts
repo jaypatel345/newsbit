@@ -7,13 +7,13 @@ export function useCategories(initialData?: string[]) {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      // Add 1000ms delay to stagger the API call (last to load)
-      await new Promise(resolve => setTimeout(resolve, 1000));
       return getAllCategoryNews();
     },
     initialData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes - categories change less frequently
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    gcTime: 15 * 60 * 1000, // 15 minutes
+    refetchOnReconnect: true,
   });
 }

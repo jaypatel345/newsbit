@@ -23,8 +23,8 @@ export default function Home() {
           <BriefPreview />
           <TodaysTopStories />
           <TopicsSection />
-          <ExploreByTopic />
-          <AICapabilities />
+          {/* <ExploreByTopic />
+          <AICapabilities /> */}
           {/* <ProductDemo /> */}
         </div>
 

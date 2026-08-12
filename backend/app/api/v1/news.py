@@ -6,7 +6,7 @@ from app.db.database import get_db
 from app.scheduler import run_news_fetch_job
 from app.services.news_service import NewsService
 from app.services.ranking_service import RankingService
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
@@ -16,21 +16,39 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/top-stories", response_model=None)
-async def get_top_stories(db: DbSession) -> list[dict[str, Any]]:
+async def get_top_stories(db: DbSession, response: Response) -> list[dict[str, Any]]:
     service = NewsService(db)
-    return await service.get_top_stories()
+    stories = await service.get_top_stories()
+    
+    # Add caching headers for better performance
+    response.headers["Cache-Control"] = "public, max-age=300, s-maxage=300"  # 5 minutes
+    response.headers["CDN-Cache-Control"] = "public, max-age=300"
+    
+    return stories
 
 
 @router.get("/today-summary", response_model=None)
-async def get_today_summary(db: DbSession) -> dict[str, Any]:
+async def get_today_summary(db: DbSession, response: Response) -> dict[str, Any]:
     service = NewsService(db)
-    return await service.get_today_summary()
+    summary = await service.get_today_summary()
+    
+    # Add caching headers for better performance
+    response.headers["Cache-Control"] = "public, max-age=300, s-maxage=300"  # 5 minutes
+    response.headers["CDN-Cache-Control"] = "public, max-age=300"
+    
+    return summary
 
 
 @router.get("/categories", response_model=None)
-async def get_categories(db: DbSession) -> dict[str, str]:
+async def get_categories(db: DbSession, response: Response) -> dict[str, str]:
     service = NewsService(db)
-    return await service.get_categories()
+    categories = await service.get_categories()
+    
+    # Add caching headers for better performance
+    response.headers["Cache-Control"] = "public, max-age=600, s-maxage=600"  # 10 minutes
+    response.headers["CDN-Cache-Control"] = "public, max-age=600"
+    
+    return categories
 
 
 @router.get("/categories/{category}", response_model=None)
