@@ -5,6 +5,7 @@ from datetime import datetime
 from app.models.article import Article
 from app.services.entity_service import EntityService
 from app.services.llm_service import LLMService
+from app.utils.category_validator import normalize_and_validate_category
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -100,7 +101,9 @@ class NewsProcessor:
             print(summary_result)
             article["summary"] = summary_result.get("summary", "")
             article["why_it_matters"] = summary_result.get("why_it_matters", "")
-            article["category"] = summary_result["category"]
+            # Validate and normalize the category
+            raw_category = summary_result.get("category")
+            article["category"] = normalize_and_validate_category(raw_category)
             published_at_str = article.get("publishedAt")
 
             if not published_at_str:

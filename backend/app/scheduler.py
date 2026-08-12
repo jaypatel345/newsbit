@@ -9,6 +9,7 @@ from app.services.gnews_service import GNewsService
 from app.services.news_service import NewsService
 from app.services.ranking_service import RankingService
 from app.services.embedding_processor import EmbeddingProcessor
+from app.utils.category_validator import ALLOWED_CATEGORIES
 
 
 logger = logging.getLogger(__name__)
@@ -21,17 +22,8 @@ scheduler = AsyncIOScheduler(
 async def run_news_fetch_job():
     logger.info("Scheduler fired")
 
-    categories = [
-        "technology",
-        "business",
-        "sports",
-        "science",
-        "world",
-        "health",
-        "entertainment",
-        "nation",
-        "general",
-    ]
+    # Use lowercase versions of allowed categories for GNews API
+    categories = [cat.lower() for cat in ALLOWED_CATEGORIES if cat != "Other"]
 
     async with AsyncSessionLocal() as session:
 

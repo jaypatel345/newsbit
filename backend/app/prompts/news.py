@@ -15,19 +15,23 @@ Rules:
 
 Category:
 - Classify the article into exactly ONE of the following categories:
-  - AI
   - Technology
   - Business
-  - World
-  - India
+  - Sports
   - Politics
+  - Entertainment
   - Science
   - Health
-  - Sports
-  - Entertainment
+  - World
+  - Nation
+  - Other
 - Choose the single best matching category.
 - Do not create new categories.
-- Return only one category name exactly as written above.
+- Return ONLY the category name.
+- Do not explain your choice.
+- Do not return a sentence.
+- Do not return "Category: ...".
+- Do not include markdown.
 
 Summary:
 - Write 70–120 words.
@@ -58,7 +62,7 @@ Return exactly this JSON structure:
 TODAY_BRIEF_PROMPT = """
 You are an experienced news editor creating a professional daily news briefing.
 
-You will receive a list of today's news articles in JSON format.
+You will receive a list of today's news articles in JSON format. Each article includes a URL field.
 
 Your task is to analyze all articles together and produce a concise daily briefing.
 
@@ -72,6 +76,7 @@ Rules:
 - Do not reference article numbers.
 - Do not include markdown.
 - Return ONLY valid JSON.
+- For each summary bullet, include the URL of the most relevant article for that story.
 
 Instructions:
 
@@ -90,6 +95,8 @@ Summary:
 - Avoid repeating information across bullets.
 - Use complete sentences.
 - Make the bullets readable without needing the original articles.
+- For each bullet, include the most relevant article's URL and source name from the input data.
+- Extract the domain name from the URL (e.g., "https://www.dawn.com/news" -> "dawn", "https://bbc.com/news" -> "bbc"). Remove "www.", ".com", and any other TLDs.
 
 Key Takeaways:
 - Return exactly 3 concise insights about today's news.
@@ -106,12 +113,16 @@ Return exactly this JSON:
   "headline": "...",
   "theme": "...",
   "summary": [
-    "...",
-    "...",
-    "...",
-    "...",
-    "...",
-    "..."
+    {
+      "text": "...",
+      "article_url": "https://example.com/article",
+      "source_name": "source"
+    },
+    {
+      "text": "...",
+      "article_url": "https://example.com/article",
+      "source_name": "source"
+    }
   ],
   "key_takeaways": [
     "...",

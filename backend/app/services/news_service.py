@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.models.article import Article
 from app.models.summary import Summary
 from app.prompts.news import TODAY_BRIEF_PROMPT
+from app.utils.category_validator import ALLOWED_CATEGORIES
 from fastapi import HTTPException
 from groq import AsyncGroq
 from sqlalchemy import func, select
@@ -60,6 +61,9 @@ class NewsService:
                 .limit(10)
             )
 
+            # Use fetchall() for better performance
+            rows = result.fetchall()
+            
             articles = [
                 {
                     "id": id,
@@ -75,7 +79,7 @@ class NewsService:
                     "category": category,
                     "popularity_score": popularity_score,
                 }
-                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score, in result.all()
+                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score, in rows
             ]
 
             return articles
@@ -84,13 +88,14 @@ class NewsService:
             raise HTTPException(status_code=500, detail="Failed to retrieve news")
 
     async def get_today_summary(self):
-
-        summary = await self.db.scalar(select(Summary))
+        # Use first() instead of scalar() for better performance
+        result = await self.db.execute(select(Summary).limit(1))
+        summary = result.scalar_one_or_none()
 
         if summary is None:
-
             return {"message": "No summary found"}
 
+        # Parse JSON fields only once
         return {
             "id": summary.id,
             "headline": summary.headline,
@@ -117,12 +122,19 @@ class NewsService:
             raise HTTPException(status_code=500, detail="Failed to retrieve categories")
 
     async def get_news_by_category(self, category: str):
+        # Validate category against allowed categories
+        if category not in ALLOWED_CATEGORIES:
+            logger.warning("Invalid category requested: %s", category)
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid category '{category}'. Must be one of: {', '.join(sorted(ALLOWED_CATEGORIES))}"
+            )
 
         try:
             result = await self.db.execute(
                 select(Article)
                 .where(
-                    Article.category.ilike(category),
+                    Article.category == category,
                     Article.image_url.is_not(None),
                     Article.image_url != '',
                 )
@@ -151,6 +163,7 @@ class NewsService:
                 Article.category,
                 Article.published_at,
                 Article.source_name,
+                Article.url,
             )
             .where(
                 Article.summary.is_not(None),
@@ -169,8 +182,9 @@ class NewsService:
                 "category": category,
                 "published_at": published_at,
                 "source_name": source_name,
+                "url": url,
             }
-            for title, summary, why_it_matters, category, published_at, source_name in result.all()
+            for title, summary, why_it_matters, category, published_at, source_name, url in result.all()
         ]
 
         # 2. Generate summary using LLM

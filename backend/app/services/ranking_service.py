@@ -5,16 +5,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 CATEGORY_PRIORITY = {
-    "AI": 10,
     "Technology": 10,
     "Politics": 10,
     "World": 10,
     "Business": 8,
     "Science": 7,
     "Health": 6,
-    "India": 5,
+    "Nation": 5,
     "Entertainment": 3,
     "Sports": 3,
+    "Other": 1,
 }
 
 
