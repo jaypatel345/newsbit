@@ -87,16 +87,15 @@ export default function BriefPreview() {
 
         {/* Sources Popup */}
         {showSourcesPopup && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Article Sources</h3>
-            <div className="space-y-2">
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="space-y-1">
               {sources.map((source, index) => (
                 <a
                   key={index}
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md transition-colors"
+                  className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-md transition-colors"
                 >
                   <ArticleSourceButton articleUrl={source.url} sourceName={source.name} showText={true} />
                 </a>

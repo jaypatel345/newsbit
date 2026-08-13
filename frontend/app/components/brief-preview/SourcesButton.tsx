@@ -39,14 +39,14 @@ export default function SourcesButton({ sources, showPopup, onTogglePopup }: Sou
             key={index}
             className="relative"
             style={{
-              marginLeft: index > 0 ? '-8px' : '0',
+              marginLeft: index > 0 ? '-10px' : '0',
               zIndex: displaySources.length - index,
             }}
           >
             <img
-              src={`https://www.google.com/s2/favicons?domain=${getDomain(source.url)}&sz=16`}
+              src={`https://www.google.com/s2/favicons?domain=${getDomain(source.url)}&sz=32`}
               alt={source.name}
-              className="w-4 h-4 rounded-full border-2 border-white"
+              className="w-6 h-6 rounded-full border-2 border-white"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = "none";
@@ -56,8 +56,8 @@ export default function SourcesButton({ sources, showPopup, onTogglePopup }: Sou
         ))}
         {remainingCount > 0 && (
           <div
-            className="relative w-4 h-4 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-[8px] font-medium text-gray-600"
-            style={{ marginLeft: '-8px' }}
+            className="relative w-6 h-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-[10px] font-medium text-gray-600"
+            style={{ marginLeft: '-10px' }}
           >
             +{remainingCount}
           </div>
