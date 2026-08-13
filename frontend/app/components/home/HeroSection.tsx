@@ -86,7 +86,7 @@ export default function HeroSection() {
         {/* AI Prompt Input */}
         <div className="w-full max-w-160 mb-6 sm:mb-8">
           <div
-            className={`flex items-center gap-2 bg-white border rounded-2xl transition-all duration-300 ${
+            className={`flex items-center gap-2 bg-white border rounded-xl transition-all duration-300 ${
               selectedPrompt
                 ? "border-gray-400 bg-gray-50 scale-[1.02]"
                 : "border-gray-200"
@@ -130,7 +130,7 @@ export default function HeroSection() {
               <button
                 key={index}
                 onClick={() => handleChipClick(question)}
-                className={`px-4 py-2.5 sm:px-5 sm:py-3 rounded-3xl text-xs sm:text-sm font-medium cursor-pointer border border-gray-200  bg-white transition-all duration-200 active:scale-95  hover:bg-gray-50/90 ${
+                className={`px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl text-xs sm:text-sm font-medium cursor-pointer border border-gray-200  bg-white transition-all duration-200 active:scale-95  hover:bg-gray-50/90 ${
                   selectedPrompt === question ? "scale-[1.03]" : "scale-100"
                 }`}
                 // style={{
