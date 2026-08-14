@@ -41,9 +41,9 @@ class Article(Base):
     source_name = Column(String(255))
     source_url = Column(Text)
 
-    url = Column(String(500), unique=True, nullable=False)
+    url = Column(Text, unique=True, nullable=False)
     image_url = Column(
-        String(500),
+        Text,
         nullable=False,
     )
 
