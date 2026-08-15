@@ -81,7 +81,6 @@ export default function ConversationMenu({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              console.log("Delete button clicked in menu for conversation:", conversation.id);
               onDelete(conversation.id);
               setIsOpen(false);
             }}

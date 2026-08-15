@@ -201,7 +201,19 @@ class ConversationService:
             .order_by(Message.created_at)
         )
 
-        return result.scalars().all()
+        messages = result.scalars().all()
+        
+        # Transform to match MessageResponse schema
+        return [
+            {
+                "id": msg.id,
+                "conversation_id": msg.conversation_id,
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at,
+            }
+            for msg in messages
+        ]
 
 
     async def send_message(

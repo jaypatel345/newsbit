@@ -8,7 +8,6 @@ interface TopicCardProps {
 
 export default function TopicCard({ category }: TopicCardProps) {
   const { data: articles, isLoading, error } = useCategoryNews(category);
-  console.log(articles);
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">

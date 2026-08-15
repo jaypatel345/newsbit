@@ -136,7 +136,6 @@ function ChatPageContent() {
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Request was aborted');
         // Remove the pending user message since we stopped the generation
         queryClient.setQueryData(
           ["messages", conversationId],
@@ -223,7 +222,6 @@ function ChatPageContent() {
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Request was aborted');
         // Revert the changes if the send was aborted
         queryClient.setQueryData(["messages", selectedConversationId], messages);
       } else {
@@ -308,18 +306,13 @@ function ChatPageContent() {
   };
 
   const handleDeleteConversation = (conversationId: number) => {
-    console.log("Delete called for conversation:", conversationId);
     if (confirm("Are you sure you want to delete this conversation?")) {
-      console.log("User confirmed delete");
       // Store deleted conversation ID in localStorage
       localStorage.setItem(`deleted_conversation_${conversationId}`, "true");
-      console.log("Stored in localStorage");
       // Optimistically remove from UI
       const previousConversations = queryClient.getQueryData(["conversations"]) as any[] || [];
-      console.log("Previous conversations:", previousConversations.length);
       const filtered = previousConversations.filter((conv) => conv.id !== conversationId);
       queryClient.setQueryData(["conversations"], filtered);
-      console.log("Removed from UI, remaining:", filtered.length);
 
       if (selectedConversationId === conversationId) {
         setSelectedConversationId(null);

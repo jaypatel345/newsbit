@@ -33,7 +33,21 @@ export async function getMessages(conversationId: number): Promise<Message[]> {
     throw new Error(errorData.detail || "Failed to fetch messages");
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  // Handle both array response (MessageListResponse) and potential direct array
+  const messages = data.messages || data;
+  
+  // Transform backend messages to match frontend Message type
+  if (Array.isArray(messages)) {
+    return messages.map((msg: any) => ({
+      id: String(msg.id), // Convert numeric ID to string
+      role: msg.role,
+      content: msg.content,
+    }));
+  }
+  
+  return [];
 }
 
 export async function sendMessage(
@@ -79,5 +93,12 @@ export async function sendMessage(
     throw new Error(errorData.detail || "Failed to send message");
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  // Transform backend response to match frontend Message type
+  return {
+    id: String(data.id), // Convert numeric ID to string
+    role: data.role,
+    content: data.content,
+  };
 }

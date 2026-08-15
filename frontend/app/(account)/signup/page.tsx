@@ -49,7 +49,6 @@ export default function SignUpPage() {
           expires: 1, // 1 day
         });
         router.push("/"); // or "/dashboard"
-        console.log("user created", data);
       },
 
       onError: (error) => {

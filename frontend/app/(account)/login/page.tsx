@@ -28,7 +28,6 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // console.log("Login form submitted:", formData);
     const guestId = localStorage.getItem("guest_id");
     mutate(
       {
@@ -42,7 +41,6 @@ export default function LoginPage() {
             expires: 1, // 1 day
           });
           router.push("/"); // or "/dashboard"
-          console.log("user created", data);
         },
 
         onError: (error) => {

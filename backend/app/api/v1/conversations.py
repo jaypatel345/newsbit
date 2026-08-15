@@ -5,6 +5,7 @@ from app.schemas.conversation import (
     UpdateConversationRequest,
 )
 from app.schemas.message import (
+    MessageListResponse,
     MessageResponse,
     SendMessageRequest,
 )
@@ -107,8 +108,8 @@ async def get_messages(
     service: ConversationService = Depends(get_conversation_service),
 
 ):
-
-    return await service.get_messages(conversation_id, current_user, guest_id)
+    messages = await service.get_messages(conversation_id, current_user, guest_id)
+    return MessageListResponse(messages=messages)
 
 
 @router.post("/conversations/{conversation_id}/messages")
