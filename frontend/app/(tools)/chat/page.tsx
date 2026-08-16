@@ -81,17 +81,21 @@ function ChatPageContent() {
     queryClient.setQueryData(
       ["messages", conversationId],
 
-      (oldMessages: Message[] = []) => [
-        ...oldMessages,
+      (oldMessages: Message[] = []) => {
+        const newMessages = [
+          ...oldMessages,
 
-        {
-          id: crypto.randomUUID(),
+          {
+            id: crypto.randomUUID(),
 
-          role: "user",
+            role: "user",
 
-          content: message,
-        },
-      ],
+            content: message,
+          },
+        ];
+        console.log("Added user message to cache:", newMessages);
+        return newMessages;
+      },
     );
 
     setLoading(true);
@@ -128,11 +132,25 @@ function ChatPageContent() {
         articleIds: selectedArticles.map((article) => article.id),
       });
 
-      // Store response in pending state, don't add to messages yet
-      setPendingResponse(response);
+      console.log("Received response from sendMessage:", response);
 
-      // Keep loading true until timeline completes
-      // Response will be added to messages when timeline completes
+      // Add the response to messages immediately
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        (oldMessages: Message[] = []) => {
+          const newMessages = [...oldMessages, response];
+          console.log("Added AI response to cache:", newMessages);
+          return newMessages;
+        },
+      );
+
+      // Invalidate the query to force a refresh
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
+
+      // Set loading to false immediately since response is now shown
+      setLoading(false);
+      setPendingResponse(null);
+
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
@@ -214,11 +232,19 @@ function ChatPageContent() {
         articleIds: selectedArticles.map((article) => article.id),
       });
 
-      // Store response in pending state, don't add to messages yet
-      setPendingResponse(response);
+      // Add the response to messages immediately
+      queryClient.setQueryData(
+        ["messages", selectedConversationId],
+        (oldMessages: Message[] = []) => {
+          const newMessages = [...oldMessages, response];
+          return newMessages;
+        },
+      );
 
-      // Keep loading true until timeline completes
-      // Response will be added to messages when timeline completes
+      // Set loading to false immediately since response is now shown
+      setLoading(false);
+      setPendingResponse(null);
+
     } catch (error) {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
@@ -234,14 +260,7 @@ function ChatPageContent() {
   };
 
   const handleAnimationComplete = () => {
-    // Add the pending response to messages when timeline completes
-    if (pendingResponse && selectedConversationId) {
-      queryClient.setQueryData(
-        ["messages", selectedConversationId],
-        (oldMessages: Message[] = []) => [...oldMessages, pendingResponse],
-      );
-      setPendingResponse(null);
-    }
+    // This function is no longer needed since we add response immediately
     setLoading(false);
   };
 

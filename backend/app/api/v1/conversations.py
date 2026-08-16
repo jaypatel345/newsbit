@@ -49,13 +49,8 @@ def get_conversation_service(
     llm_service: LLMService = Depends(get_llm_service),
     search_service: SearchService = Depends(get_search_service),
 ) -> ConversationService:
+    # Disable semantic search due to ML initialization issues
     semantic_search_service = None
-    if SEMANTIC_SEARCH_AVAILABLE and SemanticSearchService and EmbeddingService:
-        try:
-            embedding_service = EmbeddingService()
-            semantic_search_service = SemanticSearchService(db, embedding_service)
-        except ImportError:
-            pass  # ML dependencies not available
     return ConversationService(db, article_service, llm_service, search_service, semantic_search_service)
 
 

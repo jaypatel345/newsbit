@@ -291,11 +291,11 @@ class ConversationService:
             },
         ]
 
-        # 5. Call the LLM with tool support
+        # 5. Call the LLM with search tool
         chat_completion = await groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
-            tools=[SEARCH_ARTICLES_TOOL , SEMANTIC_SEARCH_TOOL],
+            tools=[SEARCH_ARTICLES_TOOL],
         )
 
         message = chat_completion.choices[0].message
@@ -316,18 +316,6 @@ class ConversationService:
                         db=self.db,
                         query=query,
                     )
-                elif tool_name == "semantic_search":
-                    if not SEMANTIC_SEARCH_AVAILABLE or self.semantic_search_service is None:
-                        tool_result = {
-                            "error": "Semantic search is not available in this environment. Use metadata search instead."
-                        }
-                    else:
-                        query = arguments["query"]
-                        top_k = arguments.get("top_k", 5)
-                        tool_result = await self.semantic_search_service.search(
-                            query=query,
-                            top_k=top_k,
-                        )
                 else:
                     tool_result = {
                         "error": f"Unknown tool: {tool_name}"

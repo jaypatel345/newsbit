@@ -1,7 +1,7 @@
 import { Message } from "@/types/message";
 import Cookies from "js-cookie";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export async function getMessages(conversationId: number): Promise<Message[]> {
   const token = Cookies.get("access_token");

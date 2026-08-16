@@ -91,15 +91,19 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
                     )
                   ) : (
                     <>
-                      {/* Normal AI text response */}
-                      {message.content && message.content.replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '').trim() && (
+                      {/* Normal AI text response - strip function calls and markdown formatting */}
+                      {message.content && (
                         <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
-                          {message.content.replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '').trim()}
+                          {message.content
+                            .replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '') // Remove function calls
+                            .replace(/\*\*/g, '') // Remove bold markdown
+                            .replace(/\*/g, '') // Remove any remaining asterisks
+                            .trim()}
                         </p>
                       )}
 
-                      {/* Fallback message when content is empty after removing function tags */}
-                      {message.content && !message.content.replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '').trim() && !message.articles && (
+                      {/* Fallback message when content is empty */}
+                      {!message.content && !message.articles && (
                         <p className="text-sm sm:text-base leading-relaxed text-gray-600">
                           No response generated. Please try again.
                         </p>
