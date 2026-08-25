@@ -275,14 +275,55 @@ class ConversationService:
         await self.db.commit()
         await self.db.refresh(user_message)
 
-        # 3. Fetch articles if provided
+        # 3. Fetch articles if provided or if user asks for news summary
         article = []
+        user_content_lower = user_message.content.lower()
+
+        # Check if user is asking for news/summary/headlines
+        news_keywords = [
+            "news",
+            "summary",
+            "headlines",
+            "top stories",
+            "today",
+            "latest",
+            "breaking",
+            "trending",
+        ]
+        should_fetch_news = any(
+            keyword in user_content_lower for keyword in news_keywords
+        )
+
         if request.article_ids:
             # Fetch articles from the provided IDs
             for article_id in request.article_ids:
                 article_data = await self.article_service.get_article_by_id(article_id)
                 if article_data:
                     article.append(article_data)
+        elif should_fetch_news:
+            # Auto-fetch recent news articles for news-related queries
+            from datetime import UTC, datetime, timedelta
+
+            from app.models.article import Article
+            from sqlalchemy import desc
+
+            # Get articles from the last 24 hours
+            today = datetime.now(UTC) - timedelta(hours=24)
+            result = await self.db.execute(
+                select(Article)
+                .where(
+                    Article.summary.is_not(None),
+                    Article.published_at >= today,
+                    Article.image_url.is_not(None),
+                    Article.image_url != "",
+                )
+                .order_by(desc(Article.popularity_score), desc(Article.published_at))
+                .limit(10)
+            )
+            recent_articles = result.scalars().all()
+
+            # Add articles directly - they're already Article objects with the right attributes
+            article.extend(recent_articles)
 
         article_context = (
             BuildArticle.build_article_context(article) if article else None
@@ -308,13 +349,18 @@ class ConversationService:
         ]
 
         # 5. Call the LLM
-        chat_completion = await groq_client.chat.completions.create(
-            model="openai/gpt-oss-120b",
-            messages=messages,
-        )
+        try:
+            chat_completion = await groq_client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=messages,
+            )
 
-        message = chat_completion.choices[0].message
-        llm_result = message.content
+            message = chat_completion.choices[0].message
+            llm_result = message.content
+        except Exception as e:
+            print(f"Error calling LLM: {e}")
+            print(f"Messages sent: {messages}")
+            raise e
 
         # 6. Save the assistant's reply.
         assistant_message = Message(

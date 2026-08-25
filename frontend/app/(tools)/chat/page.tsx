@@ -43,9 +43,13 @@ function ChatPageContent() {
   const { mutateAsync: pinConversation } = usePinConversation();
   const { mutateAsync: deleteConversation } = useDeleteConversation();
 
-  const { data: messages = [] } = useMessages(selectedConversationId);
+  const { data: messages = [], isLoading: messagesLoading } = useMessages(selectedConversationId);
   const queryClient = useQueryClient();
   const { mutateAsync: sendMessage } = useSendMessage();
+
+  // Get the latest messages from cache to ensure optimistic updates are reflected
+  const cachedMessages = queryClient.getQueryData(["messages", selectedConversationId]) as Message[] || [];
+  const displayMessages = cachedMessages.length > 0 ? cachedMessages : messages;
   const [renameDialog, setRenameDialog] = useState<{
     isOpen: boolean;
     conversationId: number | null;
@@ -134,7 +138,7 @@ function ChatPageContent() {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    const isFirstMessage = messages.length === 0;
+    const isFirstMessage = displayMessages.length === 0;
 
     queryClient.setQueryData(
       ["messages", conversationId],
@@ -238,8 +242,8 @@ function ChatPageContent() {
     if (!selectedConversationId) return;
 
     // Find the message index
-    const messages = queryClient.getQueryData(["messages", selectedConversationId]) as Message[] || [];
-    const messageIndex = messages.findIndex(m => m.id === messageId);
+    const currentMessages = queryClient.getQueryData(["messages", selectedConversationId]) as Message[] || [];
+    const messageIndex = currentMessages.findIndex(m => m.id === messageId);
 
     if (messageIndex === -1) return;
 
@@ -247,7 +251,7 @@ function ChatPageContent() {
     const isFirstMessage = messageIndex === 0;
 
     // Update the user message in the UI
-    const updatedMessages = [...messages];
+    const updatedMessages = [...currentMessages];
     updatedMessages[messageIndex] = { ...updatedMessages[messageIndex], content: newContent };
 
     // Remove the assistant response that follows this user message
@@ -309,11 +313,11 @@ function ChatPageContent() {
       // Check if the error is due to abort
       if (error instanceof Error && error.name === 'AbortError') {
         // Revert the changes if the send was aborted
-        queryClient.setQueryData(["messages", selectedConversationId], messages);
+        queryClient.setQueryData(["messages", selectedConversationId], currentMessages);
       } else {
         console.error(error);
         // Revert the changes if the send fails
-        queryClient.setQueryData(["messages", selectedConversationId], messages);
+        queryClient.setQueryData(["messages", selectedConversationId], currentMessages);
       }
       setLoading(false);
     }
@@ -508,7 +512,7 @@ function ChatPageContent() {
 
         <div className="px-3 py-4">
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-all shadow-md hover:shadow-lg"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-900 transition-colors shadow-md"
             onClick={handleCreateConversation}
           >
             <SquarePen className="h-4 w-4" />
@@ -605,7 +609,7 @@ function ChatPageContent() {
 
         <div className="px-3 py-4">
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-all shadow-md hover:shadow-lg"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-900 transition-colors shadow-md"
             onClick={handleCreateConversation}
           >
             <SquarePen className="h-4 w-4" />
@@ -693,7 +697,14 @@ function ChatPageContent() {
 
         <main className="flex-1 overflow-y-auto pb-40 pt-8 flex flex-col px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto w-full">
-            {messages.length === 0 ? (
+            {messagesLoading && selectedConversationId ? (
+              <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-8 w-8 rounded-full border-4 border-gray-200 border-t-black animate-spin" />
+                  <p className="mt-4 text-gray-600 text-sm font-medium">Loading conversation...</p>
+                </div>
+              </div>
+            ) : displayMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-800 mb-2">
@@ -710,7 +721,7 @@ function ChatPageContent() {
             ) : (
               <MessageList
                 loading={loading}
-                messages={messages}
+                messages={displayMessages}
                 onLoadingComplete={handleAnimationComplete}
                 onEditMessage={handleEditMessage}
               />

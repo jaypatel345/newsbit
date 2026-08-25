@@ -73,7 +73,7 @@ export default function ThinkingTimeline({
                 }`}
               />
 
-              {index < currentStep && (
+              {index < currentStep && index < STEPS.length - 1 && (
                 <div className="w-px h-6 bg-gray-300 my-1 animate-pulse" />
               )}
             </div>

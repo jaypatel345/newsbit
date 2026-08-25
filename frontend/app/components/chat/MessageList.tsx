@@ -91,15 +91,69 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
                     )
                   ) : (
                     <>
-                      {/* Normal AI text response - strip function calls and markdown formatting */}
+                      {/* Normal AI text response with news platform styling */}
                       {message.content && (
-                        <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                        <div className="space-y-2">
                           {message.content
                             .replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '') // Remove function calls
+                            .replace(/[^\p{L}\p{N}\p{P}\p{S}\s]/gu, '') // Remove emojis
+                            .replace(/#+/g, '') // Remove hash symbols
                             .replace(/\*\*/g, '') // Remove bold markdown
-                            .replace(/\*/g, '') // Remove any remaining asterisks
-                            .trim()}
-                        </p>
+                            .replace(/\*/g, '') // Remove italic markdown
+                            .replace(/\n\s*\n/g, '\n') // Remove extra blank lines
+                            .split('\n')
+                            .map((line, index) => {
+                              // Skip empty lines, separator rows, lines with only dashes/pipes, and table separators
+                              if (line.trim() === '' || 
+                                  /^[-\s]+$/.test(line) || 
+                                  /^—+$/.test(line) || 
+                                  /^\|[-\s]+\|$/.test(line) ||
+                                  /^\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?$/.test(line)) {
+                                return null;
+                              }
+                              
+                              // Handle table rows
+                              if (line.includes('|')) {
+                                const cells = line.split('|').filter(cell => cell.trim());
+                                if (cells.length > 1) {
+                                  return (
+                                    <div key={index} className="grid grid-cols-2 gap-3 py-2 border-b border-gray-100 last:border-0">
+                                      {cells.map((cell, cellIndex) => (
+                                        <div key={cellIndex} className={cellIndex === 0 ? "font-semibold text-gray-900 text-sm" : "text-gray-700 text-sm"}>
+                                          {cell.trim()}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+                                }
+                              }
+                              
+                              // Handle bullet points
+                              if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+                                const bulletText = line.trim().replace(/^[•-]\s*/, '');
+                                
+                                return (
+                                  <div key={index} className="flex items-start gap-2 py-0.5">
+                                    <span className="text-gray-400 mt-0.5 text-xs">•</span>
+                                    <span className="text-gray-700 flex-1 text-sm leading-snug">
+                                      {bulletText.replace(/<br>/g, ' ')}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                              
+                              // Handle regular text
+                              return (
+                                <p 
+                                  key={index} 
+                                  className="text-gray-700 text-sm leading-snug py-0.5"
+                                >
+                                  {line.replace(/<br>/g, ' ')}
+                                </p>
+                              );
+                            })
+                            .filter(Boolean)} {/* Filter out null values */}
+                        </div>
                       )}
 
                       {/* Fallback message when content is empty */}
