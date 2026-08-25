@@ -21,8 +21,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSendMessage } from "@/app/hooks/useSendMessage";
 import { generateTitleFromMessage } from "@/app/utils/titleGenerator";
 import { useArticle } from "@/app/hooks/useArticle";
+import { useChatWebSocket } from "@/app/hooks/useChatWebSocket";
 
 function ChatPageContent() {
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    number | null
+  >(null);
+  const {
+    status: webSocketStatus,
+    messages: webSocketMessages,
+    sendMessage: sendWebSocketMessage,
+  } = useChatWebSocket(selectedConversationId);
   const searchParams = useSearchParams();
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,9 +42,7 @@ function ChatPageContent() {
   const { mutateAsync: updateConversation } = useUpdateConversation();
   const { mutateAsync: pinConversation } = usePinConversation();
   const { mutateAsync: deleteConversation } = useDeleteConversation();
-  const [selectedConversationId, setSelectedConversationId] = useState<
-    number | null
-  >(null);
+
   const { data: messages = [] } = useMessages(selectedConversationId);
   const queryClient = useQueryClient();
   const { mutateAsync: sendMessage } = useSendMessage();
@@ -56,6 +63,7 @@ function ChatPageContent() {
 
   const [selectedArticles, setSelectedArticles] = useState<any[]>([]);
 
+
   const { data: article, isLoading } = useArticle(articleId);
 
   useEffect(() => {
@@ -63,6 +71,53 @@ function ChatPageContent() {
       setSelectedArticles([article]);
     }
   }, [article]);
+
+  useEffect(() => {
+
+  if (!webSocketMessages.length) {
+
+    return;
+
+  }
+
+  const latestMessage =
+
+    webSocketMessages[webSocketMessages.length - 1];
+
+  if (!selectedConversationId) {
+
+    return;
+
+  }
+
+  if (latestMessage.type !== "message") {
+
+    return;
+
+  }
+
+  // Only process messages for the current conversation
+  if (latestMessage.conversation_id && latestMessage.conversation_id !== selectedConversationId) {
+    return;
+  }
+
+  // Use the actual message data from WebSocket response
+  const aiMessage: Message = {
+    id: latestMessage.id || crypto.randomUUID(),
+    role: (latestMessage.role === "user" || latestMessage.role === "assistant")
+      ? latestMessage.role
+      : "assistant",
+    content: latestMessage.content ?? "",
+    created_at: latestMessage.created_at,
+  };
+
+  // Store in pending response instead of adding to messages immediately
+  setPendingResponse(aiMessage);
+
+}, [
+  webSocketMessages,
+  selectedConversationId,
+]);
 
   const handleSend = async (message: string) => {
     if (!message.trim()) return;
@@ -74,6 +129,9 @@ function ChatPageContent() {
       conversationId = conversation.id;
       setSelectedConversationId(conversationId);
       queryClient.setQueryData(["messages", conversationId], []);
+      
+      // Wait a bit for WebSocket to initialize
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     const isFirstMessage = messages.length === 0;
@@ -125,44 +183,46 @@ function ChatPageContent() {
     }
 
     try {
-      const response = await sendMessage({
-        conversationId: conversationId,
-        content: message,
-        signal: abortControllerRef.current.signal,
-        articleIds: selectedArticles.map((article) => article.id),
-      });
-
-      console.log("Received response from sendMessage:", response);
-
-      // Add the response to messages immediately
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        (oldMessages: Message[] = []) => {
-          const newMessages = [...oldMessages, response];
-          console.log("Added AI response to cache:", newMessages);
-          return newMessages;
-        },
+      await sendWebSocketMessage(
+        message,
+        selectedArticles.map((article) => article.id),
+      );
+      console.log(
+        "Message sent through WebSocket",
       );
 
-      // Invalidate the query to force a refresh
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-
-      // Set loading to false immediately since response is now shown
-      setLoading(false);
-      setPendingResponse(null);
-
     } catch (error) {
-      // Check if the error is due to abort
-      if (error instanceof Error && error.name === 'AbortError') {
-        // Remove the pending user message since we stopped the generation
+
+      console.error(
+        "Failed to send WebSocket message:",
+        error,
+      );
+
+      // Fallback to HTTP if WebSocket is not ready
+      try {
+        const response = await sendMessage({
+          conversationId: conversationId,
+          content: message,
+          signal: abortControllerRef.current.signal,
+          articleIds: selectedArticles.map((article) => article.id),
+        });
+
+        // Add the response to messages immediately
         queryClient.setQueryData(
           ["messages", conversationId],
-          (oldMessages: Message[] = []) => oldMessages.slice(0, -1)
+          (oldMessages: Message[] = []) => {
+            const newMessages = [...oldMessages, response];
+            return newMessages;
+          },
         );
-      } else {
-        console.error(error);
+
+        setLoading(false);
+        setPendingResponse(null);
+      } catch (httpError) {
+        console.error("HTTP fallback also failed:", httpError);
+        setLoading(false);
       }
-      setLoading(false);
+
     }
   };
 
@@ -260,7 +320,19 @@ function ChatPageContent() {
   };
 
   const handleAnimationComplete = () => {
-    // This function is no longer needed since we add response immediately
+    // Add the pending response to messages after timeline completes
+    if (pendingResponse && selectedConversationId) {
+      queryClient.setQueryData(
+        ["messages", selectedConversationId],
+        (oldMessages: Message[] = []) => {
+          return [
+            ...oldMessages,
+            pendingResponse,
+          ];
+        },
+      );
+      setPendingResponse(null);
+    }
     setLoading(false);
   };
 
@@ -403,9 +475,8 @@ function ChatPageContent() {
       )}
 
       {/* Mobile Sidebar */}
-      <aside className={`lg:hidden w-80 border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out h-full z-20 fixed ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <aside className={`lg:hidden w-80 border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out h-full z-20 fixed ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <header className="p-4 flex items-center justify-between">
           <Link
             href="/"
@@ -424,8 +495,8 @@ function ChatPageContent() {
                 <span className="text-[11px] text-gray-600">
                   AI-Powered News
                 </span>
-                  </div>
-                </div>
+              </div>
+            </div>
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -501,9 +572,8 @@ function ChatPageContent() {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:block border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out ${
-        sidebarOpen ? 'w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden p-0'
-      }`}>
+      <aside className={`hidden lg:block border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden p-0'
+        }`}>
         <header className="p-4 flex items-center justify-between">
           <Link
             href="/"
@@ -522,8 +592,8 @@ function ChatPageContent() {
                 <span className="text-[11px] text-gray-600">
                   AI-Powered News
                 </span>
-                  </div>
-                </div>
+              </div>
+            </div>
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -673,6 +743,33 @@ function ChatPageContent() {
                 </div>
               </div>
             )}
+
+            <div className="mb-2">
+              {webSocketStatus === "connecting" && (
+                <div className="text-xs text-gray-500 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                  Connecting...
+                </div>
+              )}
+              {webSocketStatus === "reconnecting" && (
+                <div className="text-xs text-gray-500 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+                  Reconnecting...
+                </div>
+              )}
+              {webSocketStatus === "error" && (
+                <div className="text-xs text-red-500 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-red-500" />
+                  Connection error
+                </div>
+              )}
+              {webSocketStatus === "disconnected" && selectedConversationId && (
+                <div className="text-xs text-gray-500 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-gray-400" />
+                  Disconnected
+                </div>
+              )}
+            </div>
 
             <ChatInput
               message={inputMessage}

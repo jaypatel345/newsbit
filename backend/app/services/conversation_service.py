@@ -1,5 +1,3 @@
-import json
-
 from app.core.llm import groq_client
 from app.models.conversation import Conversation
 from app.models.message import Message
@@ -10,7 +8,6 @@ from app.services.article_service import ArticleService
 from app.services.context_builder import BuildArticle
 from app.services.llm_service import LLMService
 from app.services.search_service import SearchService
-from app.tools.search_articles import SEARCH_ARTICLES_TOOL
 from fastapi import HTTPException
 from sqlalchemy import UUID, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 try:
     from app.services.semantic_search_service import SemanticSearchService
     from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
+
     SEMANTIC_SEARCH_AVAILABLE = True
 except ImportError:
     SEMANTIC_SEARCH_AVAILABLE = False
@@ -26,8 +24,14 @@ except ImportError:
 
 
 class ConversationService:
-
-    def __init__(self, db: AsyncSession, article_service: ArticleService, llm_service: LLMService, search_service: SearchService, semantic_search_service: SemanticSearchService = None):
+    def __init__(
+        self,
+        db: AsyncSession,
+        article_service: ArticleService,
+        llm_service: LLMService,
+        search_service: SearchService,
+        semantic_search_service: SemanticSearchService = None,
+    ):
         self.db = db
         self.article_service = article_service
         self.llm_service = llm_service
@@ -92,7 +96,13 @@ class ConversationService:
 
         return conversation
 
-    async def update_conversation(self, request, conversation_id, current_user: User | None = None, guest_id: str | None = None):
+    async def update_conversation(
+        self,
+        request,
+        conversation_id,
+        current_user: User | None = None,
+        guest_id: str | None = None,
+    ):
         if current_user is not None:
             conversation_exists = await self.db.execute(
                 select(Conversation).where(
@@ -134,7 +144,12 @@ class ConversationService:
 
         return conversation
 
-    async def delete_conversation(self, conversation_id, current_user: User | None = None, guest_id: str | None = None):
+    async def delete_conversation(
+        self,
+        conversation_id,
+        current_user: User | None = None,
+        guest_id: str | None = None,
+    ):
         if current_user is not None:
             result = await self.db.execute(
                 select(Conversation).where(
@@ -192,7 +207,6 @@ class ConversationService:
             )
 
         if not conversation:
-
             raise HTTPException(status_code=404, detail="Conversation not found")
 
         result = await self.db.execute(
@@ -202,7 +216,6 @@ class ConversationService:
         )
 
         messages = result.scalars().all()
-        
         # Transform to match MessageResponse schema
         return [
             {
@@ -214,7 +227,6 @@ class ConversationService:
             }
             for msg in messages
         ]
-
 
     async def send_message(
         self,
@@ -272,13 +284,17 @@ class ConversationService:
                 if article_data:
                     article.append(article_data)
 
-        article_context = BuildArticle.build_article_context(article) if article else None
+        article_context = (
+            BuildArticle.build_article_context(article) if article else None
+        )
 
         # 4. Build messages for LLM
         system_content = NEWSBIT_CHAT_PROMPT
 
         if article_context:
-            system_content += f"\n\nHere is some relevant article context:\n{article_context}"
+            system_content += (
+                f"\n\nHere is some relevant article context:\n{article_context}"
+            )
 
         messages = [
             {
@@ -291,53 +307,16 @@ class ConversationService:
             },
         ]
 
-        # 5. Call the LLM with search tool
+        # 5. Call the LLM
         chat_completion = await groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-120b",
             messages=messages,
-            tools=[SEARCH_ARTICLES_TOOL],
         )
 
         message = chat_completion.choices[0].message
-        llm_result = message.content  # Default to direct response
+        llm_result = message.content
 
-        # 6. Handle tool calls
-        if message.tool_calls:
-            # Add the assistant's tool-call message
-            messages.append(message)
-
-            for tool_call in message.tool_calls:
-                tool_name = tool_call.function.name
-                arguments = json.loads(tool_call.function.arguments)
-
-                if tool_name == "search_articles":
-                    query = arguments["query"]
-                    tool_result = await self.search_service.search_articles(
-                        db=self.db,
-                        query=query,
-                    )
-                else:
-                    tool_result = {
-                        "error": f"Unknown tool: {tool_name}"
-                    }
-
-                # Add backend tool result
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "content": json.dumps(tool_result, default=str),
-                })
-
-            # Send all tool results back to Groq
-            final_completion = await groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=messages,
-            )
-
-            final_message = final_completion.choices[0].message
-            llm_result = final_message.content
-
-        # 7. Save the assistant's reply.
+        # 6. Save the assistant's reply.
         assistant_message = Message(
             conversation_id=conversation_id,
             role="assistant",

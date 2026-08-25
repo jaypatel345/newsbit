@@ -13,18 +13,20 @@ from app.services.article_service import ArticleService
 from app.services.auth_service import (
     get_optional_current_user,
 )
-from app.services.conversation_service import ConversationService, SEMANTIC_SEARCH_AVAILABLE
+from app.services.conversation_service import (
+    ConversationService,
+)
 from app.services.llm_service import LLMService
 from app.services.search_service import SearchService
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 
 try:
-    from app.services.semantic_search_service import SemanticSearchService
     from app.services.embedding_service import EmbeddingService
+    from app.services.semantic_search_service import SemanticSearchService
 except ImportError:
-    SemanticSearchService = None
-    EmbeddingService = None
+    SemanticSearchService = None  # type: ignore
+    EmbeddingService = None  # type: ignore
 
 router = APIRouter(prefix="/api/v1", tags=["conversation"])
 

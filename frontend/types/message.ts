@@ -5,4 +5,5 @@ export type Message = {
   role: "user" | "assistant";
   content?: string;
   articles?: Article[];
+  created_at?: string;
 };

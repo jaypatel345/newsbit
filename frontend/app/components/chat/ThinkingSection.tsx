@@ -15,11 +15,20 @@ export default function ThinkingSection({
 }: ThinkingSectionProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [timelineCompleted, setTimelineCompleted] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   useEffect(() => {
     if (isThinking) {
       setIsVisible(true);
       setTimelineCompleted(false);
+      setShowTimeline(false);
+      
+      // Show timeline after 1.5 seconds
+      const timer = setTimeout(() => {
+        setShowTimeline(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
     }
   }, [isThinking]);
 
@@ -32,24 +41,22 @@ export default function ThinkingSection({
 
   return (
     <div className="mb-4">
-      {/* Modern loading indicator */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div className="relative">
-          {isThinking ? (
-            <Loader2 className="h-5 w-5 text-black animate-spin" />
-          ) : (
-            <Brain className="h-5 w-5 text-black" />
-          )}
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-800">{isThinking ? "Thinking..." : "Thinking Process"}</p>
-        </div>
+      {/* Thinking text */}
+      <div className="flex items-center gap-2">
+        {isThinking ? (
+          <Loader2 className="h-4 w-4 text-black animate-spin" />
+        ) : (
+          <Brain className="h-4 w-4 text-black" />
+        )}
+        <p className="text-sm font-medium text-gray-800">{isThinking ? "Thinking..." : "Thinking Process"}</p>
       </div>
 
-      {/* Timeline always visible */}
-      <div className="mt-3 ml-2 pl-4 border-l-2 border-gray-200 opacity-100 max-h-96">
-        <ThinkingTimeline onComplete={handleTimelineComplete} />
-      </div>
+      {/* Timeline shows after delay */}
+      {showTimeline && (
+        <div className="mt-3 ml-2 pl-4 border-l-2 border-gray-200 opacity-100 max-h-96">
+          <ThinkingTimeline onComplete={handleTimelineComplete} />
+        </div>
+      )}
     </div>
   );
 }

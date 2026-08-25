@@ -203,7 +203,6 @@ async def get_optional_current_user(
 ) -> User | None:
 
     if token is None:
-
         return None
 
     try:

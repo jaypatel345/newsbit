@@ -52,7 +52,7 @@ class NewsService:
                     Article.summary.is_not(None),
                     Article.published_at >= today,
                     Article.image_url.is_not(None),
-                    Article.image_url != '',
+                    Article.image_url != "",
                 )
                 .order_by(
                     Article.popularity_score.desc(),
@@ -63,7 +63,7 @@ class NewsService:
 
             # Use fetchall() for better performance
             rows = result.fetchall()
-            
+
             articles = [
                 {
                     "id": id,
@@ -79,7 +79,7 @@ class NewsService:
                     "category": category,
                     "popularity_score": popularity_score,
                 }
-                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score, in rows
+                for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score in rows
             ]
 
             return articles
@@ -127,7 +127,7 @@ class NewsService:
             logger.warning("Invalid category requested: %s", category)
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid category '{category}'. Must be one of: {', '.join(sorted(ALLOWED_CATEGORIES))}"
+                detail=f"Invalid category '{category}'. Must be one of: {', '.join(sorted(ALLOWED_CATEGORIES))}",
             )
 
         try:
@@ -136,14 +136,13 @@ class NewsService:
                 .where(
                     Article.category == category,
                     Article.image_url.is_not(None),
-                    Article.image_url != '',
+                    Article.image_url != "",
                 )
                 .order_by(Article.published_at.desc())
                 .limit(10)
             )
 
         except Exception:
-
             logger.exception("Error retrieving news for category: %s", category)
             raise HTTPException(
                 status_code=500,
@@ -169,7 +168,7 @@ class NewsService:
                 Article.summary.is_not(None),
                 Article.published_at >= today,
                 Article.image_url.is_not(None),
-                Article.image_url != '',
+                Article.image_url != "",
             )
             .order_by(Article.popularity_score.desc(), Article.published_at.desc())
             .limit(15)
@@ -190,7 +189,7 @@ class NewsService:
         # 2. Generate summary using LLM
 
         response = await groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-120b",
             messages=[
                 {
                     "role": "system",
