@@ -230,7 +230,9 @@ class NewsService:
 
         # 3. Insert/update Summary table
 
-        existing_summary = await self.db.scalar(select(Summary).limit(1))
+        existing_summary = await self.db.scalar(
+            select(Summary).order_by(Summary.updated_at.desc()).limit(1)
+        )
 
         if existing_summary:
             existing_summary.headline = result["headline"]
