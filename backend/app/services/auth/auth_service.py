@@ -4,7 +4,7 @@ import jwt
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.auth import UserResponse
-from app.services.conversation_service import ConversationService
+from app.services.conversation.conversation_service import ConversationService
 from app.utils.jwt import (
     create_access_token,
     create_refresh_token,
@@ -19,7 +19,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AuthService:
-
     def __init__(self, db: AsyncSession | None = None):
 
         self.db = db
@@ -53,7 +52,6 @@ class AuthService:
         await self.db.refresh(create_user)
 
         if guest_id is not None:
-
             conversation_service = ConversationService(self.db, None, None, None)
 
             await conversation_service.migrate_guest_conversations(
@@ -99,7 +97,6 @@ class AuthService:
         # 2. User not found.
 
         if not user:
-
             raise HTTPException(status_code=401, detail="Invalid email or password")
 
         # 3. Verify the password.
@@ -107,11 +104,9 @@ class AuthService:
         is_valid = verify_password(request.password, user.password_hash)
 
         if not is_valid:
-
             raise HTTPException(status_code=401, detail="Invalid email or password")
 
         if guest_id is not None:
-
             conversation_service = ConversationService(self.db, None, None, None)
 
             await conversation_service.migrate_guest_conversations(
@@ -188,7 +183,6 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if user is None:
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",

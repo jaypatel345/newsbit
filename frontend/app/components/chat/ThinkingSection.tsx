@@ -53,7 +53,7 @@ export default function ThinkingSection({
 
       {/* Timeline shows after delay */}
       {showTimeline && (
-        <div className="mt-3 ml-2 pl-4 border-l-2 border-gray-200 opacity-100 max-h-96">
+        <div className="mt-0 ml-0.5 opacity-100 max-h-96">
           <ThinkingTimeline onComplete={handleTimelineComplete} />
         </div>
       )}

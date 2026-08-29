@@ -8,7 +8,7 @@ Tests 3 scenarios:
 """
 
 import json
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock
 
 
 class TestConversationFlow:
@@ -45,7 +45,9 @@ class TestConversationFlow:
         # Test semantic_search tool parsing
         tool_call2 = MagicMock()
         tool_call2.function.name = "semantic_search"
-        tool_call2.function.arguments = json.dumps({"query": "machine learning trends", "top_k": 3})
+        tool_call2.function.arguments = json.dumps(
+            {"query": "machine learning trends", "top_k": 3}
+        )
         tool_call2.id = "call_456"
 
         # Verify JSON parsing works
@@ -60,7 +62,7 @@ class TestConversationFlow:
 
     def test_semantic_search_embedding_generation(self):
         """Test that semantic search generates embeddings correctly."""
-        from app.services.embedding_service import EmbeddingService
+        from app.services.ai.embedding_service import EmbeddingService
 
         embedding_service = EmbeddingService()
         test_query = "AI chip market developments"
@@ -77,13 +79,13 @@ class TestConversationFlow:
 
     def test_search_service_structure(self):
         """Test that search service has correct structure."""
-        from app.services.search_service import SearchService
+        from app.services.search.search_service import SearchService
 
         search_service = SearchService()
 
         # Verify service has required methods
-        assert hasattr(search_service, 'search')
-        assert hasattr(search_service, 'search_articles')
+        assert hasattr(search_service, "search")
+        assert hasattr(search_service, "search_articles")
         assert callable(search_service.search)
         assert callable(search_service.search_articles)
 
@@ -91,8 +93,8 @@ class TestConversationFlow:
 
     def test_semantic_search_service_structure(self):
         """Test that semantic search service has correct structure."""
-        from app.services.semantic_search_service import SemanticSearchService
-        from app.services.embedding_service import EmbeddingService
+        from app.services.ai.embedding_service import EmbeddingService
+        from app.services.ai.semantic_search_service import SemanticSearchService
 
         embedding_service = EmbeddingService()
         mock_db = MagicMock()
@@ -100,19 +102,19 @@ class TestConversationFlow:
         semantic_service = SemanticSearchService(mock_db, embedding_service)
 
         # Verify service has required methods
-        assert hasattr(semantic_service, 'search')
+        assert hasattr(semantic_service, "search")
         assert callable(semantic_service.search)
 
         print("✓ Semantic search service structure is correct")
 
     def test_conversation_service_structure(self):
         """Test that conversation service has correct structure."""
-        from app.services.conversation_service import ConversationService
+        from app.services.conversation.conversation_service import ConversationService
 
         # Verify service has required methods
-        assert hasattr(ConversationService, 'send_message')
-        assert hasattr(ConversationService, 'get_conversations')
-        assert hasattr(ConversationService, 'create_conversation')
+        assert hasattr(ConversationService, "send_message")
+        assert hasattr(ConversationService, "get_conversations")
+        assert hasattr(ConversationService, "create_conversation")
 
         print("✓ Conversation service structure is correct")
 
@@ -127,17 +129,29 @@ class TestConversationFlow:
 
         # Check that internal database/embedding implementation details are not exposed
         # Note: "database" is acceptable in descriptions as it's a user-facing concept
-        internal_terms = ["embedding", "cosine", "vector", "sql", "pgvector", "384", "1024"]
+        internal_terms = [
+            "embedding",
+            "cosine",
+            "vector",
+            "sql",
+            "pgvector",
+            "384",
+            "1024",
+        ]
 
         for term in internal_terms:
-            assert term not in search_tool_str.lower(), f"Internal term '{term}' found in search_articles tool"
-            assert term not in semantic_tool_str.lower(), f"Internal term '{term}' found in semantic_search tool"
+            assert term not in search_tool_str.lower(), (
+                f"Internal term '{term}' found in search_articles tool"
+            )
+            assert term not in semantic_tool_str.lower(), (
+                f"Internal term '{term}' found in semantic_search tool"
+            )
 
         print("✓ Tool definitions don't expose internal implementation details")
 
     def test_search_service_response_structure(self):
         """Test that search service returns properly structured responses."""
-        from app.services.search_service import SearchService
+        from app.services.search.search_service import SearchService
 
         search_service = SearchService()
 
@@ -153,16 +167,17 @@ class TestConversationFlow:
 
     def test_embedding_service_interface(self):
         """Test that embedding service maintains the correct interface."""
-        from app.services.embedding_service import EmbeddingService
+        from app.services.ai.embedding_service import EmbeddingService
 
         embedding_service = EmbeddingService()
 
         # Verify the interface matches what's expected by semantic search
-        assert hasattr(embedding_service, 'generate_embedding')
+        assert hasattr(embedding_service, "generate_embedding")
         assert callable(embedding_service.generate_embedding)
 
         # Test that it's synchronous (not async)
         import inspect
+
         assert not inspect.iscoroutinefunction(embedding_service.generate_embedding)
 
         print("✓ Embedding service interface is correct")
@@ -177,12 +192,24 @@ def run_all_tests():
     tests = [
         ("Tool definitions", test.test_tool_definitions),
         ("Tool argument parsing", test.test_tool_argument_parsing),
-        ("Semantic search embedding generation", test.test_semantic_search_embedding_generation),
+        (
+            "Semantic search embedding generation",
+            test.test_semantic_search_embedding_generation,
+        ),
         ("Search service structure", test.test_search_service_structure),
-        ("Semantic search service structure", test.test_semantic_search_service_structure),
+        (
+            "Semantic search service structure",
+            test.test_semantic_search_service_structure,
+        ),
         ("Conversation service structure", test.test_conversation_service_structure),
-        ("No internal details in tool definitions", test.test_no_internal_details_in_tool_definitions),
-        ("Search service response structure", test.test_search_service_response_structure),
+        (
+            "No internal details in tool definitions",
+            test.test_no_internal_details_in_tool_definitions,
+        ),
+        (
+            "Search service response structure",
+            test.test_search_service_response_structure,
+        ),
         ("Embedding service interface", test.test_embedding_service_interface),
     ]
 

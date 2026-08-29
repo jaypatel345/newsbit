@@ -6,17 +6,16 @@ class EntityNormalizer:
     def compute_normalized_name(name: str) -> str:
         """
         Compute normalized name for search indexing.
-        
+
         Args:
             name: The entity name to normalize
-            
+
         Returns:
             Normalized name (lowercase, no punctuation, single spaces)
         """
         text = name.lower().strip()
         text = re.sub(r"[^\w\s]", "", text)
-        text = re.sub(r"\s+", " ", text)
-        return text
+        return re.sub(r"\s+", " ", text)
 
     COUNTRY_ALIASES = {
         "US": "United States",

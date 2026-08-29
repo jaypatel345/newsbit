@@ -1,10 +1,9 @@
 import asyncio
 
-from fastapi.testclient import TestClient
-
 from app.db.database import get_db
 from app.main import app
 from app.services.news_service import NewsService
+from fastapi.testclient import TestClient
 
 
 async def override_get_db():

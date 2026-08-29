@@ -23,9 +23,9 @@ class LLMService:
                         "content": f"""
 						Title: {article["title"]}
 						Description: {article.get("description", "")}
-						 Content: {article.get("content", "")}
+						Content: {article.get("content", "")}
 
-						 """,
+						""",
                     },
                 ],
             )
@@ -79,8 +79,8 @@ class LLMService:
                     },
                 ],
             )
-            result = chat_completion.choices[0].message.content
-            return result
+            return chat_completion.choices[0].message.content
+
         except Exception:
             logger.exception(
                 "Error generating prompt is sufficient or not : %s",

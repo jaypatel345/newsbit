@@ -9,21 +9,21 @@ from app.schemas.message import (
     MessageResponse,
     SendMessageRequest,
 )
-from app.services.article_service import ArticleService
-from app.services.auth_service import (
+from app.services.ai.llm_service import LLMService
+from app.services.auth.auth_service import (
     get_optional_current_user,
 )
-from app.services.conversation_service import (
+from app.services.conversation.conversation_service import (
     ConversationService,
 )
-from app.services.llm_service import LLMService
-from app.services.search_service import SearchService
+from app.services.news.article_service import ArticleService
+from app.services.search.search_service import SearchService
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 
 try:
-    from app.services.embedding_service import EmbeddingService
-    from app.services.semantic_search_service import SemanticSearchService
+    from app.services.ai.embedding_service import EmbeddingService
+    from app.services.ai.semantic_search_service import SemanticSearchService
 except ImportError:
     SemanticSearchService = None  # type: ignore
     EmbeddingService = None  # type: ignore
@@ -53,7 +53,9 @@ def get_conversation_service(
 ) -> ConversationService:
     # Disable semantic search due to ML initialization issues
     semantic_search_service = None
-    return ConversationService(db, article_service, llm_service, search_service, semantic_search_service)
+    return ConversationService(
+        db, article_service, llm_service, search_service, semantic_search_service
+    )
 
 
 @router.get("/conversations")
@@ -84,7 +86,9 @@ async def update_conversation(
     current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
 ):
-    return await service.update_conversation(request, conversation_id, current_user, guest_id)
+    return await service.update_conversation(
+        request, conversation_id, current_user, guest_id
+    )
 
 
 @router.delete("/conversations/{conversation_id}")
@@ -103,7 +107,6 @@ async def get_messages(
     guest_id: str | None = Header(default=None, alias="X-Guest-ID"),
     current_user: User | None = Depends(get_optional_current_user),
     service: ConversationService = Depends(get_conversation_service),
-
 ):
     messages = await service.get_messages(conversation_id, current_user, guest_id)
     return MessageListResponse(messages=messages)

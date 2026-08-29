@@ -1,22 +1,18 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from zoneinfo import ZoneInfo
 import logging
-
-from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+from zoneinfo import ZoneInfo
 
 from app.db.database import AsyncSessionLocal
-from app.services.gnews_service import GNewsService
-from app.services.news_service import NewsService
-from app.services.ranking_service import RankingService
-from app.services.embedding_processor import EmbeddingProcessor
+from app.services.ai.embedding_processor import EmbeddingProcessor
+from app.services.external.gnews_service import GNewsService
+from app.services.news.news_service import NewsService
+from app.services.news.ranking_service import RankingService
 from app.utils.category_validator import ALLOWED_CATEGORIES
-
+from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 logger = logging.getLogger(__name__)
 
-scheduler = AsyncIOScheduler(
-    timezone=ZoneInfo("Asia/Kolkata")
-)
+scheduler = AsyncIOScheduler(timezone=ZoneInfo("Asia/Kolkata"))
 
 
 async def run_news_fetch_job():
@@ -24,10 +20,13 @@ async def run_news_fetch_job():
 
     # Use lowercase versions of allowed categories for GNews API
     # Exclude categories that might not be supported by GNews
-    categories = [cat.lower() for cat in ALLOWED_CATEGORIES if cat not in ["Other", "AI", "Education", "Space"]]
+    categories = [
+        cat.lower()
+        for cat in ALLOWED_CATEGORIES
+        if cat not in ["Other", "AI", "Education", "Space"]
+    ]
 
     async with AsyncSessionLocal() as session:
-
         # 1. Fetch news
         logger.info("Scheduler started fetching news...")
 
@@ -54,9 +53,7 @@ async def run_news_fetch_job():
         try:
             await news_service.generate_and_save_today_summary()
         except Exception:
-            logger.exception(
-                "Failed to generate today's summary"
-            )
+            logger.exception("Failed to generate today's summary")
 
         # 4. Generate missing embeddings
         logger.info("Processing pending article embeddings...")
@@ -67,9 +64,7 @@ async def run_news_fetch_job():
             await embedding_processor.embedding_job()
 
         except Exception:
-            logger.exception(
-                "Failed to process article embeddings"
-            )
+            logger.exception("Failed to process article embeddings")
 
         logger.info("Scheduler job completed.")
 
@@ -89,9 +84,7 @@ def job_listener(event):
             exc_info=event.exception,
         )
     else:
-        logger.info(
-            "Scheduler job executed successfully"
-        )
+        logger.info("Scheduler job executed successfully")
 
 
 scheduler.add_listener(

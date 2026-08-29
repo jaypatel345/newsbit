@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-from app.db.database import AsyncSessionLocal
 from app.scheduler import run_news_fetch_job
 
 logging.basicConfig(level=logging.INFO)

@@ -1,7 +1,7 @@
 import asyncio
 
 from app.db.database import AsyncSessionLocal
-from app.services.entity_reprocessing_service import (
+from app.services.entities.entity_reprocessing_service import (
     EntityReprocessingService,
 )
 

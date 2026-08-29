@@ -60,7 +60,7 @@ export function useChatWebSocket(conversationId: number | null) {
       socket.onmessage = (event) => {
         try {
           const data: ChatMessage = JSON.parse(event.data);
-          console.log("WebSocket message:", data);
+          // console.log("WebSocket message:", data);
 
           if (data.type === "error") {
             console.error(
@@ -138,7 +138,7 @@ export function useChatWebSocket(conversationId: number | null) {
   ) => {
     const socket = socketRef.current;
 
-    console.log("sendMessage called, socket:", socket, "readyState:", socket?.readyState);
+    // console.log("sendMessage called, socket:", socket, "readyState:", socket?.readyState);
 
     if (!socket) {
       throw new Error("WebSocket is not initialized");

@@ -1,7 +1,7 @@
 import logging
 
 from app.core.config import settings
-from app.services.news_processor import NewsProcessor
+from app.services.news.news_processor import NewsProcessor
 from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, TimeoutException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +37,7 @@ class GNewsService:
             logger.error(f"Timeout fetching {error_context}: {str(e)}")
             raise HTTPException(
                 status_code=504, detail=f"External API timeout: {str(e)}"
-            )
+            ) from e
         except HTTPStatusError as e:
             logger.error(
                 f"HTTP error fetching {error_context}: {e.response.status_code}"
@@ -45,12 +45,12 @@ class GNewsService:
             raise HTTPException(
                 status_code=e.response.status_code,
                 detail=f"External API error: {str(e)}",
-            )
+            ) from e
         except Exception as e:
             logger.exception(f"Unexpected error fetching {error_context}")
             raise HTTPException(
                 status_code=502, detail=f"Failed to fetch news: {str(e)}"
-            )
+            ) from e
 
     async def fetch_top_headlines(self) -> list[dict]:
         """Fetch top headlines in English."""

@@ -1,5 +1,6 @@
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
+
 from pydantic import BaseModel
 
 
@@ -23,7 +24,7 @@ class MessageListResponse(BaseModel):
     messages: list[MessageResponse]
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
 
     USER = "user"
     ASSISTANT = "assistant"

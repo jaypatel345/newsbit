@@ -4,16 +4,16 @@ from app.models.message import Message
 from app.models.user import User
 from app.prompts.news import NEWSBIT_CHAT_PROMPT
 from app.schemas.conversation import CreateConversationRequest
-from app.services.article_service import ArticleService
-from app.services.context_builder import BuildArticle
-from app.services.llm_service import LLMService
-from app.services.search_service import SearchService
+from app.services.ai.llm_service import LLMService
+from app.services.conversation.context_builder import BuildArticle
+from app.services.news.article_service import ArticleService
+from app.services.search.search_service import SearchService
 from fastapi import HTTPException
 from sqlalchemy import UUID, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 try:
-    from app.services.semantic_search_service import SemanticSearchService
+    from app.services.ai.semantic_search_service import SemanticSearchService
     from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
 
     SEMANTIC_SEARCH_AVAILABLE = True
@@ -282,7 +282,6 @@ class ConversationService:
         # Check if user is asking for news/summary/headlines
         news_keywords = [
             "news",
-            "summary",
             "headlines",
             "top stories",
             "today",

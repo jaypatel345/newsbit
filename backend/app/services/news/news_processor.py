@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 
 from app.models.article import Article
-from app.services.entity_service import EntityService
-from app.services.llm_service import LLMService
+from app.services.ai.llm_service import LLMService
+from app.services.entities.entity_service import EntityService
 from app.utils.category_validator import normalize_and_validate_category
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,7 +19,6 @@ def clean_title(title: str) -> str:
 
 
 class NewsProcessor:
-
     def __init__(self, db: AsyncSession):
         self.db = db
         self.llm_service = LLMService()
@@ -40,7 +39,6 @@ class NewsProcessor:
         seen_urls = set()
 
         for article in articles:
-
             url = article.get("url")
             if not url:
                 continue
@@ -50,13 +48,14 @@ class NewsProcessor:
             # Filter out articles without valid images
             image_url = article.get("image")
             if not image_url or image_url.strip() == "":
-                logger.info(f"Skipping article without image: {article.get('title', 'Unknown')}")
+                logger.info(
+                    f"Skipping article without image: {article.get('title', 'Unknown')}"
+                )
                 continue
 
             seen_urls.add(url)
 
             with self.db.no_autoflush:
-
                 db_result = await self.db.execute(
                     select(Article).where(Article.url == url)
                 )
@@ -64,9 +63,7 @@ class NewsProcessor:
             existing_article = db_result.scalar_one_or_none()
 
             if existing_article:
-
                 if article["feed_types"] not in existing_article.feed_types:
-
                     existing_article.feed_types.append(article["feed_types"])
 
                 existing_article.image_url = (
@@ -84,17 +81,11 @@ class NewsProcessor:
             # 2. Call LLMService
             try:
                 summary_result, entities = await asyncio.gather(
-
-                self.llm_service.generate_summary(article),
-
-                self.entity_service.extract_entities(
-
-                title=clean_title(article["title"]),
-
-                content=article.get("content", ""),
-
-                ),
-
+                    self.llm_service.generate_summary(article),
+                    self.entity_service.extract_entities(
+                        title=clean_title(article["title"]),
+                        content=article.get("content", ""),
+                    ),
                 )
             except Exception:
                 continue

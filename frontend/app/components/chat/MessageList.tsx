@@ -3,6 +3,7 @@ import { ExternalLink, Copy, Edit2, Check, X } from "lucide-react";
 import ThinkingSection from "./ThinkingSection";
 import { useState } from "react";
 import { toast } from "sonner";
+import React from "react";
 
 type MessageListProps = {
   messages: Message[];
@@ -104,23 +105,53 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
                             .split('\n')
                             .map((line, index) => {
                               // Skip empty lines, separator rows, lines with only dashes/pipes, and table separators
-                              if (line.trim() === '' || 
-                                  /^[-\s]+$/.test(line) || 
-                                  /^—+$/.test(line) || 
+                              if (line.trim() === '' ||
+                                  /^[-\s]+$/.test(line) ||
+                                  /^—+$/.test(line) ||
                                   /^\|[-\s]+\|$/.test(line) ||
-                                  /^\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?$/.test(line)) {
+                                  /^\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?$/.test(line) ||
+                                  /^\|.*\|$/.test(line) && line.includes('---')) {
                                 return null;
                               }
-                              
+
+                              // Skip table header rows like "| # | Headline | Key Points | Why It Matters |"
+                              if (line.includes('|') && line.includes('Headline') && line.includes('Why It Matters')) {
+                                return null;
+                              }
+
+                              // Skip lines that are just table structure with numbers like "| **1** |"
+                              if (line.includes('|') && /^\|\s*\*\*\d+\*\*\s*\|/.test(line)) {
+                                return null;
+                              }
+
+                              // Skip lines that are just separators like "|---|---|---|"
+                              if (line.includes('|') && /^\|[\s-]+\|[\s-]+\|[\s-]+\|$/.test(line)) {
+                                return null;
+                              }
+
                               // Handle table rows
                               if (line.includes('|')) {
                                 const cells = line.split('|').filter(cell => cell.trim());
                                 if (cells.length > 1) {
+                                  // Check if this is a header row (Key Points, Why It Matters) to add horizontal line
+                                  const isHeaderRow = cells.some(cell =>
+                                    cell.trim().toLowerCase() === 'key points' ||
+                                    cell.trim().toLowerCase() === 'why it matters'
+                                  );
+                                  // Check if this is a title row (contains bold text like **1**, **2**, etc.)
+                                  const isTitleRow = cells.some(cell =>
+                                    /^\*\*\d+\*\*$/.test(cell.trim())
+                                  );
                                   return (
-                                    <div key={index} className="grid grid-cols-2 gap-3 py-2 border-b border-gray-100 last:border-0">
+                                    <div key={index} className={`grid grid-cols-2 gap-3 py-2 ${isHeaderRow ? 'border-b-2 border-gray-200' : isTitleRow ? 'border-b-0' : 'border-b border-gray-100'} last:border-0`}>
                                       {cells.map((cell, cellIndex) => (
                                         <div key={cellIndex} className={cellIndex === 0 ? "font-semibold text-gray-900 text-sm" : "text-gray-700 text-sm"}>
-                                          {cell.trim()}
+                                          {cell.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').split(/<br>/gi).map((line, lineIndex) => (
+                                            <React.Fragment key={lineIndex}>
+                                              {lineIndex > 0 && <br />}
+                                              {line}
+                                            </React.Fragment>
+                                          ))}
                                         </div>
                                       ))}
                                     </div>

@@ -1,7 +1,7 @@
 import asyncio
 
 from app.models.article import Article
-from app.services.embedding_service import EmbeddingService
+from app.services.ai.embedding_service import EmbeddingService
 from sqlalchemy import select
 
 
@@ -16,9 +16,7 @@ class EmbeddingProcessor:
         while True:
             # 1. Find articles without embeddings
             result = await self.db.execute(
-                select(Article)
-                .where(Article.embedding.is_(None))
-                .limit(batch_size)
+                select(Article).where(Article.embedding.is_(None)).limit(batch_size)
             )
 
             articles = result.scalars().all()
@@ -40,15 +38,21 @@ class EmbeddingProcessor:
                 text = self._build_embedding_text(article)
 
                 try:
-                    print(f"Processing article {i+1}/{len(articles)}: {article.title[:50]}...")
+                    print(
+                        f"Processing article {i + 1}/{len(articles)}: {article.title[:50]}..."
+                    )
                     embedding = self.embedding_service.generate_embedding(text)
 
                     # 3. Save embedding
                     article.embedding = embedding
-                    print(f"✓ Successfully generated embedding (length: {len(embedding)})")
+                    print(
+                        f"✓ Successfully generated embedding (length: {len(embedding)})"
+                    )
 
                 except Exception as e:
-                    print(f"✗ Failed to generate embedding for article {article.id}: {e}")
+                    print(
+                        f"✗ Failed to generate embedding for article {article.id}: {e}"
+                    )
 
             # 4. Commit the entire batch
             await self.db.commit()

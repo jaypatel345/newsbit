@@ -5,8 +5,8 @@ from app.models.article_entity import ArticleEntity
 from app.models.entity import Entity
 from app.prompts.entity_prompt import ENTITY_EXTRACTION_PROMPT
 from app.schemas.entity import EntityExtraction
-from app.services.entity_normalizer import EntityNormalizer
-from app.services.llm_service import LLMService
+from app.services.ai.llm_service import LLMService
+from app.services.entities.entity_normalizer import EntityNormalizer
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -82,7 +82,9 @@ class EntityService:
         # Update normalized_name for existing entities that don't have it
         for entity in existing_entities:
             if not entity.normalized_name:
-                entity.normalized_name = EntityNormalizer.compute_normalized_name(entity.name)
+                entity.normalized_name = EntityNormalizer.compute_normalized_name(
+                    entity.name
+                )
 
         existing_map = {(e.name, e.type): e for e in existing_entities}
 
@@ -91,7 +93,9 @@ class EntityService:
         for name, entity_type in entity_pairs:
             if (name, entity_type) not in existing_map:
                 normalized_name = EntityNormalizer.compute_normalized_name(name)
-                new_entity = Entity(name=name, type=entity_type, normalized_name=normalized_name)
+                new_entity = Entity(
+                    name=name, type=entity_type, normalized_name=normalized_name
+                )
                 new_entities.append(new_entity)
                 existing_map[(name, entity_type)] = new_entity
 
@@ -134,9 +138,7 @@ class EntityService:
 
         from sqlalchemy import or_
 
-        result = await db.execute(
-            select(Entity).where(or_(*conditions))
-        )
+        result = await db.execute(select(Entity).where(or_(*conditions)))
         return list(result.scalars().all())
 
     async def _get_existing_relationships(
@@ -229,16 +231,39 @@ class EntityService:
         """
         # Common stop words to filter out
         stop_words = {
-            "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-            "of", "with", "by", "from", "about", "news", "latest", "recent",
-            "new", "update", "report", "story", "article", "today", "yesterday"
+            "the",
+            "a",
+            "an",
+            "and",
+            "or",
+            "but",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "of",
+            "with",
+            "by",
+            "from",
+            "about",
+            "news",
+            "latest",
+            "recent",
+            "new",
+            "update",
+            "report",
+            "story",
+            "article",
+            "today",
+            "yesterday",
         }
 
         # Split by spaces and filter stop words
         words = query.split()
-        entities = [word for word in words if word.lower() not in stop_words and len(word) > 1]
-
-        return entities
+        return [
+            word for word in words if word.lower() not in stop_words and len(word) > 1
+        ]
 
     async def search_articles_by_entities(
         self,
@@ -264,10 +289,7 @@ class EntityService:
 
         # Build the query with match counting
         stmt = (
-            select(
-                Article,
-                func.count(ArticleEntity.entity_id).label("match_count")
-            )
+            select(Article, func.count(ArticleEntity.entity_id).label("match_count"))
             .join(ArticleEntity, Article.id == ArticleEntity.article_id)
             .where(ArticleEntity.entity_id.in_(entity_ids))
             .group_by(Article.id)
@@ -275,26 +297,32 @@ class EntityService:
 
         # Add HAVING clause for strict AND mode
         if strict_and:
-            stmt = stmt.having(func.count(func.distinct(ArticleEntity.entity_id)) == len(entity_ids))
+            stmt = stmt.having(
+                func.count(func.distinct(ArticleEntity.entity_id)) == len(entity_ids)
+            )
 
         # Order by match count (desc) then by published date (desc)
-        stmt = stmt.order_by(desc("match_count"), Article.published_at.desc()).limit(limit)
+        stmt = stmt.order_by(desc("match_count"), Article.published_at.desc()).limit(
+            limit
+        )
 
         result = await db.execute(stmt)
 
         # Format results
         articles = []
         for article, match_count in result.all():
-            articles.append({
-                "id": article.id,
-                "title": article.title,
-                "summary": article.summary,
-                "url": article.url,
-                "published_at": article.published_at,
-                "source_name": article.source_name,
-                "image_url": article.image_url,
-                "category": article.category,
-                "match_count": match_count,
-            })
+            articles.append(
+                {
+                    "id": article.id,
+                    "title": article.title,
+                    "summary": article.summary,
+                    "url": article.url,
+                    "published_at": article.published_at,
+                    "source_name": article.source_name,
+                    "image_url": article.image_url,
+                    "category": article.category,
+                    "match_count": match_count,
+                }
+            )
 
         return articles

@@ -43,7 +43,7 @@ export default function ThinkingTimeline({
             }
             setCurrentStep((prev) => prev + 1);
             setDisplayedText("");
-          }, 900);
+          }, 1500);
         }
       }, 5);
     };
@@ -58,33 +58,38 @@ export default function ThinkingTimeline({
   }, [currentStep, onComplete]);
 
   return (
-    <div className="py-4">
+    <div className="py-2">
       {STEPS.slice(0, currentStep + 1).map((step, index) => {
         const completed = index < currentStep;
 
         const active = index === currentStep;
 
         return (
-          <div key={step} className="flex items-start gap-3">
-            <div className="flex flex-col items-center">
+          <div key={step} className="transition-all duration-300 ease-in-out">
+            {/* Vertical line connecting thinking to first bullet - only for first step */}
+            {index === 0 && (
+              <div className="ml-1 w-px h-4 bg-gray-300 mb-0.5 animate-pulse transition-all duration-300" />
+            )}
+
+            <div className="flex items-center gap-3 mt-0.5 min-h-[24px]">
               <div
-                className={`h-2 w-2 rounded-full mt-2 ${
+                className={`h-2 w-2 rounded-full transition-all duration-300 flex-shrink-0 ${
                   active ? "bg-black animate-pulse" : "bg-gray-400"
                 }`}
               />
 
-              {index < currentStep && index < STEPS.length - 1 && (
-                <div className="w-px h-6 bg-gray-300 my-1 animate-pulse" />
-              )}
+              <p
+                className={`text-sm leading-5 transition-all duration-300 ${
+                  active ? "text-gray-900" : "text-gray-600"
+                }`}
+              >
+                {completed ? step : displayedText}
+              </p>
             </div>
 
-            <p
-              className={`text-sm leading-6 ${
-                active ? "text-gray-900" : "text-gray-600"
-              }`}
-            >
-              {completed ? step : displayedText}
-            </p>
+            {index < currentStep && index < STEPS.length - 1 && (
+              <div className="ml-1 w-px h-4 bg-gray-300 my-0.5 animate-pulse transition-all duration-300" />
+            )}
           </div>
         );
       })}

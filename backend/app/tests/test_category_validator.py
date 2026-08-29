@@ -1,5 +1,7 @@
-import pytest
-from app.utils.category_validator import normalize_and_validate_category, ALLOWED_CATEGORIES
+from app.utils.category_validator import (
+    ALLOWED_CATEGORIES,
+    normalize_and_validate_category,
+)
 
 
 class TestCategoryValidator:
@@ -101,7 +103,7 @@ class TestCategoryValidator:
             "Education",
             "Space",
         }
-        assert ALLOWED_CATEGORIES == expected_categories
+        assert expected_categories == ALLOWED_CATEGORIES
 
     def test_markdown_format(self):
         """Test handling of markdown-formatted category."""
@@ -145,7 +147,7 @@ class TestCategoryValidator:
             ("Education", "Education"),
             ("Space", "Space"),
         ]
-        
+
         for input_category, expected in test_cases:
             result = normalize_and_validate_category(input_category)
             assert result == expected, f"Failed for input: {input_category}"

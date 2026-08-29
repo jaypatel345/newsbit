@@ -9,22 +9,18 @@ Tests 3 scenarios with actual database interactions:
 
 import asyncio
 import sys
-from datetime import datetime, timezone
 
 # Add the backend directory to the path
 sys.path.insert(0, '/Users/Jaypatel/Desktop/project/newsbit/backend')
 
 from app.db.database import AsyncSessionLocal
+from app.schemas.conversation import CreateConversationRequest
+from app.services.article_service import ArticleService
 from app.services.conversation_service import ConversationService
+from app.services.embedding_service import EmbeddingService
+from app.services.llm_service import LLMService
 from app.services.search_service import SearchService
 from app.services.semantic_search_service import SemanticSearchService
-from app.services.article_service import ArticleService
-from app.services.llm_service import LLMService
-from app.services.embedding_service import EmbeddingService
-from app.models.conversation import Conversation
-from app.models.message import Message
-from app.schemas.conversation import CreateConversationRequest
-from app.schemas.message import SendMessageRequest
 
 
 class TestConversationIntegration:
@@ -225,7 +221,7 @@ class TestConversationIntegration:
 
                 # Note: Semantic search may return some results as it finds conceptually similar content
                 # This is expected behavior - the key is that the LLM should determine if results are relevant
-                print(f"✓ Metadata search correctly finds no exact matches for unrelated query")
+                print("✓ Metadata search correctly finds no exact matches for unrelated query")
 
                 # Clean up
                 await db.delete(conversation)
@@ -348,9 +344,8 @@ async def run_all_integration_tests():
     if failed == 0:
         print("\n✓ All integration tests passed!")
         return True
-    else:
-        print(f"\n✗ {failed} integration test(s) failed")
-        return False
+    print(f"\n✗ {failed} integration test(s) failed")
+    return False
 
 
 if __name__ == "__main__":

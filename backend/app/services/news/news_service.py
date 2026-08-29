@@ -64,7 +64,7 @@ class NewsService:
             # Use fetchall() for better performance
             rows = result.fetchall()
 
-            articles = [
+            return [
                 {
                     "id": id,
                     "title": title,
@@ -81,19 +81,35 @@ class NewsService:
                 }
                 for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score in rows
             ]
-
-            return articles
         except Exception as e:
             logger.error(f"Error in get_latest_news:{e}")
-            raise HTTPException(status_code=500, detail="Failed to retrieve news")
+            raise HTTPException(
+                status_code=500, detail="Failed to retrieve news"
+            ) from e
 
     async def get_today_summary(self):
-        # Use first() instead of scalar() for better performance
-        result = await self.db.execute(select(Summary).limit(1))
+        # Try to get recent summary from last 24 hours
+        today = datetime.now(UTC) - timedelta(hours=24)
+        result = await self.db.execute(
+            select(Summary)
+            .where(Summary.updated_at >= today)
+            .order_by(Summary.updated_at.desc())
+            .limit(1)
+        )
         summary = result.scalar_one_or_none()
+
+        # If no recent summary, fall back to the most recent one regardless of age
+        if summary is None:
+            result = await self.db.execute(
+                select(Summary).order_by(Summary.updated_at.desc()).limit(1)
+            )
+            summary = result.scalar_one_or_none()
 
         if summary is None:
             return {"message": "No summary found"}
+
+        # Check if summary is outdated (older than 24 hours)
+        is_outdated = summary.updated_at < today
 
         # Parse JSON fields only once
         return {
@@ -105,6 +121,7 @@ class NewsService:
             "categories": json.loads(summary.categories_json),
             "created_at": summary.created_at,
             "updated_at": summary.updated_at,
+            "is_outdated": is_outdated,
         }
 
     async def get_categories(self):
@@ -115,11 +132,12 @@ class NewsService:
                 .having(func.count(Article.id) >= 3)
                 .order_by(Article.category)
             )
-            categories = [row[0] for row in result.all() if row[0]]
-            return categories
-        except Exception:
+            return [row[0] for row in result.all() if row[0]]
+        except Exception as e:
             logger.exception("Error retrieving categories")
-            raise HTTPException(status_code=500, detail="Failed to retrieve categories")
+            raise HTTPException(
+                status_code=500, detail="Failed to retrieve categories"
+            ) from e
 
     async def get_news_by_category(self, category: str):
         # Validate category against allowed categories
@@ -142,12 +160,12 @@ class NewsService:
                 .limit(10)
             )
 
-        except Exception:
+        except Exception as e:
             logger.exception("Error retrieving news for category: %s", category)
             raise HTTPException(
                 status_code=500,
                 detail="Failed to retrieve news category",
-            )
+            ) from e
 
         return result.scalars().all()
 
@@ -208,7 +226,7 @@ class NewsService:
         except json.JSONDecodeError as e:
             print("Invalid JSON:")
             print(response.choices[0].message.content)
-            raise e
+            raise e from e
 
         # 3. Insert/update Summary table
 

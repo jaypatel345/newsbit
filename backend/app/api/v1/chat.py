@@ -3,11 +3,11 @@ import contextlib
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.message import MessageResponse, SendMessageRequest
-from app.services.article_service import ArticleService
-from app.services.auth_service import get_optional_current_user
-from app.services.conversation_service import ConversationService
-from app.services.llm_service import LLMService
-from app.services.search_service import SearchService
+from app.services.ai.llm_service import LLMService
+from app.services.auth.auth_service import get_optional_current_user
+from app.services.conversation.conversation_service import ConversationService
+from app.services.news.article_service import ArticleService
+from app.services.search.search_service import SearchService
 from fastapi import (
     APIRouter,
     Depends,

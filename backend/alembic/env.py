@@ -1,17 +1,16 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
 from app.core.config import settings
 from app.db.database import Base
 
 # Import all models so Alembic can detect them
 from app.models.article import Article
-from app.models.user import User
-from app.models.summary import Summary
 from app.models.conversation import Conversation
 from app.models.message import Message
+from app.models.summary import Summary
+from app.models.user import User
+from sqlalchemy import engine_from_config, pool
 
 # Alembic Config object
 config = context.config

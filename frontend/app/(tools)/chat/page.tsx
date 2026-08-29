@@ -49,6 +49,7 @@ function ChatPageContent() {
 
   // Get the latest messages from cache to ensure optimistic updates are reflected
   const cachedMessages = queryClient.getQueryData(["messages", selectedConversationId]) as Message[] || [];
+  // Always prefer cached messages to prevent React Query from overwriting with stale server data
   const displayMessages = cachedMessages.length > 0 ? cachedMessages : messages;
   const [renameDialog, setRenameDialog] = useState<{
     isOpen: boolean;
@@ -79,29 +80,24 @@ function ChatPageContent() {
   useEffect(() => {
 
   if (!webSocketMessages.length) {
-
     return;
-
   }
 
   const latestMessage =
-
     webSocketMessages[webSocketMessages.length - 1];
 
   if (!selectedConversationId) {
-
     return;
-
   }
 
   if (latestMessage.type !== "message") {
-
     return;
-
   }
 
   // Only process messages for the current conversation
+  // Allow messages without conversation_id or matching ID to prevent blocking due to timing issues
   if (latestMessage.conversation_id && latestMessage.conversation_id !== selectedConversationId) {
+    // console.log("Ignoring message for different conversation:", latestMessage.conversation_id, "vs", selectedConversationId);
     return;
   }
 
@@ -149,9 +145,7 @@ function ChatPageContent() {
 
           {
             id: crypto.randomUUID(),
-
             role: "user",
-
             content: message,
           },
         ];
@@ -504,9 +498,9 @@ function ChatPageContent() {
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg transition-all duration-200 ease-in-out hover:bg-gray-50 active:scale-95"
+            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
           >
-            {sidebarOpen ? <PanelLeftOpen className="h-5 w-5 text-black" /> : <PanelRightOpen className="h-5 w-5 text-black" />}
+            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
           </button>
         </header>
 
@@ -601,9 +595,9 @@ function ChatPageContent() {
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg transition-all duration-200 ease-in-out hover:bg-gray-50 active:scale-95"
+            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
           >
-            {sidebarOpen ? <PanelLeftOpen className="h-5 w-5 text-black" /> : <PanelRightOpen className="h-5 w-5 text-black" />}
+            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
           </button>
         </header>
 
@@ -677,9 +671,9 @@ function ChatPageContent() {
         <div className="lg:hidden px-4 pt-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg transition-all duration-200 ease-in-out hover:bg-gray-50 active:scale-95"
+            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
           >
-            {sidebarOpen ? <PanelLeftOpen className="h-5 w-5 text-black" /> : <PanelRightOpen className="h-5 w-5 text-black" />}
+            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
           </button>
         </div>
 
@@ -688,9 +682,9 @@ function ChatPageContent() {
           <div className="hidden lg:flex px-4 pt-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg transition-all duration-200 ease-in-out hover:bg-gray-50 active:scale-95"
+              className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
             >
-              <PanelRightOpen className="h-5 w-5 text-black" />
+              <PanelRightOpen className="h-4 w-4 text-black" />
             </button>
           </div>
         )}
@@ -755,7 +749,7 @@ function ChatPageContent() {
               </div>
             )}
 
-            <div className="mb-2">
+            {/* <div className="mb-2">
               {webSocketStatus === "connecting" && (
                 <div className="text-xs text-gray-500 flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
@@ -780,7 +774,7 @@ function ChatPageContent() {
                   Disconnected
                 </div>
               )}
-            </div>
+            </div> */}
 
             <ChatInput
               message={inputMessage}
