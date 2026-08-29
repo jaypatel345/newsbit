@@ -52,8 +52,14 @@ async def run_news_fetch_job():
 
         try:
             await news_service.generate_and_save_today_summary()
-        except Exception:
-            logger.exception("Failed to generate today's summary")
+        except Exception as e:
+            if "rate limit" in str(e).lower() or "429" in str(e):
+                logger.error(f"Rate limit reached while generating summary: {e}")
+                logger.warning(
+                    "Summary generation skipped due to rate limit. Will retry on next scheduled run."
+                )
+            else:
+                logger.exception(f"Failed to generate today's summary: {e}")
 
         # 4. Generate missing embeddings
         logger.info("Processing pending article embeddings...")
