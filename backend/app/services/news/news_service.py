@@ -229,9 +229,13 @@ class NewsService:
             raise e from e
 
         # 3. Insert/update Summary table
-
+        # Only update if there's a recent summary (last 24 hours), otherwise create new
+        today = datetime.now(UTC) - timedelta(hours=24)
         existing_summary = await self.db.scalar(
-            select(Summary).order_by(Summary.updated_at.desc()).limit(1)
+            select(Summary)
+            .where(Summary.updated_at >= today)
+            .order_by(Summary.updated_at.desc())
+            .limit(1)
         )
 
         if existing_summary:
