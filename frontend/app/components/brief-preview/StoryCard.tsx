@@ -40,19 +40,25 @@ export default function StoryCard({
       {/* Top Row: Image and Content */}
       <div className="flex gap-4 mb-4">
         {/* Left Image */}
-        {image && (
-          <div className="w-70 sm:w-[320px] shrink-0">
+        <div className="w-70 sm:w-[320px] shrink-0">
+          {image ? (
             <img
               src={image}
               alt={headline}
               className="w-full h-40 sm:h-45 object-cover rounded-xl"
               onError={(e) => {
-                // Use a placeholder image when the original fails to load
-                e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"%3E%3Crect fill="%23f3f4f6" width="320" height="180"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="14" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image Available%3C/text%3E%3C/svg%3E';
+                // Use source logo when the original image fails to load
+                e.currentTarget.src = getSourceLogoUrl(sourceWebsite);
               }}
             />
-          </div>
-        )}
+          ) : (
+            <img
+              src={getSourceLogoUrl(sourceWebsite)}
+              alt={source}
+              className="w-full h-40 sm:h-45 object-cover rounded-xl bg-gray-100"
+            />
+          )}
+        </div>
 
         {/* Right Content */}
         <div className="flex-1">

@@ -72,19 +72,25 @@ export default function TodaysTopStories() {
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  {story.image_url && (
-                    <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                    {story.image_url ? (
                       <img
                         src={story.image_url}
                         alt={story.summary}
                         className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
                         onError={(e) => {
-                          // Use a placeholder image when the original fails to load
-                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96"%3E%3Crect fill="%23f3f4f6" width="128" height="96"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                          // Use source logo when the original image fails to load
+                          e.currentTarget.src = getSourceLogoUrl(story.domain);
                         }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <img
+                        src={getSourceLogoUrl(story.domain)}
+                        alt={story.source_name}
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                      />
+                    )}
+                  </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
@@ -133,19 +139,25 @@ export default function TodaysTopStories() {
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  {story.image_url && (
-                    <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                    {story.image_url ? (
                       <img
                         src={story.image_url}
                         alt={story.url}
                         className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
                         onError={(e) => {
-                          // Use a placeholder image when the original fails to load
-                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96"%3E%3Crect fill="%23f3f4f6" width="128" height="96"/%3E%3Ctext fill="%239ca3af" font-family="Arial, sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                          // Use source logo when the original image fails to load
+                          e.currentTarget.src = getSourceLogoUrl(story.domain);
                         }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <img
+                        src={getSourceLogoUrl(story.domain)}
+                        alt={story.source_name}
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                      />
+                    )}
+                  </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
