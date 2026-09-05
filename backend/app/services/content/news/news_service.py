@@ -9,7 +9,7 @@ from app.models.summary import Summary
 from app.prompts.news import TODAY_BRIEF_PROMPT
 from app.utils.category_validator import ALLOWED_CATEGORIES
 from fastapi import HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ class NewsService:
                 Article.published_at >= today,
                 Article.image_url.is_not(None),
                 Article.image_url != "",
-                Article.feed_types.contains(["top_headlines"]),
+                text("feed_types @> ARRAY['top_headlines']::varchar[]"),
             )
             .order_by(Article.popularity_score.desc(), Article.published_at.desc())
             .limit(10)
@@ -217,14 +217,17 @@ class NewsService:
                     "content": json.dumps(input, default=str),
                 },
             ],
+            max_tokens=4000,
         )
 
         try:
             result = json.loads(response.choices[0].message.content)
 
         except json.JSONDecodeError as e:
-            print("Invalid JSON:")
+            print("Invalid JSON from LLM:")
             print(response.choices[0].message.content)
+            print(f"Response length: {len(response.choices[0].message.content)}")
+            print(f"Finish reason: {response.choices[0].finish_reason}")
             raise e from e
 
         # 3. Insert/update Summary table
