@@ -18,7 +18,7 @@ class NewsAgentNodes:
         self.llm = ChatGroq(
             model="openai/gpt-oss-120b",
             temperature=0,
-            api_key=settings.GROQ_API_KEY_02,
+            api_key=settings.GROQ_API_KEY02,
         )
 
         # Create search tool
