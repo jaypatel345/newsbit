@@ -28,15 +28,16 @@ jobs:
         run: |
           echo "Checking GitHub Secrets configuration..."
           missing_secrets=()
-          
+
           if [ -z "${{ secrets.DATABASE_URL }}" ]; then missing_secrets+=("DATABASE_URL"); fi
           if [ -z "${{ secrets.NEWS_API_URL }}" ]; then missing_secrets+=("NEWS_API_URL"); fi
           if [ -z "${{ secrets.NEWS_API_KEY }}" ]; then missing_secrets+=("NEWS_API_KEY"); fi
-          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then missing_secrets+=("GROQ_API_KEY"); fi
+          if [ -z "${{ secrets.GROQ_API_KEY_01 }}" ]; then missing_secrets+=("GROQ_API_KEY_01"); fi
+          if [ -z "${{ secrets.GROQ_API_KEY_02 }}" ]; then missing_secrets+=("GROQ_API_KEY_02"); fi
           if [ -z "${{ secrets.G_NEWS_API_URL }}" ]; then missing_secrets+=("G_NEWS_API_URL"); fi
           if [ -z "${{ secrets.G_NEWS_API_KEY }}" ]; then missing_secrets+=("G_NEWS_API_KEY"); fi
           if [ -z "${{ secrets.FRONTEND_URL }}" ]; then missing_secrets+=("FRONTEND_URL"); fi
-          
+
           if [ ${#missing_secrets[@]} -gt 0 ]; then
             echo "❌ Error: The following GitHub Secrets are not configured:"
             for secret in "${missing_secrets[@]}"; do
@@ -52,7 +53,8 @@ jobs:
             echo "  - DATABASE_URL (PostgreSQL connection string)"
             echo "  - NEWS_API_URL (News API endpoint)"
             echo "  - NEWS_API_KEY (News API key)"
-            echo "  - GROQ_API_KEY (Groq API key for LLM)"
+            echo "  - GROQ_API_KEY_01 (Groq API key 1 for LLM)"
+            echo "  - GROQ_API_KEY_02 (Groq API key 2 for LLM)"
             echo "  - G_NEWS_API_URL (GNews API endpoint)"
             echo "  - G_NEWS_API_KEY (GNews API key)"
             echo "  - FRONTEND_URL (Frontend application URL)"
@@ -67,7 +69,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEWS_API_URL: ${{ secrets.NEWS_API_URL }}
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY_01: ${{ secrets.GROQ_API_KEY_01 }}
+          GROQ_API_KEY_02: ${{ secrets.GROQ_API_KEY_02 }}
           G_NEWS_API_URL: ${{ secrets.G_NEWS_API_URL }}
           G_NEWS_API_KEY: ${{ secrets.G_NEWS_API_KEY }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
