@@ -4,8 +4,8 @@ from typing import Annotated, Any
 from app.core.config import settings
 from app.db.database import get_db
 from app.scheduler import run_news_fetch_job
-from app.services.news.news_service import NewsService
-from app.services.news.ranking_service import RankingService
+from app.services.content.news.news_service import NewsService
+from app.services.content.news.ranking_service import RankingService
 from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 

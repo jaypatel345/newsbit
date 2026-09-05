@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 
 from app.models.article import Article
-from app.services.ai.llm_service import LLMService
-from app.services.entities.entity_service import EntityService
+from app.services.core.entities.entity_service import EntityService
+from app.services.infrastructure.ai.llm_service import LLMService
 from app.utils.category_validator import normalize_and_validate_category
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -2,7 +2,7 @@ import logging
 
 from app.models.article import Article
 from app.models.article_entity import ArticleEntity
-from app.services.entities.entity_service import EntityService
+from app.services.core.entities.entity_service import EntityService
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 

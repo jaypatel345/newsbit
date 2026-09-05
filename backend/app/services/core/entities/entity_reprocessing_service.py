@@ -1,7 +1,7 @@
 import logging
 
 from app.models.article import Article
-from app.services.entity_service import EntityService
+from app.services.core.entities.entity_service import EntityService
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,9 +22,7 @@ class EntityReprocessingService:
         """
 
         result = await self.db.execute(
-            select(Article).where(
-                Article.entities_processed.is_(False)
-            )
+            select(Article).where(Article.entities_processed.is_(False))
         )
 
         articles = result.scalars().all()

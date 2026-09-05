@@ -3,17 +3,15 @@ import logging
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlparse
 
-from app.core.config import settings
+from app.core.llm import groq_client02
 from app.models.article import Article
 from app.models.summary import Summary
 from app.prompts.news import TODAY_BRIEF_PROMPT
 from app.utils.category_validator import ALLOWED_CATEGORIES
 from fastapi import HTTPException
-from groq import AsyncGroq
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
 logger = logging.getLogger(__name__)
 
 
@@ -187,9 +185,10 @@ class NewsService:
                 Article.published_at >= today,
                 Article.image_url.is_not(None),
                 Article.image_url != "",
+                Article.feed_types.contains(["top_headlines"]),
             )
             .order_by(Article.popularity_score.desc(), Article.published_at.desc())
-            .limit(15)
+            .limit(10)
         )
         input = [
             {
@@ -206,7 +205,7 @@ class NewsService:
 
         # 2. Generate summary using LLM
 
-        response = await groq_client.chat.completions.create(
+        response = await groq_client02.chat.completions.create(
             model="openai/gpt-oss-120b",
             messages=[
                 {

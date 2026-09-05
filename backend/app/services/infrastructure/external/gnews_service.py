@@ -1,7 +1,7 @@
 import logging
 
 from app.core.config import settings
-from app.services.news.news_processor import NewsProcessor
+from app.services.content.news.news_processor import NewsProcessor
 from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, TimeoutException
 from sqlalchemy.ext.asyncio import AsyncSession

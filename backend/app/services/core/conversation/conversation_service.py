@@ -1,19 +1,36 @@
+import logging
+
 from app.core.llm import groq_client
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.models.user import User
 from app.prompts.news import NEWSBIT_CHAT_PROMPT
 from app.schemas.conversation import CreateConversationRequest
-from app.services.ai.llm_service import LLMService
-from app.services.conversation.context_builder import BuildArticle
-from app.services.news.article_service import ArticleService
-from app.services.search.search_service import SearchService
+from app.services.content.news.article_service import ArticleService
+from app.services.core.conversation.context_builder import BuildArticle  # noqa: F401
+from app.services.infrastructure.ai.embedding_service import EmbeddingService
+from app.services.infrastructure.ai.llm_service import LLMService
+from app.services.infrastructure.search.search_service import SearchService
 from fastapi import HTTPException
 from sqlalchemy import UUID, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+logger = logging.getLogger(__name__)
+
 try:
-    from app.services.ai.semantic_search_service import SemanticSearchService
+    from app.services.core.agents.news_agent.graph import create_news_graph
+
+    LANGGRAPH_AVAILABLE = True
+    logger.info("LangGraph import successful")
+except ImportError as e:
+    LANGGRAPH_AVAILABLE = False
+    create_news_graph = None
+    logger.error(f"LangGraph import failed: {e}")
+
+try:
+    from app.services.infrastructure.ai.semantic_search_service import (
+        SemanticSearchService,
+    )
     from app.tools.semantic_search import SEMANTIC_SEARCH_TOOL
 
     SEMANTIC_SEARCH_AVAILABLE = True
@@ -31,12 +48,14 @@ class ConversationService:
         llm_service: LLMService,
         search_service: SearchService,
         semantic_search_service: SemanticSearchService = None,
+        embedding_service: EmbeddingService = None,
     ):
         self.db = db
         self.article_service = article_service
         self.llm_service = llm_service
         self.search_service = search_service
         self.semantic_search_service = semantic_search_service
+        self.embedding_service = embedding_service
 
     async def get_conversations(
         self, current_user: User | None, guest_id: str | None
@@ -275,93 +294,42 @@ class ConversationService:
         await self.db.commit()
         await self.db.refresh(user_message)
 
-        # 3. Fetch articles if provided or if user asks for news summary
-        article = []
-        user_content_lower = user_message.content.lower()
-
-        # Check if user is asking for news/summary/headlines
-        news_keywords = [
-            "news",
-            "headlines",
-            "top stories",
-            "today",
-            "latest",
-            "breaking",
-            "trending",
-        ]
-        should_fetch_news = any(
-            keyword in user_content_lower for keyword in news_keywords
-        )
-
-        if request.article_ids:
-            # Fetch articles from the provided IDs
-            for article_id in request.article_ids:
-                article_data = await self.article_service.get_article_by_id(article_id)
-                if article_data:
-                    article.append(article_data)
-        elif should_fetch_news:
-            # Auto-fetch recent news articles for news-related queries
-            from datetime import UTC, datetime, timedelta
-
-            from app.models.article import Article
-            from sqlalchemy import desc
-
-            # Get articles from the last 24 hours
-            today = datetime.now(UTC) - timedelta(hours=24)
-            result = await self.db.execute(
-                select(Article)
-                .where(
-                    Article.summary.is_not(None),
-                    Article.published_at >= today,
-                    Article.image_url.is_not(None),
-                    Article.image_url != "",
+        # 3. Build the LangGraph (if available)
+        logger.info(f"LANGGRAPH_AVAILABLE: {LANGGRAPH_AVAILABLE}")
+        if LANGGRAPH_AVAILABLE:
+            try:
+                logger.info("Creating news graph...")
+                graph = create_news_graph(db=self.db)
+                # 4. Run the graph
+                logger.info(f"Running graph with input: {request.content}")
+                result = await graph.ainvoke(
+                    {
+                        "messages": [
+                            {"role": "user", "content": request.content},
+                            {"role": "assistant", "content": ""},
+                        ],
+                        "search_results": [],
+                        "tool_calls": [],
+                    }
                 )
-                .order_by(desc(Article.popularity_score), desc(Article.published_at))
-                .limit(10)
-            )
-            recent_articles = result.scalars().all()
+                # 5 Get final assistant response
+                llm_result = result["messages"][-1].content
+                logger.info(
+                    f"Graph execution successful, result length: {len(llm_result)}"
+                )
+            except Exception as e:
+                logger.error(f"Error executing news agent graph: {e}")
+                import traceback
 
-            # Add articles directly - they're already Article objects with the right attributes
-            article.extend(recent_articles)
+                traceback.print_exc()
+                # Fallback to simple LLM call
+                llm_result = await self._fallback_llm_call(request.content)
+        else:
+            # Fallback to simple LLM call when LangGraph is not available
+            logger.warning("LangGraph not available, using fallback LLM call")
+            llm_result = await self._fallback_llm_call(request.content)
 
-        article_context = (
-            BuildArticle.build_article_context(article) if article else None
-        )
-
-        # 4. Build messages for LLM
-        system_content = NEWSBIT_CHAT_PROMPT
-
-        if article_context:
-            system_content += (
-                f"\n\nHere is some relevant article context:\n{article_context}"
-            )
-
-        messages = [
-            {
-                "role": "system",
-                "content": system_content,
-            },
-            {
-                "role": "user",
-                "content": user_message.content,
-            },
-        ]
-
-        # 5. Call the LLM
-        try:
-            chat_completion = await groq_client.chat.completions.create(
-                model="openai/gpt-oss-120b",
-                messages=messages,
-            )
-
-            message = chat_completion.choices[0].message
-            llm_result = message.content
-        except Exception as e:
-            print(f"Error calling LLM: {e}")
-            print(f"Messages sent: {messages}")
-            raise e
-
-        # 6. Save the assistant's reply.
+        # 5. Save the assistant's reply.
         assistant_message = Message(
             conversation_id=conversation_id,
             role="assistant",
@@ -370,7 +338,7 @@ class ConversationService:
 
         self.db.add(assistant_message)
 
-        # 8. Update the conversation timestamp.
+        # 6. Update the conversation timestamp.
         conversation.updated_at = func.now()
 
         await self.db.commit()
@@ -378,7 +346,7 @@ class ConversationService:
         await self.db.refresh(assistant_message)
         await self.db.refresh(conversation)
 
-        # 9. Return the assistant message.
+        # 7. Return the assistant message.
         return {
             "id": assistant_message.id,
             "conversation_id": assistant_message.conversation_id,
@@ -389,6 +357,28 @@ class ConversationService:
 
     async def clear_messages(self, conversation_id):
         pass
+
+    async def _fallback_llm_call(self, user_content: str) -> str:
+        """Fallback LLM call when retrieval service is not available."""
+        messages = [
+            {
+                "role": "system",
+                "content": NEWSBIT_CHAT_PROMPT,
+            },
+            {
+                "role": "user",
+                "content": user_content,
+            },
+        ]
+        try:
+            chat_completion = await groq_client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=messages,
+            )
+            return chat_completion.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Error in fallback LLM call: {e}")
+            raise
 
     async def migrate_guest_conversations(
         self,

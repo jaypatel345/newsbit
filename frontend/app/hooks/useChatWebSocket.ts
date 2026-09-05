@@ -186,6 +186,34 @@ export function useChatWebSocket(conversationId: number | null) {
       throw new Error("WebSocket is not connected");
     }
 
+    // Create a promise that resolves when we get a response or times out
+    const responsePromise = new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Response timeout after 35 seconds"));
+      }, 35000); // 35 second timeout (slightly longer than backend 30s timeout)
+
+      const messageHandler = (event: MessageEvent) => {
+        try {
+          const data: ChatMessage = JSON.parse(event.data);
+          if (data.type === "message" || data.type === "error") {
+            clearTimeout(timeout);
+            socket.removeEventListener("message", messageHandler);
+            if (data.type === "error") {
+              reject(new Error(data.content || "Unknown error"));
+            } else {
+              resolve();
+            }
+          }
+        } catch (error) {
+          clearTimeout(timeout);
+          socket.removeEventListener("message", messageHandler);
+          reject(error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+    });
+
     socket.send(
       JSON.stringify({
         type: "user_message",
@@ -193,6 +221,9 @@ export function useChatWebSocket(conversationId: number | null) {
         article_ids: articleIds,
       }),
     );
+
+    // Wait for response or timeout
+    await responsePromise;
   },
   [],
 );

@@ -5,8 +5,8 @@ from app.models.article_entity import ArticleEntity
 from app.models.entity import Entity
 from app.prompts.entity_prompt import ENTITY_EXTRACTION_PROMPT
 from app.schemas.entity import EntityExtraction
-from app.services.ai.llm_service import LLMService
-from app.services.entities.entity_normalizer import EntityNormalizer
+from app.services.core.entities.entity_normalizer import EntityNormalizer
+from app.services.infrastructure.ai.llm_service import LLMService
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from app.db.database import AsyncSessionLocal
-from app.services.ai.embedding_processor import EmbeddingProcessor
+from app.services.infrastructure.ai.embedding_processor import EmbeddingProcessor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

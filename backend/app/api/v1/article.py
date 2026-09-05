@@ -1,6 +1,6 @@
 from app.db.database import get_db
 from app.schemas.article import ArticleResponse
-from app.services.news.article_service import ArticleService
+from app.services.content.news.article_service import ArticleService
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 

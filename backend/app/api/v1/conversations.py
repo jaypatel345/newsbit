@@ -9,24 +9,26 @@ from app.schemas.message import (
     MessageResponse,
     SendMessageRequest,
 )
-from app.services.ai.llm_service import LLMService
-from app.services.auth.auth_service import (
-    get_optional_current_user,
-)
-from app.services.conversation.conversation_service import (
+from app.services.content.news.article_service import ArticleService
+from app.services.core.conversation.conversation_service import (
     ConversationService,
 )
-from app.services.news.article_service import ArticleService
-from app.services.search.search_service import SearchService
+from app.services.infrastructure.ai.llm_service import LLMService
+from app.services.infrastructure.auth.auth_service import (
+    get_optional_current_user,
+)
+from app.services.infrastructure.search.search_service import SearchService
 from fastapi import APIRouter, Depends, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 
 try:
-    from app.services.ai.embedding_service import EmbeddingService
-    from app.services.ai.semantic_search_service import SemanticSearchService
+    from app.services.infrastructure.ai import (
+        embedding_service,
+        semantic_search_service,
+    )
 except ImportError:
-    SemanticSearchService = None  # type: ignore
-    EmbeddingService = None  # type: ignore
+    semantic_search_service = None  # type: ignore
+    embedding_service = None  # type: ignore
 
 router = APIRouter(prefix="/api/v1", tags=["conversation"])
 

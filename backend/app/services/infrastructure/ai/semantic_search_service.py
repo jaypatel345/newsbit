@@ -1,5 +1,5 @@
 from app.models import Article
-from app.services.ai.embedding_service import (
+from app.services.infrastructure.ai.embedding_service import (
     SENTENCE_TRANSFORMERS_AVAILABLE,
     EmbeddingService,
 )

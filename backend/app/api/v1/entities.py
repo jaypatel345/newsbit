@@ -2,7 +2,7 @@ from typing import Annotated, Any
 
 from app.db.database import get_db
 from app.schemas.entity import EntitySearchResponse
-from app.services.entities.entity_service import EntityService
+from app.services.core.entities.entity_service import EntityService
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -2,10 +2,10 @@ import logging
 from zoneinfo import ZoneInfo
 
 from app.db.database import AsyncSessionLocal
-from app.services.ai.embedding_processor import EmbeddingProcessor
-from app.services.external.gnews_service import GNewsService
-from app.services.news.news_service import NewsService
-from app.services.news.ranking_service import RankingService
+from app.services.content.news.news_service import NewsService
+from app.services.content.news.ranking_service import RankingService
+from app.services.infrastructure.ai.embedding_processor import EmbeddingProcessor
+from app.services.infrastructure.external.gnews_service import GNewsService
 from app.utils.category_validator import ALLOWED_CATEGORIES
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

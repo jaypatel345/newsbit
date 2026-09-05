@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from app.db.database import get_db
-from app.services.search.search_service import SearchService
+from app.services.infrastructure.search.search_service import SearchService
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 

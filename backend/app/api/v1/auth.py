@@ -1,7 +1,7 @@
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest, LoginResponse, SignupRequest, UserResponse
-from app.services.auth.auth_service import AuthService, get_current_user
+from app.services.infrastructure.auth.auth_service import AuthService, get_current_user
 from fastapi import APIRouter, Depends, Header, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 

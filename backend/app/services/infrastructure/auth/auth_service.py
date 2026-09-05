@@ -4,7 +4,7 @@ import jwt
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.auth import UserResponse
-from app.services.conversation.conversation_service import ConversationService
+from app.services.core.conversation.conversation_service import ConversationService
 from app.utils.jwt import (
     create_access_token,
     create_refresh_token,

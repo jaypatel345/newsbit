@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from app.db.database import get_db
-from app.services.external.gnews_service import GNewsService
+from app.services.infrastructure.external.gnews_service import GNewsService
 from app.utils.category_validator import ALLOWED_CATEGORIES
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession

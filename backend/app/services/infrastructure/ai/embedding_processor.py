@@ -1,13 +1,15 @@
 import asyncio
 
 from app.models.article import Article
-from app.services.ai.embedding_service import EmbeddingService
+from app.services.core.entities.entity_service import EntityService
+from app.services.infrastructure.ai.embedding_service import EmbeddingService
 from sqlalchemy import select
 
 
 class EmbeddingProcessor:
     def __init__(self, db):
         self.db = db
+        self.embedding_service = EntityService()
         self.embedding_service = EmbeddingService()
 
     async def embedding_job(self):
