@@ -72,12 +72,12 @@ export default function TodaysTopStories() {
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  <div className="w-full lg:w-48 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
                     {story.image_url ? (
                       <img
                         src={story.image_url}
                         alt={story.summary}
-                        className="w-full h-56 lg:w-48 lg:h-40 object-cover rounded-lg"
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
                         onError={(e) => {
                           // Use source logo when the original image fails to load
                           e.currentTarget.src = getSourceLogoUrl(story.domain);
@@ -87,7 +87,7 @@ export default function TodaysTopStories() {
                       <img
                         src={getSourceLogoUrl(story.domain)}
                         alt={story.source_name}
-                        className="w-full h-56 lg:w-48 lg:h-40 object-cover rounded-lg bg-gray-100"
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
                       />
                     )}
                   </div>
@@ -139,12 +139,12 @@ export default function TodaysTopStories() {
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  <div className="w-full lg:w-48 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
                     {story.image_url ? (
                       <img
                         src={story.image_url}
                         alt={story.url}
-                        className="w-full h-56 lg:w-48 lg:h-40 object-cover rounded-lg"
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
                         onError={(e) => {
                           // Use source logo when the original image fails to load
                           e.currentTarget.src = getSourceLogoUrl(story.domain);
@@ -154,7 +154,7 @@ export default function TodaysTopStories() {
                       <img
                         src={getSourceLogoUrl(story.domain)}
                         alt={story.source_name}
-                        className="w-full h-56 lg:w-48 lg:h-40 object-cover rounded-lg bg-gray-100"
+                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
                       />
                     )}
                   </div>
