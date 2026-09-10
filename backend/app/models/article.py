@@ -42,6 +42,9 @@ class Article(Base):
     source_url = Column(Text)
 
     url = Column(Text, unique=True, nullable=False)
+    # Tracking-free, normalized form of ``url``. Unique so the database
+    # rejects duplicate articles even if the app-level checks miss one.
+    url_canonical = Column(Text, unique=True, index=True, nullable=True)
     image_url = Column(
         Text,
         nullable=False,
