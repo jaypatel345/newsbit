@@ -5,6 +5,7 @@ from app.models.article_entity import ArticleEntity
 from app.services.core.entities.entity_service import EntityService
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import load_only
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +116,19 @@ class SearchService:
         # Build the query with match counting
         stmt = (
             select(Article, func.count(ArticleEntity.entity_id).label("match_count"))
+            .options(
+                load_only(
+                    Article.id,
+                    Article.title,
+                    Article.summary,
+                    Article.url,
+                    Article.published_at,
+                    Article.source_name,
+                    Article.image_url,
+                    Article.category,
+                    Article.popularity_score,
+                )
+            )
             .join(ArticleEntity, Article.id == ArticleEntity.article_id)
             .where(ArticleEntity.entity_id.in_(entity_ids))
             .group_by(Article.id)
@@ -158,21 +172,29 @@ class SearchService:
         """
         results = []
 
+        if not articles_with_matches:
+            return results
+
+        # Fetch every article->entity match in one query instead of one
+        # round-trip per article (N+1).
+        article_ids = [item["article"].id for item in articles_with_matches]
+        stmt = select(ArticleEntity.article_id, ArticleEntity.entity_id).where(
+            ArticleEntity.article_id.in_(article_ids),
+            ArticleEntity.entity_id.in_(entity_ids_to_names.keys()),
+        )
+        rows = await db.execute(stmt)
+        matches_by_article: dict[int, list[int]] = {}
+        for article_id, entity_id in rows.all():
+            matches_by_article.setdefault(article_id, []).append(entity_id)
+
         for item in articles_with_matches:
             article = item["article"]
             match_count = item["match_count"]
 
-            # Get the entity IDs that match this article
-            stmt = select(ArticleEntity.entity_id).where(
-                ArticleEntity.article_id == article.id,
-                ArticleEntity.entity_id.in_(entity_ids_to_names.keys()),
-            )
-            result = await db.execute(stmt)
-            matched_entity_ids = [row[0] for row in result.all()]
-
             # Map entity IDs to names
             matched_entities = [
-                entity_ids_to_names[entity_id] for entity_id in matched_entity_ids
+                entity_ids_to_names[entity_id]
+                for entity_id in matches_by_article.get(article.id, [])
             ]
 
             results.append(

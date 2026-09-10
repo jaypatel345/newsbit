@@ -148,7 +148,20 @@ class NewsService:
 
         try:
             result = await self.db.execute(
-                select(Article)
+                select(
+                    Article.id,
+                    Article.title,
+                    Article.summary,
+                    Article.url,
+                    Article.author,
+                    Article.published_at,
+                    Article.source_name,
+                    Article.source_url,
+                    Article.image_url,
+                    Article.why_it_matters,
+                    Article.category,
+                    Article.popularity_score,
+                )
                 .where(
                     Article.category == category,
                     Article.image_url.is_not(None),
@@ -165,7 +178,26 @@ class NewsService:
                 detail="Failed to retrieve news category",
             ) from e
 
-        return result.scalars().all()
+        # Select only the columns the clients render instead of the full ORM
+        # row (which serializes the 384-dim embedding and full article body).
+        return [
+            {
+                "id": row.id,
+                "title": row.title,
+                "summary": row.summary,
+                "url": row.url,
+                "author": row.author,
+                "domain": self.get_domain(row.url),
+                "published_at": row.published_at,
+                "source_name": row.source_name,
+                "source_url": row.source_url,
+                "image_url": row.image_url,
+                "why_it_matters": row.why_it_matters,
+                "category": row.category,
+                "popularity_score": row.popularity_score,
+            }
+            for row in result.all()
+        ]
 
     async def generate_and_save_today_summary(self):
         # 1. Fetch latest articles from DB

@@ -2,6 +2,7 @@ from app.models.article import Article
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import load_only
 
 
 class ArticleService:
@@ -12,7 +13,17 @@ class ArticleService:
     async def get_article_by_id(self, id: int):
         # 1. Query the Article table and Find the article where Article.id == id.
         result = await self.db.execute(
-            select(Article).where(Article.id == id)
+            select(Article)
+            .options(
+                load_only(
+                    Article.id,
+                    Article.title,
+                    Article.description,
+                    Article.content,
+                    Article.source_name,
+                )
+            )
+            .where(Article.id == id)
         )
         article = result.scalar_one_or_none()
 

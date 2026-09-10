@@ -40,7 +40,9 @@ try:
     db_url = _build_async_database_url(settings.DATABASE_URL)
     engine = create_async_engine(
         db_url,
-        echo=True,
+        # echo=True emits every SQL statement + params through the logging
+        # stack on every query, which measurably slows request handling.
+        echo=False,
         connect_args={"statement_cache_size": 0},
         pool_pre_ping=True,
         pool_recycle=3600,

@@ -169,15 +169,26 @@ class EntityService:
         Returns:
             List of articles ordered by published_at DESC
         """
+        # Only the columns the endpoint serializes - avoids loading the
+        # embedding vector and full article body for every row.
         stmt = (
-            select(Article)
+            select(
+                Article.id,
+                Article.title,
+                Article.summary,
+                Article.url,
+                Article.published_at,
+                Article.source_name,
+                Article.image_url,
+                Article.category,
+            )
             .join(ArticleEntity, Article.id == ArticleEntity.article_id)
             .where(ArticleEntity.entity_id == entity_id)
             .order_by(Article.published_at.desc())
             .limit(limit)
         )
         result = await db.execute(stmt)
-        return list(result.scalars().all())
+        return list(result.all())
 
     async def search_entities(
         self,
