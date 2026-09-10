@@ -35,8 +35,14 @@ def get_search_service() -> SearchService:
     return SearchService()
 
 
-def get_embedding_service() -> EmbeddingService:
-    return EmbeddingService()
+def get_embedding_service() -> EmbeddingService | None:
+    # ML deps (sentence-transformers/torch) are optional and not installed in
+    # every environment. Degrade gracefully instead of failing the whole
+    # request/WebSocket handshake with a 500, matching conversations.py.
+    try:
+        return EmbeddingService()
+    except ImportError:
+        return None
 
 
 def get_conversation_service(
@@ -44,7 +50,7 @@ def get_conversation_service(
     article_service: ArticleService = Depends(get_article_service),
     llm_service: LLMService = Depends(get_llm_service),
     search_service: SearchService = Depends(get_search_service),
-    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    embedding_service: EmbeddingService | None = Depends(get_embedding_service),
 ) -> ConversationService:
     semantic_search_service = None
     return ConversationService(
@@ -126,11 +132,20 @@ async def chat_websocket(
                         current_user,
                         guest_id,
                     ),
-                    timeout=30.0,  # 30 second timeout
+                    # 30s was cutting off normal tool-calling runs (agent +
+                    # Groq + retries regularly need 40-60s). The client's own
+                    # timeout is 90s, so stay just under that.
+                    timeout=85.0,
                 )
 
+                # send_message returns a plain dict, not a schema object.
+                response_role = (
+                    response.get("role")
+                    if isinstance(response, dict)
+                    else getattr(response, "role", None)
+                )
                 print(
-                    f"Generated response for message_id {message_id}: {response.role}"
+                    f"Generated response for message_id {message_id}: {response_role}"
                 )
 
                 # Send existing MessageResponse back through WebSocket

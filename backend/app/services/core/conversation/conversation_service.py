@@ -294,6 +294,23 @@ class ConversationService:
         await self.db.commit()
         await self.db.refresh(user_message)
 
+        # 2b. Load the earlier turns of this conversation so the assistant
+        # keeps context across the same conversation. The message saved above
+        # is included, so this list ends with the current user message.
+        history_result = await self.db.execute(
+            select(Message)
+            .where(Message.conversation_id == conversation_id)
+            .order_by(Message.created_at)
+        )
+        conversation_history = [
+            {"role": msg.role, "content": msg.content}
+            for msg in history_result.scalars().all()
+            if msg.content and msg.content.strip()
+        ]
+        # Keep only the most recent turns to bound the prompt size. The Groq
+        # free tier caps tokens-per-minute, so a handful of turns is plenty.
+        conversation_history = conversation_history[-8:]
+
         # 3. Build the LangGraph (if available)
         logger.info(f"LANGGRAPH_AVAILABLE: {LANGGRAPH_AVAILABLE}")
         if LANGGRAPH_AVAILABLE:
@@ -304,10 +321,7 @@ class ConversationService:
                 logger.info(f"Running graph with input: {request.content}")
                 result = await graph.ainvoke(
                     {
-                        "messages": [
-                            {"role": "user", "content": request.content},
-                            {"role": "assistant", "content": ""},
-                        ],
+                        "messages": conversation_history,
                         "search_results": [],
                         "tool_calls": [],
                     }
@@ -322,12 +336,16 @@ class ConversationService:
                 import traceback
 
                 traceback.print_exc()
+                # A failed tool query can leave the session in an aborted
+                # transaction; clear it before we try to save the reply.
+                # The user message is already committed, so nothing is lost.
+                await self.db.rollback()
                 # Fallback to simple LLM call
-                llm_result = await self._fallback_llm_call(request.content)
+                llm_result = await self._fallback_llm_call(conversation_history)
         else:
             # Fallback to simple LLM call when LangGraph is not available
             logger.warning("LangGraph not available, using fallback LLM call")
-            llm_result = await self._fallback_llm_call(request.content)
+            llm_result = await self._fallback_llm_call(conversation_history)
 
         # 5. Save the assistant's reply.
         assistant_message = Message(
@@ -358,17 +376,18 @@ class ConversationService:
     async def clear_messages(self, conversation_id):
         pass
 
-    async def _fallback_llm_call(self, user_content: str) -> str:
+    async def _fallback_llm_call(self, conversation_history) -> str:
         """Fallback LLM call when retrieval service is not available."""
+        if isinstance(conversation_history, str):
+            conversation_history = [
+                {"role": "user", "content": conversation_history}
+            ]
         messages = [
             {
                 "role": "system",
                 "content": NEWSBIT_CHAT_PROMPT,
             },
-            {
-                "role": "user",
-                "content": user_content,
-            },
+            *conversation_history,
         ]
         try:
             chat_completion = await groq_client.chat.completions.create(

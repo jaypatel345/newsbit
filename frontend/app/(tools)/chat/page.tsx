@@ -104,7 +104,7 @@ function ChatPageContent() {
 
   // Use the actual message data from WebSocket response
   const aiMessage: Message = {
-    id: latestMessage.id || crypto.randomUUID(),
+    id: latestMessage.id ? String(latestMessage.id) : crypto.randomUUID(),
     role: (latestMessage.role === "user" || latestMessage.role === "assistant")
       ? latestMessage.role
       : "assistant",
@@ -112,12 +112,26 @@ function ChatPageContent() {
     created_at: latestMessage.created_at,
   };
 
-  // Store in pending response instead of adding to messages immediately
-  setPendingResponse(aiMessage);
+  // Show the reply as soon as it arrives. The thinking timeline is a fixed
+  // ~11s animation; gating the reply on it meant fast responses were held
+  // back and — worse — a reply that landed after the animation finished was
+  // dropped entirely (no output at all).
+  queryClient.setQueryData(
+    ["messages", selectedConversationId],
+    (oldMessages: Message[] = []) => {
+      if (oldMessages.some((m) => String(m.id) === String(aiMessage.id))) {
+        return oldMessages;
+      }
+      return [...oldMessages, aiMessage];
+    },
+  );
+  setPendingResponse(null);
+  setLoading(false);
 
 }, [
   webSocketMessages,
   selectedConversationId,
+  queryClient,
 ]);
 
   const handleSend = async (message: string) => {
@@ -191,27 +205,16 @@ function ChatPageContent() {
         "Message sent through WebSocket",
       );
 
-    } catch (error) {
+    } catch (wsError) {
 
-      console.error(
-        "Failed to send WebSocket message:",
-        error,
+      // The WebSocket send failed — this is common and usually recoverable
+      // (connection still warming up, a transient hiccup). Retry over HTTP
+      // silently and only show the user an error if that ALSO fails.
+      console.warn(
+        "WebSocket send failed, falling back to HTTP:",
+        wsError,
       );
 
-      // Set user-friendly error message
-      if (error instanceof Error) {
-        if (error.message.includes("timeout")) {
-          setError("Connection timed out. Please try again.");
-        } else if (error.message.includes("closed")) {
-          setError("Connection lost. Please try again.");
-        } else {
-          setError("Unable to send message. Please try again.");
-        }
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
-
-      // Fallback to HTTP if WebSocket is not ready
       try {
         const response = await sendMessage({
           conversationId: conversationId,
@@ -235,6 +238,20 @@ function ChatPageContent() {
       } catch (httpError) {
         console.error("HTTP fallback also failed:", httpError);
         setLoading(false);
+        setPendingResponse(null);
+
+        // User hit stop — not an error worth showing.
+        if (httpError instanceof Error && httpError.name === "AbortError") {
+          return;
+        }
+
+        const reason =
+          wsError instanceof Error ? wsError.message.toLowerCase() : "";
+        if (reason.includes("timeout") || reason.includes("timed out")) {
+          setError("That's taking longer than usual. Please try again.");
+        } else {
+          setError("Couldn't send your message. Please try again.");
+        }
       }
 
     }

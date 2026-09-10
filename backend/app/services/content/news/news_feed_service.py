@@ -1,5 +1,5 @@
 from app.models.article import Article
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 
 
 class NewsFeedService:
@@ -23,8 +23,8 @@ class NewsFeedService:
     async def get_category_news(self, category: str, limit=10):
         results = await self.db.execute(
             select(Article)
-            .where(Article.category == category)
-            .limit(limit)
+            .where(func.lower(Article.category) == category.lower())
             .order_by(Article.published_at.desc())
+            .limit(limit)
         )
         return results.scalars().all()
