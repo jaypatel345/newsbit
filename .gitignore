@@ -61,3 +61,6 @@ Screenshot*
 # Temporary files
 *.tmp
 *.temp
+
+# Local AI tool output
+Claude outputs/
