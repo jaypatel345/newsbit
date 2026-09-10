@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ArticleImage from "@/app/components/common/ArticleImage";
 
 interface StoryCardProps {
   id: number;
@@ -41,23 +42,12 @@ export default function StoryCard({
       <div className="flex gap-4 mb-4">
         {/* Left Image */}
         <div className="w-70 sm:w-[320px] shrink-0">
-          {image ? (
-            <img
-              src={image}
-              alt={headline}
-              className="w-full h-40 sm:h-45 object-cover rounded-xl"
-              onError={(e) => {
-                // Use source logo when the original image fails to load
-                e.currentTarget.src = getSourceLogoUrl(sourceWebsite);
-              }}
-            />
-          ) : (
-            <img
-              src={getSourceLogoUrl(sourceWebsite)}
-              alt={source}
-              className="w-full h-40 sm:h-45 object-cover rounded-xl bg-gray-100"
-            />
-          )}
+          <ArticleImage
+            src={image}
+            alt={headline}
+            domain={sourceWebsite}
+            className="w-full h-40 sm:h-45 object-cover rounded-xl bg-gray-100"
+          />
         </div>
 
         {/* Right Content */}

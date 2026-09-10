@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
+import ArticleImage from "@/app/components/common/ArticleImage";
 
 interface TopicCardProps {
   category: string;
@@ -40,23 +41,12 @@ export default function TopicCard({ category }: TopicCardProps) {
           >
             {/* Left Image */}
             <div className="w-20 h-20 rounded-xl object-cover shrink-0 bg-gray-100">
-              {article.image_url ? (
-                <img
-                  src={article.image_url}
-                  alt={article.title}
-                  className="w-full h-full rounded-xl object-cover"
-                  onError={(e) => {
-                    // Use source logo when the original image fails to load
-                    e.currentTarget.src = `https://www.google.com/s2/favicons?domain=${article.source_url}&sz=64`;
-                  }}
-                />
-              ) : (
-                <img
-                  src={`https://www.google.com/s2/favicons?domain=${article.source_url}&sz=64`}
-                  alt={article.source_name}
-                  className="w-full h-full rounded-xl object-cover"
-                />
-              )}
+              <ArticleImage
+                src={article.image_url}
+                alt={article.title}
+                domain={article.source_url ?? article.domain}
+                className="w-full h-full rounded-xl object-cover"
+              />
             </div>
 
             {/* Right Content */}

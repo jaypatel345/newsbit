@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTopStories } from "@/app/hooks/useTopStories";
 import { formatDistanceToNow } from "date-fns";
+import ArticleImage from "@/app/components/common/ArticleImage";
 
 function getSourceLogoUrl(sourceWebsite: string) {
   return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(sourceWebsite)}&sz=64`;
@@ -73,23 +74,12 @@ export default function TodaysTopStories() {
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
                   <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
-                    {story.image_url ? (
-                      <img
-                        src={story.image_url}
-                        alt={story.summary}
-                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
-                        onError={(e) => {
-                          // Use source logo when the original image fails to load
-                          e.currentTarget.src = getSourceLogoUrl(story.domain);
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={getSourceLogoUrl(story.domain)}
-                        alt={story.source_name}
-                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
-                      />
-                    )}
+                    <ArticleImage
+                      src={story.image_url}
+                      alt={story.title}
+                      domain={story.domain}
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                    />
                   </div>
 
                   {/* Content */}
@@ -140,23 +130,12 @@ export default function TodaysTopStories() {
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
                   <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
-                    {story.image_url ? (
-                      <img
-                        src={story.image_url}
-                        alt={story.url}
-                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg"
-                        onError={(e) => {
-                          // Use source logo when the original image fails to load
-                          e.currentTarget.src = getSourceLogoUrl(story.domain);
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={getSourceLogoUrl(story.domain)}
-                        alt={story.source_name}
-                        className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
-                      />
-                    )}
+                    <ArticleImage
+                      src={story.image_url}
+                      alt={story.title}
+                      domain={story.domain}
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                    />
                   </div>
 
                   {/* Content */}
