@@ -18,6 +18,7 @@ type ChatMessage = {
   id?: string;
   role?: string;
   created_at?: string;
+  message_id?: string;
 };
 
 export function useChatWebSocket(conversationId: number | null) {
@@ -70,10 +71,13 @@ export function useChatWebSocket(conversationId: number | null) {
             return;
           }
 
-          setMessages((previous) => [
-            ...previous,
-            data,
-          ]);
+          setMessages((previous) => {
+            // Prevent duplicate messages by checking id
+            if (data.id && previous.some((message) => message.id === data.id)) {
+              return previous;
+            }
+            return [...previous, data];
+          });
         } catch (error) {
           console.error(
             "Failed to parse WebSocket message:",
@@ -89,6 +93,11 @@ export function useChatWebSocket(conversationId: number | null) {
 
       socket.onclose = () => {
         console.log("WebSocket disconnected");
+
+        // Protect onclose from old socket instances
+        if (socketRef.current !== socket) {
+          return;
+        }
 
         if (manuallyClosed) {
           setStatus("disconnected");
@@ -131,71 +140,62 @@ export function useChatWebSocket(conversationId: number | null) {
     };
   }, [conversationId]);
 
+  // Helper to wait for an open connection
+  const waitForConnection = useCallback((): Promise<WebSocket> => {
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        const socket = socketRef.current;
+        if (!socket) {
+          reject(new Error("WebSocket not initialized"));
+          return;
+        }
+        if (socket.readyState === WebSocket.OPEN) {
+          resolve(socket);
+          return;
+        }
+        if (
+          socket.readyState === WebSocket.CLOSED ||
+          socket.readyState === WebSocket.CLOSING
+        ) {
+          reject(new Error("WebSocket closed"));
+          return;
+        }
+        setTimeout(check, 100);
+      };
+      check();
+    });
+  }, []);
+
   const sendMessage = useCallback(
   async (
     content: string,
     articleIds: number[] = [],
   ) => {
-    const socket = socketRef.current;
+    // Wait for connection with 15 second timeout
+    const connectionTimeout = setTimeout(() => {
+      throw new Error("Connection timeout after 15 seconds");
+    }, 15000);
 
-    // console.log("sendMessage called, socket:", socket, "readyState:", socket?.readyState);
+    const socket = await waitForConnection();
+    clearTimeout(connectionTimeout);
 
-    if (!socket) {
-      throw new Error("WebSocket is not initialized");
-    }
-
-    if (socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) {
-      throw new Error("WebSocket is closed or closing");
-    }
-
-    if (socket.readyState === WebSocket.CONNECTING) {
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(
-            new Error(
-              "WebSocket connection timeout",
-            ),
-          );
-        }, 10000);
-
-        socket.addEventListener(
-          "open",
-          () => {
-            clearTimeout(timeout);
-            resolve();
-          },
-          { once: true },
-        );
-
-        socket.addEventListener(
-          "error",
-          () => {
-            clearTimeout(timeout);
-            reject(
-              new Error(
-                "WebSocket connection failed",
-              ),
-            );
-          },
-          { once: true },
-        );
-      });
-    }
-
-    if (socket.readyState !== WebSocket.OPEN) {
-      throw new Error("WebSocket is not connected");
-    }
+    // Generate unique message ID for request-response tracking
+    const messageId = crypto.randomUUID();
 
     // Create a promise that resolves when we get a response or times out
     const responsePromise = new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error("Response timeout after 35 seconds"));
-      }, 35000); // 35 second timeout (slightly longer than backend 30s timeout)
+        reject(new Error("Response timeout after 90 seconds"));
+      }, 90000); // 90 second timeout for AI response
 
       const messageHandler = (event: MessageEvent) => {
         try {
           const data: ChatMessage = JSON.parse(event.data);
-          if (data.type === "message" || data.type === "error") {
+if (data.type === "message" || data.type === "error") {
+            // Check if this response matches our request
+            if (data.message_id && data.message_id !== messageId) {
+              return; // Not our response
+            }
             clearTimeout(timeout);
             socket.removeEventListener("message", messageHandler);
             if (data.type === "error") {
@@ -217,6 +217,7 @@ export function useChatWebSocket(conversationId: number | null) {
     socket.send(
       JSON.stringify({
         type: "user_message",
+        message_id: messageId,
         content,
         article_ids: articleIds,
       }),
@@ -225,7 +226,7 @@ export function useChatWebSocket(conversationId: number | null) {
     // Wait for response or timeout
     await responsePromise;
   },
-  [],
+  [waitForConnection],
 );
 
   return {

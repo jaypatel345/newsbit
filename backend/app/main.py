@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from app.scheduler import scheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 
 from .api.v1.admin_news import router as admin_news_router
 from .api.v1.article import router as article_router
@@ -46,8 +45,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add GZip compression for faster response times
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# GZip middleware removed to prevent WebSocket interference
+# Can be re-added with proper ASGI middleware implementation
+
 
 app.include_router(news_router)
 app.include_router(admin_news_router)

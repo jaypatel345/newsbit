@@ -36,6 +36,7 @@ function ChatPageContent() {
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingResponse, setPendingResponse] = useState<Message | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: conversations = [] } = useConversations();
   const { mutateAsync: createConversation } = useCreateConversation();
@@ -181,6 +182,7 @@ function ChatPageContent() {
     }
 
     try {
+      setError(null);
       await sendWebSocketMessage(
         message,
         selectedArticles.map((article) => article.id),
@@ -195,6 +197,19 @@ function ChatPageContent() {
         "Failed to send WebSocket message:",
         error,
       );
+
+      // Set user-friendly error message
+      if (error instanceof Error) {
+        if (error.message.includes("timeout")) {
+          setError("Connection timed out. Please try again.");
+        } else if (error.message.includes("closed")) {
+          setError("Connection lost. Please try again.");
+        } else {
+          setError("Unable to send message. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
 
       // Fallback to HTTP if WebSocket is not ready
       try {
@@ -216,6 +231,7 @@ function ChatPageContent() {
 
         setLoading(false);
         setPendingResponse(null);
+        setError(null);
       } catch (httpError) {
         console.error("HTTP fallback also failed:", httpError);
         setLoading(false);
@@ -749,32 +765,20 @@ function ChatPageContent() {
               </div>
             )}
 
-            {/* <div className="mb-2">
-              {webSocketStatus === "connecting" && (
-                <div className="text-xs text-gray-500 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
-                  Connecting...
-                </div>
-              )}
-              {webSocketStatus === "reconnecting" && (
-                <div className="text-xs text-gray-500 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-                  Reconnecting...
-                </div>
-              )}
-              {webSocketStatus === "error" && (
-                <div className="text-xs text-red-500 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-red-500" />
-                  Connection error
-                </div>
-              )}
-              {webSocketStatus === "disconnected" && selectedConversationId && (
-                <div className="text-xs text-gray-500 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-gray-400" />
-                  Disconnected
-                </div>
-              )}
-            </div> */}
+            {/* Connection Status - Hidden from UI, logs still work in console */}
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
+                <p className="text-xs text-red-700">{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-xs text-red-600 hover:text-red-800 font-medium"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
 
             <ChatInput
               message={inputMessage}

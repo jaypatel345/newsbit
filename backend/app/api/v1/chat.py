@@ -1,5 +1,3 @@
-import contextlib
-
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.message import MessageResponse, SendMessageRequest
@@ -67,6 +65,8 @@ async def chat_websocket(
     token: str | None = Query(default=None),
     service: ConversationService = Depends(get_conversation_service),
 ):
+    print(f"WebSocket connection attempt: conversation {conversation_id}")
+
     # Get guest_id from WebSocket query params or headers
     guest_id = None
     if "guest_id" in websocket.query_params:
@@ -74,24 +74,29 @@ async def chat_websocket(
     elif "X-Guest-ID" in websocket.headers:
         guest_id = websocket.headers["X-Guest-ID"]
 
+    print(f"Guest ID: {guest_id}")
+
     if token:
         # TODO: Validate token and get user info
         current_user = await get_optional_current_user(token, db)
     else:
         current_user = None
 
-    await websocket.accept()
-
-    print(f"WebSocket connected: conversation {conversation_id}")
+    try:
+        await websocket.accept()
+        print(f"WebSocket connected: conversation {conversation_id}")
+    except Exception as e:
+        print(f"Error accepting WebSocket: {e}")
+        return
 
     try:
         while True:
             data = await websocket.receive_json()
-
             print("Received:", data)
 
             user_message = data.get("content")
             article_ids = data.get("article_ids", [])
+            message_id = data.get("message_id")
 
             # Validate message
             if not user_message or not user_message.strip():
@@ -99,6 +104,7 @@ async def chat_websocket(
                     {
                         "type": "error",
                         "content": "Message content is required",
+                        "message_id": message_id,
                     }
                 )
                 continue
@@ -117,42 +123,62 @@ async def chat_websocket(
                     service.send_message(
                         request,
                         conversation_id,
-                        current_user,  # current_user - WebSocket doesn't support auth headers easily
-                        guest_id,  # guest_id from WebSocket
+                        current_user,
+                        guest_id,
                     ),
                     timeout=30.0,  # 30 second timeout
                 )
 
+                print(
+                    f"Generated response for message_id {message_id}: {response.role}"
+                )
+
                 # Send existing MessageResponse back through WebSocket
-                await websocket.send_json(
-                    {
+                try:
+                    response_data = {
                         "type": "message",
+                        "message_id": message_id,
                         **jsonable_encoder(response),
                     }
-                )
+                    # print(
+                    #     f"Sending WebSocket response data: {list(response_data.keys())}"
+                    # )
+                    await websocket.send_json(response_data)
+                    # print(
+                    #     f"Successfully sent response via WebSocket for message_id {message_id}"
+                    # )
+                except Exception:
+                    # print(f"Error sending WebSocket response: {ws_error}")
+                    # import traceback
+
+                    # traceback.print_exc()
+                    raise
             except TimeoutError:
                 await websocket.send_json(
                     {
                         "type": "error",
                         "content": "Request timed out. Please try again.",
+                        "message_id": message_id,
+                    }
+                )
+            except Exception as e:
+                # print(f"Error processing message: {e}")
+                await websocket.send_json(
+                    {
+                        "type": "error",
+                        "content": str(e),
+                        "message_id": message_id,
                     }
                 )
 
     except WebSocketDisconnect:
-        print(f"Client disconnected: conversation {conversation_id}")
-
-    except Exception as e:
+        # print(f"Client disconnected: conversation {conversation_id}")
+        pass
+    except Exception:
+        # print(f"WebSocket error: {e}")
         import traceback
 
         traceback.print_exc()
-
-        with contextlib.suppress(Exception):
-            await websocket.send_json(
-                {
-                    "type": "error",
-                    "content": str(e),
-                }
-            )
 
 
 # Keep your existing HTTP endpoint
