@@ -13,7 +13,9 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
-      - key: GROQ_API_KEY
+      - key: GROQ_API_KEY_01
+        sync: false
+      - key: GROQ_API_KEY_02
         sync: false
       - key: G_NEWS_API_URL
         sync: false
