@@ -341,11 +341,11 @@ class ConversationService:
                 # The user message is already committed, so nothing is lost.
                 await self.db.rollback()
                 # Fallback to simple LLM call
-                llm_result = await self._fallback_llm_call(conversation_history)
+                llm_result = await self._safe_fallback_llm_call(conversation_history)
         else:
             # Fallback to simple LLM call when LangGraph is not available
             logger.warning("LangGraph not available, using fallback LLM call")
-            llm_result = await self._fallback_llm_call(conversation_history)
+            llm_result = await self._safe_fallback_llm_call(conversation_history)
 
         # 5. Save the assistant's reply.
         assistant_message = Message(
@@ -398,6 +398,24 @@ class ConversationService:
         except Exception as e:
             logger.error(f"Error in fallback LLM call: {e}")
             raise
+
+    async def _safe_fallback_llm_call(self, conversation_history) -> str:
+        """Call the fallback LLM, turning a failure into an HTTPException.
+
+        An unhandled exception here would propagate past FastAPI's CORS
+        middleware and come back as a bare 500 with no CORS headers — the
+        browser then reports it as a CORS failure, hiding the real cause
+        (e.g. a missing/rate-limited Groq key). Raising HTTPException keeps
+        the response on the normal, CORS-wrapped path.
+        """
+        try:
+            return await self._fallback_llm_call(conversation_history)
+        except Exception as e:
+            logger.error(f"Fallback LLM call failed, no response available: {e}")
+            raise HTTPException(
+                status_code=503,
+                detail="The AI service is temporarily unavailable. Please try again shortly.",
+            ) from e
 
     async def migrate_guest_conversations(
         self,

@@ -1,8 +1,22 @@
 import Cookies from "js-cookie";
 import { getGuestId } from "@/app/lib/guest";
 
-const WS_BASE_URL =
-  process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000";
+// Prefer an explicit WS URL. Otherwise derive one from the API URL (http ->
+// ws, https -> wss) instead of hardcoding a localhost default — that default
+// silently broke chat in production, where NEXT_PUBLIC_WS_URL was never set:
+// every browser tried to open a WebSocket to the visitor's own machine.
+function resolveWsBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    return process.env.NEXT_PUBLIC_WS_URL;
+  }
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (apiUrl) {
+    return apiUrl.replace(/^http/, "ws");
+  }
+  return "ws://127.0.0.1:8000";
+}
+
+const WS_BASE_URL = resolveWsBaseUrl();
 
 export function createChatWebSocket(conversationId: number | null) {
   if (!conversationId) {
