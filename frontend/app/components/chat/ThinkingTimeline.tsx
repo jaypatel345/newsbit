@@ -35,15 +35,22 @@ export default function ThinkingTimeline({
         if (index >= text.length) {
           clearInterval(typing);
 
-          setTimeout(() => {
-            if (currentStep === STEPS.length - 1) {
-              onComplete();
+          const isLastStep = currentStep === STEPS.length - 1;
+          setTimeout(
+            () => {
+              if (isLastStep) {
+                onComplete();
 
-              return;
-            }
-            setCurrentStep((prev) => prev + 1);
-            setDisplayedText("");
-          }, 1500);
+                return;
+              }
+              setCurrentStep((prev) => prev + 1);
+              setDisplayedText("");
+            },
+            // Keep the deliberate pacing between steps, but don't sit on the
+            // finished last line doing nothing — signal completion right
+            // away so nothing holds up showing the real answer.
+            isLastStep ? 200 : 1500,
+          );
         }
       }, 5);
     };

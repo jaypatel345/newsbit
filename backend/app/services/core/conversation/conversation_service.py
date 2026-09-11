@@ -1,13 +1,14 @@
 import logging
 
 from app.core.llm import groq_client
+from app.models.article import Article
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.models.user import User
 from app.prompts.news import NEWSBIT_CHAT_PROMPT
 from app.schemas.conversation import CreateConversationRequest
 from app.services.content.news.article_service import ArticleService
-from app.services.core.conversation.context_builder import BuildArticle  # noqa: F401
+from app.services.core.conversation.context_builder import BuildArticle
 from app.services.infrastructure.ai.embedding_service import EmbeddingService
 from app.services.infrastructure.ai.llm_service import LLMService
 from app.services.infrastructure.search.search_service import SearchService
@@ -310,6 +311,51 @@ class ConversationService:
         # Keep only the most recent turns to bound the prompt size. The Groq
         # free tier caps tokens-per-minute, so a handful of turns is plenty.
         conversation_history = conversation_history[-8:]
+
+        # 2c. The user can pin specific articles as "Context" from the
+        # frontend (request.article_ids). That was being collected and sent
+        # over the wire but never actually read here, so the model never saw
+        # what the user was pointing at. Fetch them and splice their content
+        # in as a system message right before the current question.
+        article_ids = getattr(request, "article_ids", None) or []
+        if article_ids:
+            articles_result = await self.db.execute(
+                select(Article).where(Article.id.in_(article_ids))
+            )
+            selected_articles = articles_result.scalars().all()
+
+            if selected_articles:
+                # Truncate content so a couple of long articles don't blow
+                # the tight Groq free-tier tokens-per-minute budget. Build
+                # plain dicts instead of passing the ORM rows through, so we
+                # never risk writing truncated content back on the commit
+                # below.
+                max_content_chars = 1500
+                article_dicts = [
+                    {
+                        "title": article.title,
+                        "summary": article.summary,
+                        "why_it_matters": article.why_it_matters,
+                        "content": (article.content or "")[:max_content_chars],
+                    }
+                    for article in selected_articles
+                ]
+                context_message = {
+                    "role": "system",
+                    "content": (
+                        "The user has selected the following article(s) as "
+                        "context for this conversation. Answer using them "
+                        "whenever the question relates to them:\n\n"
+                        + BuildArticle.build_article_context(article_dicts)
+                    ),
+                }
+                # Insert right before the current (last) user turn so it's
+                # the freshest thing the model sees.
+                conversation_history = (
+                    conversation_history[:-1]
+                    + [context_message]
+                    + conversation_history[-1:]
+                )
 
         # 3. Build the LangGraph (if available)
         logger.info(f"LANGGRAPH_AVAILABLE: {LANGGRAPH_AVAILABLE}")
