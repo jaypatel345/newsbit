@@ -351,7 +351,15 @@ function ChatPageContent() {
   };
 
   const handleAnimationComplete = () => {
-    // Add the pending response to messages after timeline completes
+    // The scripted thinking timeline is a fixed ~10s animation that often
+    // finishes before the real reply does. This used to unconditionally
+    // call setLoading(false) here, which hid the indicator the instant the
+    // animation ended — leaving a blank screen until the actual answer
+    // showed up a couple seconds later (via the webSocketMessages effect
+    // above, which is the only thing that should ever clear `loading`).
+    // Only flush/clear here if a reply is already sitting in pendingResponse
+    // (kept as a safety net); otherwise leave the indicator up so it stays
+    // visible with no gap until the real answer swaps it out.
     if (pendingResponse && selectedConversationId) {
       queryClient.setQueryData(
         ["messages", selectedConversationId],
@@ -363,8 +371,8 @@ function ChatPageContent() {
         },
       );
       setPendingResponse(null);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleCreateConversation = async () => {
