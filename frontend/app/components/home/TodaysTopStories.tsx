@@ -96,7 +96,7 @@ export default function TodaysTopStories() {
                     </p>
 
                     {/* Headline */}
-                    <Link href="/brief" className="block">
+                    <Link href={`/brief#story-${story.id}`} className="block">
                       <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
                         {story.title}
                       </h3>
@@ -151,7 +151,7 @@ export default function TodaysTopStories() {
                     </p>
 
                     {/* Headline */}
-                    <Link href="/brief" className="block">
+                    <Link href={`/brief#story-${story.id}`} className="block">
                       <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
                         {story.title}
                       </h3>

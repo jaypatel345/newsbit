@@ -39,19 +39,19 @@ export default function StoryCard({
   return (
     <div className="py-6">
       {/* Top Row: Image and Content */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
         {/* Left Image */}
-        <div className="w-70 sm:w-[320px] shrink-0">
+        <div className="w-full sm:w-70 md:w-[320px] sm:shrink-0">
           <ArticleImage
             src={image}
             alt={headline}
             domain={sourceWebsite}
-            className="w-full h-40 sm:h-45 object-cover rounded-xl bg-gray-100"
+            className="w-full h-48 sm:h-40 md:h-45 object-cover rounded-xl bg-gray-100"
           />
         </div>
 
         {/* Right Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Story Number and Category */}
           <div className="flex items-center gap-3 mb-2">
             <span className="text-sm font-medium" style={{ color: "#8A6A3F" }}>
@@ -67,14 +67,14 @@ export default function StoryCard({
 
           {/* Headline */}
           <h3
-            className="text-xl font-semibold mb-2"
+            className="text-lg sm:text-xl font-semibold mb-2 break-words"
             style={{ color: "#1E1E1E" }}
           >
             {headline}
           </h3>
 
           {/* AI Summary */}
-          <p className="text-sm leading-relaxed" style={{ color: "#5B4C3A" }}>
+          <p className="text-sm leading-relaxed break-words" style={{ color: "#5B4C3A" }}>
             {summary}
           </p>
         </div>
@@ -88,31 +88,31 @@ export default function StoryCard({
         <p className="text-xs font-medium mb-1" style={{ color: "#8A6A3F" }}>
           Why it matters
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: "#5B4C3A" }}>
+        <p className="text-xs leading-relaxed break-words" style={{ color: "#5B4C3A" }}>
           {whyItMatters}
         </p>
       </div>
 
       {/* Bottom Row: Source and Ask AI Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Left: Source with Link */}
         <a
           href={sourceWebsite}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:underline decoration-gray-300 underline-offset-2 transition-colors"
+          className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:underline decoration-gray-300 underline-offset-2 transition-colors min-w-0"
         >
           <img
             src={getSourceLogoUrl(sourceWebsite)}
             alt=""
-            className="h-5 w-5 rounded-full object-cover"
+            className="h-5 w-5 rounded-full object-cover shrink-0"
           />
-          {source}
+          <span className="truncate">{source}</span>
         </a>
 
         {/* Right: Ask AI Button */}
 
-        <button onClick={sendArticleId} className="px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:opacity-80 bg-gray-900 text-white flex items-center gap-2 cursor-pointer">
+        <button onClick={sendArticleId} className="px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:opacity-80 bg-gray-900 text-white flex items-center gap-2 cursor-pointer shrink-0">
           Ask AI
           <ArrowRight size={16} />
         </button>

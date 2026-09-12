@@ -1,5 +1,6 @@
 // app/brief/BriefClient.tsx
 "use client";
+import { useEffect, useState } from "react";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import BriefHeader from "@/app/components/brief-preview/BriefHeader";
 import ExecutiveSummaryCard from "@/app/components/brief-preview/ExecutiveSummaryCard";
@@ -9,12 +10,35 @@ import { useTopStories } from "@/app/hooks/useTopStories";
 
 export default function BriefClient() {
   const { data, isLoading, error } = useTopStories(0); // No delay for brief page
-  
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  // Deep-link support: /brief#story-<id> (used when a specific article is
+  // clicked elsewhere, e.g. the home page "Top Stories" list) scrolls to
+  // and briefly highlights that story once the stories have loaded.
+  useEffect(() => {
+    if (isLoading || !data || data.length === 0) return;
+
+    const match = window.location.hash.match(/^#story-(\d+)$/);
+    if (!match) return;
+
+    const targetId = Number(match[1]);
+    const element = document.getElementById(`story-${targetId}`);
+    if (!element) return;
+
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    const frame = requestAnimationFrame(() => setHighlightedId(targetId));
+    const timeout = setTimeout(() => setHighlightedId(null), 2500);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+    };
+  }, [isLoading, data]);
+
   return (
     <div className="min-h-screen bg-white">
       <NavigationBar />
       <main className="pt-24 pb-12 sm:pt-28 sm:pb-16">
-        <div className="max-w-4xl mx-auto px-6 sm:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8">
           {/* Header */}
           {/* <BriefHeader updatedTime="8:00 AM" storyCount={10} readTime="2 min" /> */}
 
@@ -29,14 +53,14 @@ export default function BriefClient() {
 
           {/* Top Stories Heading */}
           <h2
-            className="text-3xl font-semibold mb-8"
+            className="text-2xl sm:text-3xl font-semibold mb-6 sm:mb-8"
             style={{ color: "#1E1E1E" }}
           >
             Top Stories
           </h2>
 
           {/* Story Cards */}
-          <div className="mb-12 rounded-3xl border border-gray-200 p-6">
+          <div className="mb-12 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {isLoading ? (
               // Skeleton loading state
               Array.from({ length: 10 }).map((_, index) => (
@@ -79,18 +103,27 @@ export default function BriefClient() {
             ) : (
               data?.map((story, index) => (
                 <div key={story.id}>
-                  <StoryCard
-                    id={story.id}
-                    storyNumber={index + 1}
-                    category={story.category}
-                    headline={story.title}
-                    publishedTime={story.published_at}
-                    summary={story.summary}
-                    whyItMatters={story.why_it_matters}
-                    source={story.source_name}
-                    sourceWebsite={story.domain}
-                    image={story.image_url}
-                  />
+                  <div
+                    id={`story-${story.id}`}
+                    className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
+                      highlightedId === story.id
+                        ? "ring-2 ring-offset-2 ring-gray-900/40"
+                        : ""
+                    }`}
+                  >
+                    <StoryCard
+                      id={story.id}
+                      storyNumber={index + 1}
+                      category={story.category}
+                      headline={story.title}
+                      publishedTime={story.published_at}
+                      summary={story.summary}
+                      whyItMatters={story.why_it_matters}
+                      source={story.source_name}
+                      sourceWebsite={story.domain}
+                      image={story.image_url}
+                    />
+                  </div>
                   {index < data?.length - 1 && (
                     <div className="border-t border-gray-200"></div>
                   )}

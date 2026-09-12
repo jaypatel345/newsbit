@@ -14,7 +14,7 @@ export default function TopicCard({ category }: TopicCardProps) {
     <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
       {/* Header: Name with Arrow */}
       <Link
-        href={`/explore?category=${category}`}
+        href={`/explore?category=${encodeURIComponent(category)}`}
         className="flex items-center gap-2 mb-4 sm:mb-5 pb-3 border-b border-gray-200 group"
       >
         <h3 className="text-[17px] sm:text-[18px] md:text-[19px] font-semibold text-gray-900 capitalize">
@@ -36,7 +36,7 @@ export default function TopicCard({ category }: TopicCardProps) {
         {articles?.slice(0, 3).map((article: any) => (
           <Link
             key={article.id}
-            href={`/explore?category=${category}`}
+            href={`/explore?category=${encodeURIComponent(category)}#article-${article.id}`}
             className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
           >
             {/* Left Image */}
@@ -64,7 +64,7 @@ export default function TopicCard({ category }: TopicCardProps) {
               </div>
 
               {/* Title */}
-              <h4 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+              <h4 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:underline decoration-gray-300 underline-offset-2 transition-colors">
                 {article.title}
               </h4>
 
