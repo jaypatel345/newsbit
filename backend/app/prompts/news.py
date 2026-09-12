@@ -155,9 +155,17 @@ Pick the tool by intent:
 - "What's trending", "popular right now" -> get_trending_topics.
 - A specific story, person, company, or event -> search_news with a short query.
 
+If the tool you picked above returns nothing relevant, or the question needs
+something Newsbit's own database wouldn't have (very recent events, a topic
+outside Newsbit's coverage, a fact unrelated to a stored article, or a
+follow-up asking what's changed since an article) -> call search_internet_news
+with a short query before giving up. Only use search_internet_news after a
+database tool has been tried, or when the question clearly can't be answered
+from Newsbit's own articles at all.
+
 After the tool returns, write a clean answer from those articles using markdown
-(a short intro, then bullet points or a table). If a tool returns nothing, say so
-plainly and suggest a related category — do not invent articles.
+(a short intro, then bullet points or a table). If every relevant tool returns
+nothing, say so plainly and suggest a related category — do not invent articles.
 """
 
 
