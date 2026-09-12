@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import StoryCard from "@/app/components/brief-preview/StoryCard";
 import { useCategories } from "@/app/hooks/useCategories";
 import { Article } from "@/types/article";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
-import { useEffect } from "react";
 
 // Categories to exclude from display
 const EXCLUDED_CATEGORIES = ["India", "Nation", "Other"];
@@ -21,7 +21,16 @@ export default function ExploreClient({
   initialArticles,
   initialCategory,
 }: ExploreClientProps = {}) {
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "");
+  // Deep-link support: /explore?category=<name> (e.g. from "Topics You May
+  // Like" on the home page) opens straight into that category.
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get("category") || undefined;
+
+  const [selectedCategory, setSelectedCategory] = useState(
+    initialCategory || categoryFromUrl || ""
+  );
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+  const hasScrolledToHash = useRef(false);
 
   const { data: categories = [] } = useCategories(initialCategories);
 
@@ -31,9 +40,13 @@ export default function ExploreClient({
   );
 
   useEffect(() => {
-    if (filteredCategories.length > 0 && !selectedCategory) {
-      setSelectedCategory(filteredCategories[0]);
+    if (filteredCategories.length === 0) return;
+    // Keep the current selection if it's still a valid category (covers the
+    // initial deep-linked category); otherwise fall back to the first one.
+    if (selectedCategory && filteredCategories.includes(selectedCategory)) {
+      return;
     }
+    setSelectedCategory(filteredCategories[0]);
   }, [filteredCategories, selectedCategory]);
 
   const {
@@ -45,16 +58,39 @@ export default function ExploreClient({
     initialCategory && selectedCategory === initialCategory ? initialArticles : undefined
   );
 
+  // Deep-link support: /explore?category=<c>#article-<id> scrolls to and
+  // briefly highlights that specific article once it has loaded.
+  useEffect(() => {
+    if (hasScrolledToHash.current) return;
+    if (isLoading || articles.length === 0) return;
+
+    const match = window.location.hash.match(/^#article-(\d+)$/);
+    if (!match) return;
+
+    const targetId = Number(match[1]);
+    const element = document.getElementById(`article-${targetId}`);
+    if (!element) return;
+
+    hasScrolledToHash.current = true;
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    const frame = requestAnimationFrame(() => setHighlightedId(targetId));
+    const timeout = setTimeout(() => setHighlightedId(null), 2500);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+    };
+  }, [isLoading, articles]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12">
       {/* Category Navigation Row */}
-      <div className="mb-8">
-        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="mb-8 -mx-4 sm:mx-0">
+        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide px-4 sm:px-0">
           {filteredCategories.map((topic: string) => (
             <button
               key={topic}
               onClick={() => setSelectedCategory(topic)}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer  ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer shrink-0 ${
                 selectedCategory === topic
                   ? "text-gray-900 border-b-2 border-gray-900"
                   : "text-gray-600 hover:text-gray-900"
@@ -80,7 +116,7 @@ export default function ExploreClient({
         </div> */}
 
       {/* Articles Grid */}
-      <div className="mb-12 rounded-3xl border border-gray-200 p-6">
+      <div className="mb-12 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
         {isLoading ? (
           // Skeleton loading state
           Array.from({ length: 10 }).map((_, index) => (
@@ -129,18 +165,27 @@ export default function ExploreClient({
         ) : (
           articles.map((article: Article, index: number) => (
             <div key={article.id}>
-              <StoryCard
-                id={article.id}
-                storyNumber={index + 1}
-                category={article.category}
-                headline={article.title}
-                publishedTime={article.published_at}
-                summary={article.summary}
-                whyItMatters={article.why_it_matters}
-                source={article.source_name}
-                sourceWebsite={article.url || article.url}
-                image={article.image_url}
-              />
+              <div
+                id={`article-${article.id}`}
+                className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
+                  highlightedId === article.id
+                    ? "ring-2 ring-offset-2 ring-gray-900/40"
+                    : ""
+                }`}
+              >
+                <StoryCard
+                  id={article.id}
+                  storyNumber={index + 1}
+                  category={article.category}
+                  headline={article.title}
+                  publishedTime={article.published_at}
+                  summary={article.summary}
+                  whyItMatters={article.why_it_matters}
+                  source={article.source_name}
+                  sourceWebsite={article.url || article.url}
+                  image={article.image_url}
+                />
+              </div>
               {index < articles.length - 1 && (
                 <div className="border-t border-gray-200"></div>
               )}
