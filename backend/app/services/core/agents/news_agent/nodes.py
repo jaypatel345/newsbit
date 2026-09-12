@@ -1,5 +1,8 @@
 from app.core.config import settings
 from app.prompts.news import NEWSBIT_AGENT_PROMPT
+from app.services.content.tools.news.internet_search import (
+    create_internet_search_tool,
+)
 from app.services.content.tools.news.news_feed import (
     create_news_feed_tools,  # noqa: F401
 )
@@ -55,10 +58,16 @@ class NewsAgentNodes:
         # Create news feed tools
         self.news_feed_tools = create_news_feed_tools(db)
 
+        # Live internet search (Tavily) - the fallback for when Newsbit's own
+        # database (everything above) doesn't have what the user is asking
+        # about, e.g. something too recent or outside Newsbit's coverage.
+        self.internet_search_tool = create_internet_search_tool()
+
         # Combine all tools
         self.all_tools = [
             self.search_news_tool,
             *self.news_feed_tools,
+            self.internet_search_tool,
         ]
 
         # Give all tools to the LLM, with the fallbacks bound to the same tools.

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY_02: str = ""
     G_NEWS_API_URL: str = ""
     G_NEWS_API_KEY: str = ""
+    TAVILY_API_KEY: str = ""
     SCHEDULER_SECRET: str = "default_secret_change_in_production"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
