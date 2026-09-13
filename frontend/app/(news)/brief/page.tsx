@@ -11,7 +11,7 @@ const newsCollectionSchema = {
     "@type": "Organization",
     "name": "Newsbit AI",
     "url": "https://www.newsbit.in",
-    "logo": "https://www.newsbit.in/newsbit_logo/high-resolution-logo-grayscale (1).png",
+    "logo": "https://www.newsbit.in/newsbit_logo/newsbit-logo.png",
   },
 };
 

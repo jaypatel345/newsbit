@@ -100,7 +100,7 @@ export default function RootLayout({
       url: "https://www.newsbit.in",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.newsbit.in/newsbit_logo/high-resolution-logo-grayscale (1).png",
+        url: "https://www.newsbit.in/newsbit_logo/newsbit-logo.png",
       },
     },
   };
