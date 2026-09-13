@@ -4,6 +4,8 @@ import { useTodaySummary } from "@/app/hooks/useTodaySummary";
 import ArticleSourceButton from "./ArticleSourceButton";
 import SourcesButton from "./SourcesButton";
 import { SummaryItem } from "@/types/todaySummary";
+import ListenButton from "@/app/components/common/ListenButton";
+import { getTodaysBriefAudioUrl } from "@/app/services/audio.service";
 
 export default function BriefPreview() {
   const { data, isLoading, error } = useTodaySummary();
@@ -73,7 +75,18 @@ export default function BriefPreview() {
       </div>
 
       {/* Hero Card */}
-      <div className="bg-white border border-gray-200/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+      <div className="relative bg-white border border-gray-200/50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+        {/* Corner control: listen to today's whole brief read aloud */}
+        {!isLoading && !error && (
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+            <ListenButton
+              src={getTodaysBriefAudioUrl()}
+              label="today's brief"
+              variant="icon"
+            />
+          </div>
+        )}
+
         {/* Preview Text - Bullet Points */}
         {isLoading ? (
           <div className="space-y-3 sm:space-y-4">

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ArticleImage from "@/app/components/common/ArticleImage";
+import ListenButton from "@/app/components/common/ListenButton";
+import { getArticleAudioUrl } from "@/app/services/audio.service";
 
 interface StoryCardProps {
   id: number;
@@ -74,9 +76,11 @@ export default function StoryCard({
           </h3>
 
           {/* AI Summary */}
-          <p className="text-sm leading-relaxed break-words" style={{ color: "#5B4C3A" }}>
+          <p className="text-sm leading-relaxed break-words mb-2" style={{ color: "#5B4C3A" }}>
             {summary}
           </p>
+
+          <ListenButton src={getArticleAudioUrl(id)} label="summary" />
         </div>
       </div>
 

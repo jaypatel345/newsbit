@@ -27,5 +27,7 @@ services:
         sync: false
       - key: TAVILY_API_KEY
         sync: false
+      - key: GOOGLE_TTS_API_KEY
+        sync: false
       - key: SCHEDULER_SECRET
         sync: false

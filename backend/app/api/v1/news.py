@@ -6,6 +6,7 @@ from app.db.database import get_db
 from app.scheduler import run_news_fetch_job
 from app.services.content.news.news_service import NewsService
 from app.services.content.news.ranking_service import RankingService
+from app.services.content.news.summary_audio_service import SummaryAudioService
 from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,6 +38,21 @@ async def get_today_summary(db: DbSession, response: Response) -> dict[str, Any]
     response.headers["CDN-Cache-Control"] = "public, max-age=300"
 
     return summary
+
+
+@router.get("/today-summary/audio")
+async def get_today_summary_audio(db: DbSession):
+    """Return MP3 audio of the home page's daily brief, generating and
+    caching it on first request."""
+    service = SummaryAudioService(db)
+    audio = await service.get_or_create_audio()
+    return Response(
+        content=audio.audio_content,
+        media_type=audio.mime_type,
+        # Matches /today-summary's own freshness window since the brief
+        # itself can be regenerated during the day.
+        headers={"Cache-Control": "public, max-age=300"},
+    )
 
 
 @router.get("/categories", response_model=None)
