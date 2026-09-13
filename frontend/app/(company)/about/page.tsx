@@ -28,7 +28,7 @@ const organizationSchema = {
   "@type": "Organization",
   "name": "Newsbit AI",
   "url": "https://www.newsbit.in",
-  "logo": "https://www.newsbit.in/newsbit_logo/high-resolution-logo-grayscale (1).png",
+  "logo": "https://www.newsbit.in/newsbit_logo/newsbit-logo.png",
   "description": "AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.",
   "sameAs": [
     "https://github.com/jaypatel345/newsbit",
