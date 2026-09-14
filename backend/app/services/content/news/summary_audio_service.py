@@ -135,7 +135,15 @@ class SummaryAudioService:
 
         cached = await self.db.get(SummaryAudio, summary.id)
         if cached is not None:
-            return cached
+            if cached.created_at >= summary.updated_at:
+                return cached
+            # The scheduler regenerates the day's Summary row in place (same
+            # id, new headline/bullets) rather than inserting a new row, so
+            # a cache keyed only by summary_id would otherwise keep serving
+            # yesterday's - or this morning's - narration forever. Drop the
+            # stale row and fall through to regenerate.
+            await self.db.delete(cached)
+            await self.db.flush()
 
         segments = await _broadcast_segments(summary)
         if not segments:
