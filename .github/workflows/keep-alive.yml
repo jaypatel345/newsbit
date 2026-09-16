@@ -12,4 +12,4 @@ jobs:
       - name: Ping backend health endpoint
         run: |
           curl -sf -o /dev/null -w "status=%{http_code} time=%{time_total}s\n" \
-            https://newsbit-bgbi.onrender.com/health || echo "Ping failed (backend may be cold-starting)"
+            https://newsbit-1.onrender.com/health || echo "Ping failed (backend may be cold-starting)"
