@@ -5,6 +5,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
+    region: singapore
     healthCheckPath: /health
     autoDeploy: false
     workingDirectory: backend
