@@ -37,6 +37,22 @@ export default function ListenButton({
 }: ListenButtonProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [status, setStatus] = useState<Status>("idle");
+  const prefetchedSrc = useRef<string | null>(null);
+
+  // On a cold cache, generating audio costs a real ~8-15s Google TTS call,
+  // all of which the user would otherwise wait through after clicking. Kick
+  // that off as soon as they show intent to listen (hover / focus / touch)
+  // instead of waiting for the click, so by the time they actually press
+  // play the backend has usually already generated and cached it.
+  const prefetch = () => {
+    if (prefetchedSrc.current === src) return;
+    prefetchedSrc.current = src;
+    fetch(src).catch(() => {
+      // A failed prefetch just means the real click falls back to the
+      // normal (slower) path - nothing to handle here.
+      prefetchedSrc.current = null;
+    });
+  };
 
   const handleClick = () => {
     const audio = audioRef.current;
@@ -80,6 +96,9 @@ export default function ListenButton({
       <button
         type="button"
         onClick={handleClick}
+        onMouseEnter={prefetch}
+        onFocus={prefetch}
+        onTouchStart={prefetch}
         disabled={status === "loading"}
         aria-label={`${text} to ${label}`}
         title={variant === "icon" ? `${text} to ${label}` : undefined}
