@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from app.db.database import AsyncSessionLocal
 from app.services.content.news.news_service import NewsService
 from app.services.content.news.ranking_service import RankingService
+from app.services.content.news.summary_audio_service import SummaryAudioService
 from app.services.infrastructure.ai.embedding_processor import EmbeddingProcessor
 from app.services.infrastructure.external.gnews_service import GNewsService
 from app.utils.category_validator import ALLOWED_CATEGORIES
@@ -60,6 +61,16 @@ async def run_news_fetch_job():
                 )
             else:
                 logger.exception(f"Failed to generate today's summary: {e}")
+
+        # 3b. Pre-warm the brief's "Listen" audio so it's already cached by
+        # the time a real visitor clicks it, instead of every first listen
+        # of the day paying for a live Google TTS call (~8-15s).
+        logger.info("Pre-warming today's brief audio...")
+
+        try:
+            await SummaryAudioService(session).get_or_create_audio()
+        except Exception:
+            logger.exception("Failed to pre-warm today's brief audio")
 
         # 4. Generate missing embeddings
         logger.info("Processing pending article embeddings...")
