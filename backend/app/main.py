@@ -12,6 +12,7 @@ from .api.v1.conversations import router as conversations_router
 from .api.v1.entities import router as entities_router
 from .api.v1.news import router as news_router
 from .api.v1.search import router as search_router
+from .api.v1.voice import router as voice_router
 
 
 @asynccontextmanager
@@ -58,6 +59,7 @@ app.include_router(entities_router)
 app.include_router(search_router)
 app.include_router(article_router)
 app.include_router(chat_router)
+app.include_router(voice_router)
 
 
 @app.get("/")
