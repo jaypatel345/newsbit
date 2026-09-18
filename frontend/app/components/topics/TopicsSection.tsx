@@ -14,7 +14,7 @@ export default function TopicsSection() {
   );
 
   return (
-    <section className="py-8 sm:py-12">
+    <section className="py-24 sm:py-32 md:py-40">
       {/* Header */}
       <div className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
@@ -29,7 +29,7 @@ export default function TopicsSection() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-2xl p-6 animate-pulse">
+            <div key={i} className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-6 animate-pulse">
               <div className="h-6 w-20 bg-gray-200 rounded mb-3" />
               <div className="h-4 w-full bg-gray-200 rounded" />
             </div>

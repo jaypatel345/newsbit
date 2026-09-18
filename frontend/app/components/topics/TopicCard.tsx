@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
 import ArticleImage from "@/app/components/common/ArticleImage";
+import { formatArticleTime } from "@/app/utils/formatTime";
 
 interface TopicCardProps {
   category: string;
@@ -11,7 +12,7 @@ export default function TopicCard({ category }: TopicCardProps) {
   const { data: articles, isLoading, error } = useCategoryNews(category);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+    <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
       {/* Header: Name with Arrow */}
       <Link
         href={`/explore?category=${encodeURIComponent(category)}`}
@@ -40,37 +41,37 @@ export default function TopicCard({ category }: TopicCardProps) {
             className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
           >
             {/* Left Image */}
-            <div className="w-20 h-20 rounded-xl object-cover shrink-0 bg-gray-100">
+            <div className="w-20 h-20 rounded-xl shrink-0 bg-gray-100 overflow-hidden">
               <ArticleImage
                 src={article.image_url}
                 alt={article.title}
                 domain={article.source_url ?? article.domain}
-                className="w-full h-full rounded-xl object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
               />
             </div>
 
             {/* Right Content */}
             <div className="flex-1 min-w-0">
               {/* Source */}
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-1.5 mb-1">
                 <img
                   src={`https://www.google.com/s2/favicons?domain=${article.source_url}&sz=64`}
                   alt={article.source_name}
-                  className="w-4 h-4 rounded-sm"
+                  className="w-4 h-4 rounded-sm ring-1 ring-black/5"
                 />
-                <span className="text-xs text-gray-500 truncate">
+                <span className="text-xs font-semibold text-gray-700 truncate">
                   {article.source_name}
                 </span>
               </div>
 
               {/* Title */}
-              <h4 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:underline decoration-gray-300 underline-offset-2 transition-colors">
+              <h4 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-gray-600 transition-colors">
                 {article.title}
               </h4>
 
-              {/* Published Date */}
-              <p className="mt-2 text-xs text-gray-500">
-                {new Date(article.published_at).toLocaleDateString()}
+              {/* Published Time */}
+              <p className="mt-2 text-xs text-gray-400">
+                {formatArticleTime(article.published_at)}
               </p>
             </div>
           </Link>

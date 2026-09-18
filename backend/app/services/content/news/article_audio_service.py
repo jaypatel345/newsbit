@@ -3,7 +3,6 @@ from xml.sax.saxutils import escape
 
 from app.models.article import Article
 from app.models.article_audio import ArticleAudio
-from app.services.infrastructure.voice.reporter import REPORTER_INTRO
 from app.services.infrastructure.voice.tts_service import (
     DEFAULT_VOICE_NAME,
     TTSService,
@@ -18,15 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 def _article_ssml(summary: str) -> str:
-    """Reporter intro (no "today's brief" - this is one story, not the
-    daily roundup) followed by the article's summary. Short break instead
-    of stacking on the sentence-final pause the voice already adds - see
-    SummaryAudioService._segments_to_ssml for why."""
-    return (
-        f"<speak>{escape(REPORTER_INTRO)}"
-        f'<break time="250ms"/>'
-        f"{escape(summary)}</speak>"
-    )
+    """The article's summary, read aloud with no reporter intro - unlike
+    the daily brief, this is a single story so it starts directly on the
+    content."""
+    return f"<speak>{escape(summary)}</speak>"
 
 
 class ArticleAudioService:

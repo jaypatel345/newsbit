@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Fraunces } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import AuthInitializer from "./components/AuthInitializer";
 import GuestInitializer from "./components/GuestInitializer";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  weight: ["300", "500", "600"],
+  style: ["italic"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -106,7 +112,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${geist.variable} h-full antialiased`}>
+    <html lang="en" className={`${geist.variable} ${fraunces.variable} h-full antialiased`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script

@@ -187,6 +187,13 @@ export default function Footer() {
           </p>
         </div>
       </div>
+
+      {/* Big Brand Wordmark */}
+      <div className="mt-10 sm:mt-14 overflow-hidden select-none pointer-events-none">
+        <p className="text-center font-bold tracking-tight text-gray-200 leading-none whitespace-nowrap text-[18vw] sm:text-[15vw] lg:text-[11rem] xl:text-[13rem]">
+          Newsbit
+        </p>
+      </div>
     </footer>
   );
 }

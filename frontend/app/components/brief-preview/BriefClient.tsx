@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import BriefHeader from "@/app/components/brief-preview/BriefHeader";
 import ExecutiveSummaryCard from "@/app/components/brief-preview/ExecutiveSummaryCard";
-import StoryCard from "@/app/components/brief-preview/StoryCard";
+import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
 import AskAICTA from "@/app/components/brief-preview/AskAICTA";
 import { useTopStories } from "@/app/hooks/useTopStories";
 
@@ -38,7 +38,7 @@ export default function BriefClient() {
     <div className="min-h-screen bg-white">
       <NavigationBar />
       <main className="pt-24 pb-12 sm:pt-28 sm:pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Header */}
           {/* <BriefHeader updatedTime="8:00 AM" storyCount={10} readTime="2 min" /> */}
 
@@ -52,85 +52,64 @@ export default function BriefClient() {
           {/* <div className="mb-12 border-t border-gray-200"></div> */}
 
           {/* Top Stories Heading */}
-          <h2
-            className="text-2xl sm:text-3xl font-semibold mb-6 sm:mb-8"
-            style={{ color: "#1E1E1E" }}
-          >
-            Top Stories
-          </h2>
-
-          {/* Story Cards */}
-          <div className="mb-12 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
-            {isLoading ? (
-              // Skeleton loading state
-              Array.from({ length: 10 }).map((_, index) => (
-                <div key={index}>
-                  <div className="animate-pulse">
-                    <div className="flex gap-4 mb-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <div className="w-6 h-6 bg-gray-300 rounded-full" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <div className="h-4 bg-gray-200 rounded w-1/4" />
-                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                        <div className="h-3 bg-gray-200 rounded w-1/2" />
-                      </div>
-                    </div>
-                    <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-gray-200 rounded" />
-                      <div className="h-4 bg-gray-200 rounded" />
-                      <div className="h-4 bg-gray-200 rounded w-5/6" />
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <div className="h-3 bg-gray-200 rounded w-1/4 mb-2" />
-                      <div className="space-y-2">
-                        <div className="h-3 bg-gray-200 rounded" />
-                        <div className="h-3 bg-gray-200 rounded w-5/6" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 bg-gray-200 rounded-full" />
-                      <div className="h-4 bg-gray-200 rounded w-24" />
-                    </div>
-                  </div>
-                  {index < 9 && <div className="border-t border-gray-200 my-6" />}
-                </div>
-              ))
-            ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Unable to load stories at this time.</p>
-              </div>
-            ) : (
-              data?.map((story, index) => (
-                <div key={story.id}>
-                  <div
-                    id={`story-${story.id}`}
-                    className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
-                      highlightedId === story.id
-                        ? "ring-2 ring-offset-2 ring-gray-900/40"
-                        : ""
-                    }`}
-                  >
-                    <StoryCard
-                      id={story.id}
-                      storyNumber={index + 1}
-                      category={story.category}
-                      headline={story.title}
-                      publishedTime={story.published_at}
-                      summary={story.summary}
-                      whyItMatters={story.why_it_matters}
-                      source={story.source_name}
-                      sourceWebsite={story.domain}
-                      image={story.image_url}
-                    />
-                  </div>
-                  {index < data?.length - 1 && (
-                    <div className="border-t border-gray-200"></div>
-                  )}
-                </div>
-              ))
-            )}
+          <div className="mb-6 sm:mb-8 text-center">
+            <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3">
+              Top Stories
+            </h2>
+            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-500">
+              Today&apos;s most important stories, summarized by AI.
+            </p>
           </div>
+
+          {isLoading ? (
+            <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl border border-gray-200 overflow-hidden animate-pulse"
+                >
+                  <div className="flex gap-4 p-5">
+                    <div className="flex-1 space-y-3">
+                      <div className="h-3 bg-gray-200 rounded w-1/3" />
+                      <div className="h-4 bg-gray-200 rounded w-full" />
+                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    </div>
+                    <div className="w-28 sm:w-32 h-24 bg-gray-200 rounded-xl shrink-0" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Unable to load stories at this time.</p>
+            </div>
+          ) : (
+            <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+              {data?.map((story, index) => (
+                <div
+                  key={story.id}
+                  id={`story-${story.id}`}
+                  className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
+                    highlightedId === story.id
+                      ? "ring-2 ring-offset-2 ring-gray-900/40"
+                      : ""
+                  }`}
+                >
+                  <StoryGridCard
+                    id={story.id}
+                    storyNumber={index + 1}
+                    category={story.category}
+                    headline={story.title}
+                    publishedTime={story.published_at}
+                    summary={story.summary}
+                    source={story.source_name}
+                    sourceWebsite={story.domain}
+                    image={story.image_url}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Ask AI CTA */}
           {/* <AskAICTA /> */}

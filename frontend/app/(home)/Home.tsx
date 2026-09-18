@@ -18,14 +18,15 @@ export default function Home() {
       <div className="min-h-screen bg-white text-black overflow-x-hidden">
         <NavigationBar />
 
+        <HeroSection />
+
         {/* Common centered container for Today's Brief, Top Stories, and Topics */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <HeroSection />
           <BriefPreview />
           <TodaysTopStories />
           <TopicsSection />
-          {/* <ExploreByTopic />
-          <AICapabilities /> */}
+          {/* <ExploreByTopic /> */}
+          <AICapabilities />
           {/* <ProductDemo /> */}
         </div>
 

@@ -85,16 +85,70 @@ body {
   * {
     @apply border-stone-200;
   }
-  
+
   body {
     @apply text-stone-900 bg-white;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply text-stone-800 tracking-tight;
   }
-  
+
   p {
     @apply leading-relaxed text-stone-700;
+  }
+
+  /* Some page wrappers use overflow-x-hidden, which per spec forces the
+     other axis to compute as overflow-y:auto - making that div the real
+     scroll container instead of html/body. scroll-behavior isn't
+     inherited, so apply it broadly to whatever ends up scrolling. */
+  html, body, * {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html, body, * {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* Prompt suggestion marquee (AICapabilities) - each row's content is
+   duplicated in the markup, so translateX(-50%) loops seamlessly. */
+@keyframes prompt-slide-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes prompt-slide-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-prompt-slide-left {
+  animation: prompt-slide-left 32s linear infinite;
+}
+
+.animate-prompt-slide-right {
+  animation: prompt-slide-right 32s linear infinite;
+}
+
+.animate-prompt-slide-left:hover,
+.animate-prompt-slide-right:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-prompt-slide-left,
+  .animate-prompt-slide-right {
+    animation: none;
   }
 }

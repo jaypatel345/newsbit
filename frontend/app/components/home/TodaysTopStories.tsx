@@ -2,23 +2,18 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTopStories } from "@/app/hooks/useTopStories";
-import { formatDistanceToNow } from "date-fns";
+import { formatArticleTime } from "@/app/utils/formatTime";
 import ArticleImage from "@/app/components/common/ArticleImage";
 
 function getSourceLogoUrl(sourceWebsite: string) {
   return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(sourceWebsite)}&sz=64`;
-}
-export function getRelativeTime(dateString: string) {
-  return formatDistanceToNow(new Date(dateString), {
-    addSuffix: true,
-  });
 }
 
 export default function TodaysTopStories() {
   const { data: topStories, isLoading, error } = useTopStories(0); // No delay for optimal performance
 
   return (
-    <section className="py-16 sm:py-20 md:py-24">
+    <section className="py-24 sm:py-32 md:py-40">
       {/* Header */}
       <div className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
@@ -33,7 +28,7 @@ export default function TodaysTopStories() {
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {[1, 2].map((col) => (
-            <div key={col} className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+            <div key={col} className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
               {[1, 2, 3].map((index) => (
                 <div
                   key={index}
@@ -65,106 +60,104 @@ export default function TodaysTopStories() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Left Column */}
-          <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(0, 3).map((story, index) => (
-              <div
+              <Link
                 key={story.id}
-                className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                href={`/brief#story-${story.id}`}
+                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0 overflow-hidden rounded-xl">
                     <ArticleImage
                       src={story.image_url}
                       alt={story.title}
                       domain={story.domain}
-                      className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-gray-100 transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     {/* Source */}
-                    <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900 ">
+                    <p className="mb-1.5 flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-700">
                       <img
                         src={getSourceLogoUrl(story.domain)}
                         alt=""
-                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
+                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover ring-1 ring-black/5"
                       />
 
                       {story.source_name}
                     </p>
 
                     {/* Headline */}
-                    <Link href={`/brief#story-${story.id}`} className="block">
-                      <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                        {story.title}
-                      </h3>
-                    </Link>
+                    <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-semibold text-gray-900 mb-2 leading-snug line-clamp-2 group-hover:text-gray-600 transition-colors">
+                      {story.title}
+                    </h3>
 
                     {/* Time and Author */}
-                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
+                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-400">
                       <span className="shrink-0">
-                        {getRelativeTime(story.published_at)}
+                        {formatArticleTime(story.published_at)}
                       </span>
 
                       {story.author && (
                         <span className="max-w-32 sm:max-w-40 truncate" title={story.author}>
-                          • {story.author}
+                          · {story.author}
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
           {/* Right Column */}
-          <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6">
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(3, 6).map((story, index) => (
-              <div
+              <Link
                 key={story.id}
-                className={`${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                href={`/brief#story-${story.id}`}
+                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
-                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
+                  <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0 overflow-hidden rounded-xl">
                     <ArticleImage
                       src={story.image_url}
                       alt={story.title}
                       domain={story.domain}
-                      className="w-full h-40 lg:w-32 lg:h-24 object-cover rounded-lg bg-gray-100"
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-gray-100 transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     {/* Source */}
-                    <p className="mb-1 flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-900">
+                    <p className="mb-1.5 flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-700">
                       <img
                         src={getSourceLogoUrl(story.domain)}
                         alt=""
-                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
+                        className="h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover ring-1 ring-black/5"
                       />
                       {story.source_name}
                     </p>
 
                     {/* Headline */}
-                    <Link href={`/brief#story-${story.id}`} className="block">
-                      <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-medium text-gray-900 mb-2 line-clamp-2 hover:underline decoration-gray-300 underline-offset-2 transition-colors">
-                        {story.title}
-                      </h3>
-                    </Link>
+                    <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-semibold text-gray-900 mb-2 leading-snug line-clamp-2 group-hover:text-gray-600 transition-colors">
+                      {story.title}
+                    </h3>
 
                     {/* Time and Author */}
-                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-500">
-                      <span>{getRelativeTime(story.published_at)}</span>
-                      {story.author && <span>• {story.author}</span>}
+                    <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-gray-400">
+                      <span>{formatArticleTime(story.published_at)}</span>
+                      {story.author && <span>· {story.author}</span>}
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

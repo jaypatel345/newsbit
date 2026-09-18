@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import StoryCard from "@/app/components/brief-preview/StoryCard";
+import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
 import { useCategories } from "@/app/hooks/useCategories";
 import { Article } from "@/types/article";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
@@ -116,83 +116,61 @@ export default function ExploreClient({
         </div> */}
 
       {/* Articles Grid */}
-      <div className="mb-12 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
-        {isLoading ? (
-          // Skeleton loading state
-          Array.from({ length: 10 }).map((_, index) => (
-            <div key={index}>
-              <div className="animate-pulse">
-                <div className="flex gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-gray-300 rounded-full" />
-                  </div>
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-1/4" />
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/2" />
-                  </div>
+      {isLoading ? (
+        <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-gray-200 overflow-hidden animate-pulse"
+            >
+              <div className="flex gap-4 p-5">
+                <div className="flex-1 space-y-3">
+                  <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3" />
                 </div>
-                <div className="space-y-2 mb-4">
-                  <div className="h-4 bg-gray-200 rounded" />
-                  <div className="h-4 bg-gray-200 rounded" />
-                  <div className="h-4 bg-gray-200 rounded w-5/6" />
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <div className="h-3 bg-gray-200 rounded w-1/4 mb-2" />
-                  <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded" />
-                    <div className="h-3 bg-gray-200 rounded w-5/6" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-gray-200 rounded-full" />
-                  <div className="h-4 bg-gray-200 rounded w-24" />
-                </div>
+                <div className="w-28 sm:w-32 h-24 bg-gray-200 rounded-xl shrink-0" />
               </div>
-              {index < 9 && <div className="border-t border-gray-200 my-6" />}
             </div>
-          ))
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-600">Error loading articles</p>
-          </div>
-        ) : articles.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">
-              No articles found for this category
-            </p>
-          </div>
-        ) : (
-          articles.map((article: Article, index: number) => (
-            <div key={article.id}>
-              <div
-                id={`article-${article.id}`}
-                className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
-                  highlightedId === article.id
-                    ? "ring-2 ring-offset-2 ring-gray-900/40"
-                    : ""
-                }`}
-              >
-                <StoryCard
-                  id={article.id}
-                  storyNumber={index + 1}
-                  category={article.category}
-                  headline={article.title}
-                  publishedTime={article.published_at}
-                  summary={article.summary}
-                  whyItMatters={article.why_it_matters}
-                  source={article.source_name}
-                  sourceWebsite={article.url || article.url}
-                  image={article.image_url}
-                />
-              </div>
-              {index < articles.length - 1 && (
-                <div className="border-t border-gray-200"></div>
-              )}
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-600">Error loading articles</p>
+        </div>
+      ) : articles.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600">
+            No articles found for this category
+          </p>
+        </div>
+      ) : (
+        <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          {articles.map((article: Article, index: number) => (
+            <div
+              key={article.id}
+              id={`article-${article.id}`}
+              className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
+                highlightedId === article.id
+                  ? "ring-2 ring-offset-2 ring-gray-900/40"
+                  : ""
+              }`}
+            >
+              <StoryGridCard
+                id={article.id}
+                storyNumber={index + 1}
+                category={article.category}
+                headline={article.title}
+                publishedTime={article.published_at}
+                summary={article.summary}
+                source={article.source_name}
+                sourceWebsite={article.url || article.url}
+                image={article.image_url}
+              />
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

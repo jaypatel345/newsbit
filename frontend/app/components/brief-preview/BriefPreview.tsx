@@ -63,7 +63,7 @@ export default function BriefPreview() {
     ) || [];
 
   return (
-    <section id="brief-preview" className="relative py-12 sm:py-16">
+    <section id="brief-preview" className="relative pt-40 sm:pt-52 pb-24 sm:pb-32 md:pb-40">
       {/* Decorative AI glow backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[28rem] h-[24rem] sm:w-[36rem] sm:h-[28rem] rounded-full bg-linear-to-br from-gray-400 via-gray-300 to-gray-200 opacity-[0.18] blur-3xl" />
@@ -79,12 +79,11 @@ export default function BriefPreview() {
         </p>
       </div>
 
-      {/* Hero Card - gradient-bordered glass card */}
-      <div className="relative rounded-2xl sm:rounded-3xl bg-linear-to-br from-gray-300 via-gray-200 to-gray-300 p-px shadow-[0_10px_40px_-12px_rgba(0,0,0,0.15)]">
-        <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+      {/* Hero Card - glass card */}
+      <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
           {/* Corner control: listen to today's whole brief read aloud */}
           {!isLoading && !error && (
-            <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+            <div className="absolute top-[7px] right-3 sm:top-[10px] sm:right-4">
               <ListenButton
                 src={getTodaysBriefAudioUrl()}
                 label="today's brief"
@@ -97,8 +96,7 @@ export default function BriefPreview() {
           {isLoading ? (
             <div className="space-y-3 sm:space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-gray-200 mt-0.5 shrink-0 animate-pulse" />
+                <div key={i} className="flex items-start gap-3 pl-3">
                   <div className="flex-1 space-y-2">
                     <div className="h-4 bg-gray-200 rounded animate-pulse" />
                     <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
@@ -111,10 +109,7 @@ export default function BriefPreview() {
           ) : (
             <ul className="text-gray-700 text-sm leading-relaxed mb-2 sm:mb-3 space-y-3 sm:space-y-3.5">
               {data?.summary?.slice(0, 5).map((item: string | SummaryItem, index: number) => (
-                <li key={index} className={`flex items-start gap-3 ${index === 0 ? 'mt-6' : ''}`}>
-                  <span className="flex items-center justify-center w-3 h-3 rounded-full bg-linear-to-br from-gray-800 to-black shrink-0 mt-1.5 shadow-sm">
-                    <span className="w-1 h-1 rounded-full bg-white" />
-                  </span>
+                <li key={index} className={`flex items-start gap-3 pl-3 ${index === 0 ? 'mt-6' : ''}`}>
                   <div className="flex-1">
                     <span>{typeof item === 'string' ? item : item.text}</span>
                     {typeof item === 'object' && item.article_url && item.source_name && (
@@ -128,7 +123,7 @@ export default function BriefPreview() {
 
           {/* Footer with sources */}
           <div className="flex justify-end pt-2 sm:pt-3 relative">
-            <div className="relative">
+            <div className="relative" ref={popupRef}>
               {sources.length > 0 && (
                 <SourcesButton
                   sources={sources}
@@ -140,8 +135,7 @@ export default function BriefPreview() {
               {/* Sources Popup - positioned above the button */}
               {showSourcesPopup && (
                 <div
-                  ref={popupRef}
-                  className="absolute bottom-full left-[30%] mb-2 p-3 bg-white/80 backdrop-blur-lg rounded-xl border border-gray-200 z-10 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200"
+                  className="absolute bottom-full right-0 mb-2 p-3 bg-white rounded-xl border border-gray-200 shadow-xl shadow-black/5 z-10 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-semibold text-gray-900">News Sources</h3>
@@ -199,7 +193,6 @@ export default function BriefPreview() {
             </div>
           </div>
         </div>
-      </div>
     </section>
   );
 }
