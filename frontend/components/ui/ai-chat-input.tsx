@@ -395,7 +395,7 @@ export const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
               overflow: expanded ? "visible" : "hidden",
             }}
             className={cn(
-              "relative w-full border border-border bg-card shadow-sm focus-within:border-ring/40 focus-within:ring-1 focus-within:ring-ring/20 hover:border-border/80 z-10",
+              "relative w-full bg-gray-300/60 backdrop-blur-xl backdrop-saturate-150 border border-gray-300 focus-within:border-ring/40 focus-within:ring-1 focus-within:ring-ring/20 z-10",
               expanded ? "cursor-text" : "cursor-default"
             )}
           >
@@ -439,11 +439,11 @@ export const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
 
             <div
               ref={topFadeRef}
-              className="absolute left-5 right-14 top-0 z-[2] h-9 bg-gradient-to-b from-card via-card/90 to-transparent pointer-events-none"
+              className="absolute left-5 right-14 top-0 z-[2] h-9 bg-gradient-to-b from-white/35 via-white/25 to-transparent pointer-events-none"
             />
             <div
               ref={bottomFadeRef}
-              className="absolute left-5 right-14 z-[2] h-9 bg-gradient-to-t from-card via-card/90 to-transparent pointer-events-none"
+              className="absolute left-5 right-14 z-[2] h-9 bg-gradient-to-t from-white/35 via-white/25 to-transparent pointer-events-none"
               style={{
                 opacity: 0,
                 top: `${textareaHeight - 36}px`,

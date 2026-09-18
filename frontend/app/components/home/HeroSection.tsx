@@ -15,7 +15,7 @@ export default function HeroSection() {
   };
 
   return (
-    <main className="relative min-h-[70vh] sm:min-h-[65vh] lg:min-h-[60vh] flex items-center justify-center overflow-x-hidden">
+    <main className="relative min-h-[70vh] sm:min-h-[65vh] lg:min-h-[60vh] flex items-center justify-center pt-28 sm:pt-32 lg:pt-36 bg-white overflow-x-hidden">
       {/* Decorative AI glow backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
         <div className="absolute -top-32 -left-32 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-linear-to-br from-gray-400 via-gray-500 to-gray-300 opacity-20 blur-3xl" />
@@ -41,15 +41,7 @@ export default function HeroSection() {
           style={{ color: "#1E1E1E" }}
         >
           News{" "}
-          <span
-            className="inline-block font-light not-italic bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(90deg, rgba(245,120,2,1) 0%, rgba(238,160,190,1) 45%, rgba(255,255,255,1) 100%)",
-            }}
-          >
-            for
-          </span>{" "}
+          <span className="inline-block text-black">for</span>{" "}
           busy minds.
         </h1>
 
