@@ -112,7 +112,11 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${geist.variable} ${fraunces.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${geist.variable} ${fraunces.variable} h-full antialiased`}
+    >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script

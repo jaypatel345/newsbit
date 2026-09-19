@@ -101,13 +101,32 @@ body {
   /* Some page wrappers use overflow-x-hidden, which per spec forces the
      other axis to compute as overflow-y:auto - making that div the real
      scroll container instead of html/body. scroll-behavior isn't
-     inherited, so apply it broadly to whatever ends up scrolling. */
-  html, body, * {
+     inherited, so apply it broadly to whatever ends up scrolling.
+     Kept as separate rules (not a "html, body, *" list) because the
+     build's CSS minifier collapses a "*" combined with other selectors
+     in one list down to just the narrowest one. */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    scroll-behavior: smooth;
+  }
+
+  * {
     scroll-behavior: smooth;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html, body, * {
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      scroll-behavior: auto;
+    }
+
+    * {
       scroll-behavior: auto;
     }
   }

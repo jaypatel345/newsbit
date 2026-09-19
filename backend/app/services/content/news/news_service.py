@@ -8,6 +8,7 @@ from app.models.article import Article
 from app.models.summary import Summary
 from app.prompts.news import TODAY_BRIEF_PROMPT
 from app.utils.category_validator import ALLOWED_CATEGORIES
+from app.utils.dedup import normalize_title
 from fastapi import HTTPException
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +20,29 @@ def clean_title(title: str) -> str:
     if " - " in title:
         return title.rsplit(" - ", 1)[0]
     return title
+
+
+def _dedupe_by_title(rows: list[dict], limit: int) -> list[dict]:
+    """Drop rows whose (normalized) title repeats one already kept.
+
+    ``rows`` must already be sorted by priority (popularity / recency) so
+    the first occurrence of a story - i.e. the one worth showing - wins.
+    Different sources covering the same story under the same or a near-
+    identical headline is exactly the case this exists to catch; ingestion
+    only dedupes within a single source, so it lets that case through.
+    """
+    seen: set[str] = set()
+    deduped: list[dict] = []
+    for row in rows:
+        key = normalize_title(row["title"])
+        if key and key in seen:
+            continue
+        if key:
+            seen.add(key)
+        deduped.append(row)
+        if len(deduped) >= limit:
+            break
+    return deduped
 
 
 class NewsService:
@@ -56,13 +80,15 @@ class NewsService:
                     Article.popularity_score.desc(),
                     Article.published_at.desc(),
                 )
-                .limit(10)
+                # Fetch extra candidates so deduping same-story rows below
+                # still leaves a full page of 10 distinct stories.
+                .limit(40)
             )
 
             # Use fetchall() for better performance
             rows = result.fetchall()
 
-            return [
+            candidates = [
                 {
                     "id": id,
                     "title": title,
@@ -79,6 +105,7 @@ class NewsService:
                 }
                 for id, title, summary, url, author, published_at, source_name, image_url, why_it_matters, category, popularity_score in rows
             ]
+            return _dedupe_by_title(candidates, 10)
         except Exception as e:
             logger.error(f"Error in get_latest_news:{e}")
             raise HTTPException(
@@ -168,7 +195,9 @@ class NewsService:
                     Article.image_url != "",
                 )
                 .order_by(Article.published_at.desc())
-                .limit(10)
+                # Fetch extra candidates so deduping same-story rows below
+                # still leaves a full page of 10 distinct stories.
+                .limit(40)
             )
 
         except Exception as e:
@@ -180,7 +209,7 @@ class NewsService:
 
         # Select only the columns the clients render instead of the full ORM
         # row (which serializes the 384-dim embedding and full article body).
-        return [
+        candidates = [
             {
                 "id": row.id,
                 "title": row.title,
@@ -198,6 +227,7 @@ class NewsService:
             }
             for row in result.all()
         ]
+        return _dedupe_by_title(candidates, 10)
 
     async def generate_and_save_today_summary(self):
         # 1. Fetch latest articles from DB

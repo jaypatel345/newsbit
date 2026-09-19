@@ -2,12 +2,23 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-100 pt-16 sm:pt-20 md:pt-24 pb-6">
-      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-white px-2 sm:px-4">
+      {/* Curved background - matches wattspet.com/footer: border-radius 30vw on the
+          left corners (a big sweeping scoop), 38px on the right corners */}
+      <div
+        className="overflow-hidden bg-gray-100 pt-16 sm:pt-20 md:pt-24 pl-[20vw] sm:pl-[16vw] pr-6 sm:pr-8 lg:pr-10"
+        style={{
+          borderTopLeftRadius: "30vw",
+          borderBottomLeftRadius: "30vw",
+          borderTopRightRadius: "38px",
+          borderBottomRightRadius: "38px",
+        }}
+      >
+      <div className="max-w-300 px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-12 sm:mb-16">
-          {/* Left Section */}
-          <div className="md:col-span-1">
+          {/* Logo / Description / Social Section */}
+          <div className="md:col-span-1 md:border-r md:border-gray-200 md:pr-8 lg:pr-12">
             <img
               src="/newsbit_logo/logo_without_bg.png"
               alt="Newsbit Logo"
@@ -66,7 +77,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Center Section - Product */}
+          {/* Product Section */}
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4">
               Product
@@ -74,7 +85,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/#todays-brief"
+                  href="/brief"
                   className="text-sm text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-all duration-200"
                 >
                   Today's Brief
@@ -82,7 +93,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/#explore"
+                  href="/explore"
                   className="text-sm text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-all duration-200"
                 >
                   Explore
@@ -90,7 +101,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/#explore"
+                  href="/explore"
                   className="text-sm text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-all duration-200"
                 >
                   Topics
@@ -107,7 +118,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Right Section - Company */}
+          {/* Company Section */}
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4">
               Company
@@ -177,7 +188,7 @@ export default function Footer() {
       <div className="" />
 
       {/* Bottom Row - Full Width */}
-      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-5">
+      <div className="max-w-300 px-4 sm:px-6 lg:px-8 mt-4 sm:mt-5">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
           <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
             © 2026 Newsbit. All rights reserved.
@@ -189,10 +200,14 @@ export default function Footer() {
       </div>
 
       {/* Big Brand Wordmark */}
-      <div className="mt-10 sm:mt-14 overflow-hidden select-none pointer-events-none">
-        <p className="text-center font-bold tracking-tight text-gray-200 leading-none whitespace-nowrap text-[18vw] sm:text-[15vw] lg:text-[11rem] xl:text-[13rem]">
-          Newsbit
+      <div className="mt-10 sm:mt-14 pt-10 sm:pt-16 overflow-hidden select-none pointer-events-none">
+        <p
+          className="text-center font-bold tracking-tight leading-none whitespace-nowrap text-transparent text-[16vw] sm:text-[13vw] lg:text-[9rem] xl:text-[11rem]"
+          style={{ WebkitTextStroke: "1.5px #E5E7EB" }}
+        >
+          NEWSBIT
         </p>
+      </div>
       </div>
     </footer>
   );
