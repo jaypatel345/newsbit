@@ -83,6 +83,8 @@ export default function ExploreClient({
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <h1 className="sr-only">Explore News by Category</h1>
+
       {/* Category Navigation Row */}
       <div className="mb-8 -mx-4 sm:mx-0">
         <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide px-4 sm:px-0">

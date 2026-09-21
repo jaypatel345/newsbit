@@ -18,17 +18,19 @@ export default function Home() {
       <div className="min-h-screen bg-white text-black overflow-x-hidden">
         <NavigationBar />
 
-        <HeroSection />
+        <main>
+          <HeroSection />
 
-        {/* Common centered container for Today's Brief, Top Stories, and Topics */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <BriefPreview />
-          <TodaysTopStories />
-          <TopicsSection />
-          {/* <ExploreByTopic /> */}
-          <AICapabilities />
-          {/* <ProductDemo /> */}
-        </div>
+          {/* Common centered container for Today's Brief, Top Stories, and Topics */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <BriefPreview />
+            <TodaysTopStories />
+            <TopicsSection />
+            {/* <ExploreByTopic /> */}
+            <AICapabilities />
+            {/* <ProductDemo /> */}
+          </div>
+        </main>
 
         {/* <WhyNewsbit /> */}
         {/* <TrustTransparency /> */}

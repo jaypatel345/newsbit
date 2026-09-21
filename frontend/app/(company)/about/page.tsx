@@ -4,7 +4,7 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "About - Newsbit AI",
+  title: "About",
   description: "Learn about Newsbit's mission to make news understandable through AI-powered summaries and explanations.",
   keywords: ["about newsbit", "newsbit mission", "AI news platform", "news summarization"],
   openGraph: {
@@ -49,7 +49,7 @@ export default function AboutPage() {
       />
       <div className="min-h-screen bg-white">
         <NavigationBar />
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
+        <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
         <div className="mb-16">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
@@ -188,7 +188,7 @@ export default function AboutPage() {
             Try Newsbit
           </Link>
         </section>
-      </div>
+      </main>
       <Footer />
     </div>
     </>

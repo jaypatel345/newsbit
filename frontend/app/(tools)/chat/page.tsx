@@ -731,6 +731,7 @@ function ChatPageContent() {
         )}
 
         <main className="flex-1 overflow-y-auto pb-40 pt-8 flex flex-col px-4 sm:px-6 lg:px-8">
+          <h1 className="sr-only">AI Chat - Ask Newsbit About Today&apos;s News</h1>
           <div className="max-w-4xl mx-auto w-full">
             {messagesLoading && selectedConversationId ? (
               <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">

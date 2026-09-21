@@ -3,7 +3,7 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Newsbit AI",
+  title: "Privacy Policy",
   description: "Learn about how Newsbit protects your privacy and handles your data.",
   keywords: ["privacy policy", "data protection", "newsbit privacy", "user data"],
   openGraph: {
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
       <NavigationBar />
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
+      <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
@@ -199,7 +199,7 @@ export default function PrivacyPage() {
             </p>
           </section>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

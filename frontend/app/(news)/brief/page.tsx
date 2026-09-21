@@ -16,7 +16,7 @@ const newsCollectionSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Today's Brief | Newsbit AI",
+  title: "Today's Brief",
   description:
     "Understand today's biggest stories in about 2 minutes with AI-powered news summaries.",
   keywords: ["daily brief", "news summary", "AI brief", "today's news", "news digest"],

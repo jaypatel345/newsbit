@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign Up - Newsbit AI",
+  title: "Sign Up",
   description: "Create your Newsbit account to get AI-powered news summaries and personalized briefings.",
   keywords: ["signup", "register", "create account", "AI news"],
   openGraph: {
@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     title: "Sign Up - Newsbit AI",
     description: "Create your Newsbit account to get AI-powered news summaries and personalized briefings.",
     images: ["/newsbit_graph.png"],
+  },
+  alternates: {
+    canonical: "/signup",
   },
   robots: {
     index: false,

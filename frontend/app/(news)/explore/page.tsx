@@ -8,7 +8,9 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-white text-black">
       <NavigationBar />
-      <ExploreClient />
+      <main>
+        <ExploreClient />
+      </main>
       <Footer />
     </div>
   );

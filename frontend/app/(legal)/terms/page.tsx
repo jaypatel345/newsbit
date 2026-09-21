@@ -3,7 +3,7 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Newsbit AI",
+  title: "Terms of Service",
   description: "Terms and conditions for using Newsbit.",
   keywords: ["terms of service", "terms and conditions", "newsbit terms", "legal terms"],
   openGraph: {
@@ -26,7 +26,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
       <NavigationBar />
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
+      <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
@@ -182,7 +182,7 @@ export default function TermsPage() {
             </p>
           </section>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

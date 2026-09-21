@@ -8,9 +8,50 @@ import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
 import AskAICTA from "@/app/components/brief-preview/AskAICTA";
 import { useTopStories } from "@/app/hooks/useTopStories";
 
+// Escapes "</" so story text from third-party sources can't break out of
+// the JSON-LD <script> tag it's embedded in.
+function safeJsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
 export default function BriefClient() {
   const { data, isLoading, error } = useTopStories(0); // No delay for brief page
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  const itemListSchema =
+    data && data.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Today's Top Stories - Newsbit AI",
+          description:
+            "AI-summarized top news stories for today, curated by Newsbit.",
+          itemListElement: data.map((story, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: story.url,
+            item: {
+              "@type": "NewsArticle",
+              headline: story.title,
+              description: story.summary,
+              ...(story.image_url ? { image: story.image_url } : {}),
+              ...(story.published_at
+                ? { datePublished: story.published_at }
+                : {}),
+              author: {
+                "@type": "Organization",
+                name: story.source_name,
+              },
+              publisher: {
+                "@type": "Organization",
+                name: story.source_name,
+              },
+              url: story.url,
+              mainEntityOfPage: story.url,
+            },
+          })),
+        }
+      : null;
 
   // Deep-link support: /brief#story-<id> (used when a specific article is
   // clicked elsewhere, e.g. the home page "Top Stories" list) scrolls to
@@ -36,6 +77,12 @@ export default function BriefClient() {
 
   return (
     <div className="min-h-screen bg-white">
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(itemListSchema) }}
+        />
+      )}
       <NavigationBar />
       <main className="pt-24 pb-12 sm:pt-28 sm:pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -53,9 +100,9 @@ export default function BriefClient() {
 
           {/* Top Stories Heading */}
           <div className="mb-6 sm:mb-8 text-center">
-            <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3">
+            <h1 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3">
               Top Stories
-            </h2>
+            </h1>
             <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-500">
               Today&apos;s most important stories, summarized by AI.
             </p>

@@ -4,7 +4,7 @@ import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Contact - Newsbit AI",
+  title: "Contact",
   description: "Get in touch with the Newsbit team for inquiries, partnerships, or support.",
   keywords: ["contact newsbit", "newsbit support", "newsbit email", "newsbit partnership"],
   openGraph: {
@@ -27,7 +27,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
       <NavigationBar />
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
+      <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
         <div className="mb-16">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
@@ -135,7 +135,7 @@ export default function ContactPage() {
             </Link>
           </div>
         </section>
-      </div>
+      </main>
       <Footer />
     </div>
   );

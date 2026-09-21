@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Fraunces } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
 import AuthInitializer from "./components/AuthInitializer";
@@ -83,6 +84,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -118,21 +124,6 @@ export default function RootLayout({
       className={`${geist.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-G7N4FLTFHN"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-G7N4FLTFHN');
-            `,
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -144,6 +135,18 @@ export default function RootLayout({
           <GuestInitializer />
           {children}
         </Providers>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-G7N4FLTFHN"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-G7N4FLTFHN');
+          `}
+        </Script>
       </body>
     </html>
   );
