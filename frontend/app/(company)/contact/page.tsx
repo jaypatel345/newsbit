@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     title: "Contact - Newsbit AI",
     description: "Get in touch with the Newsbit team for inquiries, partnerships, or support.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/contact",
@@ -91,7 +93,7 @@ export default function ContactPage() {
               GitHub
             </a>
             <a
-              href="https://twitter.com"
+              href="https://x.com/newsbitai"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-700"

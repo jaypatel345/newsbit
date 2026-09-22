@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     title: "Sign In - Newsbit AI",
     description: "Sign in to your Newsbit account to access AI-powered news summaries and personalized briefings.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/login",

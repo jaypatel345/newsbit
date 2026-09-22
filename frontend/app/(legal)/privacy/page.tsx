@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     title: "Privacy Policy - Newsbit AI",
     description: "Learn about how Newsbit protects your privacy and handles your data.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/privacy",

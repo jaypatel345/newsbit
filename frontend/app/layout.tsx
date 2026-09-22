@@ -64,6 +64,7 @@ export const metadata: Metadata = {
     description:
       "Stay informed without the noise. Newsbit AI delivers the top 10 news stories with concise, intelligent summaries powered by AI.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
     creator: "@newsbitai",
   },
   robots: {

@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     title: "About - Newsbit AI",
     description: "Learn about Newsbit's mission to make news understandable through AI-powered summaries and explanations.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/about",
@@ -32,6 +34,7 @@ const organizationSchema = {
   "description": "AI-powered news summarization platform that delivers the top 10 news stories with concise, intelligent summaries in minutes.",
   "sameAs": [
     "https://github.com/jaypatel345/newsbit",
+    "https://x.com/newsbitai",
   ],
   "contactPoint": {
     "@type": "ContactPoint",

@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     title: "Report an Issue - Newsbit AI",
     description: "Report bugs or issues to the Newsbit team.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/report",

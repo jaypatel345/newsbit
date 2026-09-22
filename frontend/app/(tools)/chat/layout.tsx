@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     title: "AI Chat - Newsbit AI",
     description: "Chat with AI to understand news better. Ask questions, get explanations, and explore topics in depth.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/chat",

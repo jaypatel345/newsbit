@@ -38,6 +38,8 @@ export const metadata: Metadata = {
     description:
       "Understand today's biggest stories in about 2 minutes with AI-powered news summaries.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/brief",

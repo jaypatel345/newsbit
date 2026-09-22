@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     title: "Terms of Service - Newsbit AI",
     description: "Terms and conditions for using Newsbit.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/terms",

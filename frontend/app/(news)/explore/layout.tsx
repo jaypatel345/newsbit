@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     title: "Explore News - Newsbit AI",
     description: "Explore news by category. Browse stories from World, AI, Business, Markets, India, Sports, Health, Science and more.",
     images: ["/newsbit_graph.png"],
+    site: "@newsbitai",
+    creator: "@newsbitai",
   },
   alternates: {
     canonical: "/explore",
