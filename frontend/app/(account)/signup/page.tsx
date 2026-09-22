@@ -70,7 +70,7 @@ export default function SignUpPage() {
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
-                className="h-7 w-7"
+                className="h-9 w-9"
               />
               <div className="flex flex-col">
                 <span className="text-[17px] font-medium text-gray-900">

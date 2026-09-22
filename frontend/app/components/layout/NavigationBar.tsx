@@ -58,7 +58,7 @@ export default function NavigationBar() {
             <img
               src="/newsbit_logo/logo_without_bg.png"
               alt="Newsbit Logo"
-              className="h-6 w-6 sm:h-7 sm:w-7"
+              className="h-7 w-7 sm:h-9 sm:w-9"
             />
             <div className="flex flex-col">
               <span className="text-[15px] sm:text-[17px] font-medium text-gray-900">
