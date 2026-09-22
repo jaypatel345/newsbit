@@ -1,5 +1,11 @@
 import BriefClient from "@/app/components/brief-preview/BriefClient";
 import { Metadata } from "next";
+import { getTopStories } from "@/app/services/news.service";
+import { Article } from "@/types/article";
+
+// News content must be fetched fresh per request, not frozen into the
+// build's static output.
+export const dynamic = "force-dynamic";
 
 const newsCollectionSchema = {
   "@context": "https://schema.org",
@@ -38,14 +44,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BriefPage() {
+export default async function BriefPage() {
+  // Fetched server-side so the page has real, crawlable content on first
+  // paint instead of a client-rendered loading skeleton. If the backend is
+  // unreachable at request time, fall through to undefined and let
+  // BriefClient fetch it client-side as before.
+  let initialStories: Article[] | undefined;
+  try {
+    initialStories = await getTopStories();
+  } catch {
+    initialStories = undefined;
+  }
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(newsCollectionSchema) }}
       />
-      <BriefClient />
+      <BriefClient initialStories={initialStories} />
     </>
   );
 }

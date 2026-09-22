@@ -104,7 +104,11 @@ export default function StoryGridCard({
             <span className="truncate">{source}</span>
           </a>
           <span style={{ color: "#9CA3AF" }}>&middot;</span>
-          <span className="shrink-0" style={{ color: "#9CA3AF" }}>
+          <span
+            className="shrink-0"
+            style={{ color: "#9CA3AF" }}
+            suppressHydrationWarning
+          >
             {formatArticleTime(publishedTime)}
           </span>
         </div>

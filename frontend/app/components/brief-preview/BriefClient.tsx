@@ -7,6 +7,7 @@ import ExecutiveSummaryCard from "@/app/components/brief-preview/ExecutiveSummar
 import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
 import AskAICTA from "@/app/components/brief-preview/AskAICTA";
 import { useTopStories } from "@/app/hooks/useTopStories";
+import { Article } from "@/types/article";
 
 // Escapes "</" so story text from third-party sources can't break out of
 // the JSON-LD <script> tag it's embedded in.
@@ -14,8 +15,16 @@ function safeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
-export default function BriefClient() {
-  const { data, isLoading, error } = useTopStories(0); // No delay for brief page
+interface BriefClientProps {
+  /** Stories fetched server-side so the page has real content on first
+   * paint (search crawlers and no-JS clients see the full list, not a
+   * loading skeleton). Seeds the query's cache; the client still owns
+   * refetching after staleTime. */
+  initialStories?: Article[];
+}
+
+export default function BriefClient({ initialStories }: BriefClientProps = {}) {
+  const { data, isLoading, error } = useTopStories(0, initialStories); // No delay for brief page
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
 
   const itemListSchema =

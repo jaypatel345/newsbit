@@ -1,8 +1,9 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { getTopStories } from "../services/news.service";
+import { Article } from "@/types/article";
 
-export function useTopStories(delay: number = 0) {
+export function useTopStories(delay: number = 0, initialData?: Article[]) {
   return useQuery({
     queryKey: ["TopStories"],
     queryFn: async () => {
@@ -12,6 +13,7 @@ export function useTopStories(delay: number = 0) {
       }
       return getTopStories();
     },
+    initialData,
     // Optimized for speed
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false,
