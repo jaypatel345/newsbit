@@ -63,7 +63,7 @@ export default function LoginPage() {
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
-                className="h-9 w-9"
+                className="h-8 w-8"
               />
               <div className="flex flex-col">
                 <span className="text-[17px] font-medium text-gray-900">

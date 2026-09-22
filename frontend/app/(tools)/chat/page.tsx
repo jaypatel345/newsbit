@@ -525,7 +525,7 @@ function ChatPageContent() {
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
-                className="h-8 w-8"
+                className="h-7 w-7"
               />
               <div className="flex flex-col">
                 <span className="text-[15px] font-medium text-gray-900">
@@ -622,7 +622,7 @@ function ChatPageContent() {
               <img
                 src="/newsbit_logo/logo_without_bg.png"
                 alt="Newsbit Logo"
-                className="h-8 w-8"
+                className="h-7 w-7"
               />
               <div className="flex flex-col">
                 <span className="text-[15px] font-medium text-gray-900">
