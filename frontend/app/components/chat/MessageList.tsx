@@ -1,6 +1,7 @@
 import { Message } from "@/types/message";
 import { ExternalLink, Copy, Edit2, Check, X } from "lucide-react";
 import ThinkingSection from "./ThinkingSection";
+import AssistantContent from "./AssistantContent";
 import { useState } from "react";
 import { toast } from "sonner";
 import React from "react";
@@ -8,6 +9,7 @@ import React from "react";
 type MessageListProps = {
   messages: Message[];
   loading: boolean;
+  streamingContent?: string;
   onLoadingComplete?: () => void;
   onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
 };
@@ -16,7 +18,7 @@ const getDomainName = (url: string) => {
   return new URL(url).hostname.replace("www.", "");
 };
 
-export default function MessageList({ messages, loading, onLoadingComplete, onEditMessage }: MessageListProps) {
+export default function MessageList({ messages, loading, streamingContent = "", onLoadingComplete, onEditMessage }: MessageListProps) {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
 
@@ -94,97 +96,7 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
                     <>
                       {/* Normal AI text response with news platform styling */}
                       {message.content && (
-                        <div className="space-y-2">
-                          {message.content
-                            .replace(/<function=[^>]+>[\s\S]*?<\/function>/g, '') // Remove function calls
-                            .replace(/[^\p{L}\p{N}\p{P}\p{S}\s]/gu, '') // Remove emojis
-                            .replace(/#+/g, '') // Remove hash symbols
-                            .replace(/\*\*/g, '') // Remove bold markdown
-                            .replace(/\*/g, '') // Remove italic markdown
-                            .replace(/\n\s*\n/g, '\n') // Remove extra blank lines
-                            .split('\n')
-                            .map((line, index) => {
-                              // Skip empty lines, separator rows, lines with only dashes/pipes, and table separators
-                              if (line.trim() === '' ||
-                                  /^[-\s]+$/.test(line) ||
-                                  /^—+$/.test(line) ||
-                                  /^\|[-\s]+\|$/.test(line) ||
-                                  /^\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?\s*[-]{3,}\s*\|?$/.test(line) ||
-                                  /^\|.*\|$/.test(line) && line.includes('---')) {
-                                return null;
-                              }
-
-                              // Skip table header rows like "| # | Headline | Key Points | Why It Matters |"
-                              if (line.includes('|') && line.includes('Headline') && line.includes('Why It Matters')) {
-                                return null;
-                              }
-
-                              // Skip lines that are just table structure with numbers like "| **1** |"
-                              if (line.includes('|') && /^\|\s*\*\*\d+\*\*\s*\|/.test(line)) {
-                                return null;
-                              }
-
-                              // Skip lines that are just separators like "|---|---|---|"
-                              if (line.includes('|') && /^\|[\s-]+\|[\s-]+\|[\s-]+\|$/.test(line)) {
-                                return null;
-                              }
-
-                              // Handle table rows
-                              if (line.includes('|')) {
-                                const cells = line.split('|').filter(cell => cell.trim());
-                                if (cells.length > 1) {
-                                  // Check if this is a header row (Key Points, Why It Matters) to add horizontal line
-                                  const isHeaderRow = cells.some(cell =>
-                                    cell.trim().toLowerCase() === 'key points' ||
-                                    cell.trim().toLowerCase() === 'why it matters'
-                                  );
-                                  // Check if this is a title row (contains bold text like **1**, **2**, etc.)
-                                  const isTitleRow = cells.some(cell =>
-                                    /^\*\*\d+\*\*$/.test(cell.trim())
-                                  );
-                                  return (
-                                    <div key={index} className={`grid grid-cols-2 gap-3 py-2 ${isHeaderRow ? 'border-b-2 border-gray-200' : isTitleRow ? 'border-b-0' : 'border-b border-gray-100'} last:border-0`}>
-                                      {cells.map((cell, cellIndex) => (
-                                        <div key={cellIndex} className={cellIndex === 0 ? "font-semibold text-gray-900 text-sm" : "text-gray-700 text-sm"}>
-                                          {cell.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').split(/<br>/gi).map((line, lineIndex) => (
-                                            <React.Fragment key={lineIndex}>
-                                              {lineIndex > 0 && <br />}
-                                              {line}
-                                            </React.Fragment>
-                                          ))}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  );
-                                }
-                              }
-                              
-                              // Handle bullet points
-                              if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
-                                const bulletText = line.trim().replace(/^[•-]\s*/, '');
-                                
-                                return (
-                                  <div key={index} className="flex items-start gap-2 py-0.5">
-                                    <span className="text-gray-400 mt-0.5 text-xs">•</span>
-                                    <span className="text-gray-700 flex-1 text-sm leading-snug">
-                                      {bulletText.replace(/<br>/g, ' ')}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              
-                              // Handle regular text
-                              return (
-                                <p 
-                                  key={index} 
-                                  className="text-gray-700 text-sm leading-snug py-0.5"
-                                >
-                                  {line.replace(/<br>/g, ' ')}
-                                </p>
-                              );
-                            })
-                            .filter(Boolean)} {/* Filter out null values */}
-                        </div>
+                        <AssistantContent content={message.content} sources={message.sources ?? []} />
                       )}
 
                       {/* Fallback message when content is empty */}
@@ -253,7 +165,22 @@ export default function MessageList({ messages, loading, onLoadingComplete, onEd
           </div>
       ))}
 
-      {loading && onLoadingComplete && <ThinkingSection onComplete={onLoadingComplete} isThinking={loading} />}
+      {/* The answer streams in here. Once the saved message arrives it takes
+          over and this bubble empties, so the text never appears twice. */}
+      {streamingContent && (
+        <div className="flex w-full justify-start">
+          <div className="flex flex-col max-w-full sm:max-w-[85%]">
+            <div className="rounded-2xl p-4 sm:p-5 bg-white border border-gray-200 text-gray-800 shadow-sm">
+              <AssistantContent content={streamingContent} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Thinking stands in only until the first token lands. */}
+      {loading && !streamingContent && onLoadingComplete && (
+        <ThinkingSection onComplete={onLoadingComplete} isThinking={loading} />
+      )}
     </div>
   );
 }

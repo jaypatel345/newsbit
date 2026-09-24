@@ -16,6 +16,9 @@ class MessageResponse(BaseModel):
     conversation_id: int
     role: str
     content: str
+    # Articles the agent's tools returned for this reply, so the source
+    # credits stay clickable. Empty for user messages and older replies.
+    sources: list[dict] = []
     created_at: datetime
 
 

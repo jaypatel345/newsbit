@@ -125,49 +125,54 @@ async def chat_websocket(
             import asyncio
 
             try:
-                response = await asyncio.wait_for(
-                    service.send_message(
+                # Stream the answer out token by token, then finish with the
+                # saved message. 30s was cutting off normal tool-calling runs
+                # (agent + Groq + retries regularly need 40-60s). The client's
+                # own timeout is 90s, so stay just under that. The budget
+                # covers the whole turn, not each chunk.
+                response = None
+
+                async with asyncio.timeout(85.0):
+                    async for kind, payload in service.send_message_stream(
                         request,
                         conversation_id,
                         current_user,
                         guest_id,
-                    ),
-                    # 30s was cutting off normal tool-calling runs (agent +
-                    # Groq + retries regularly need 40-60s). The client's own
-                    # timeout is 90s, so stay just under that.
-                    timeout=85.0,
-                )
+                    ):
+                        if kind == "delta":
+                            await websocket.send_json(
+                                {
+                                    "type": "chunk",
+                                    "message_id": message_id,
+                                    "content": payload,
+                                }
+                            )
+                        elif kind == "reset":
+                            await websocket.send_json(
+                                {
+                                    "type": "reset",
+                                    "message_id": message_id,
+                                }
+                            )
+                        elif kind == "final":
+                            response = payload
 
-                # send_message returns a plain dict, not a schema object.
-                response_role = (
-                    response.get("role")
-                    if isinstance(response, dict)
-                    else getattr(response, "role", None)
-                )
+                if response is None:
+                    raise RuntimeError("Stream ended without a saved message")
+
                 print(
-                    f"Generated response for message_id {message_id}: {response_role}"
+                    f"Generated response for message_id {message_id}: "
+                    f"{response.get('role')}"
                 )
 
                 # Send existing MessageResponse back through WebSocket
-                try:
-                    response_data = {
+                await websocket.send_json(
+                    {
                         "type": "message",
                         "message_id": message_id,
                         **jsonable_encoder(response),
                     }
-                    # print(
-                    #     f"Sending WebSocket response data: {list(response_data.keys())}"
-                    # )
-                    await websocket.send_json(response_data)
-                    # print(
-                    #     f"Successfully sent response via WebSocket for message_id {message_id}"
-                    # )
-                except Exception:
-                    # print(f"Error sending WebSocket response: {ws_error}")
-                    # import traceback
-
-                    # traceback.print_exc()
-                    raise
+                )
             except TimeoutError:
                 await websocket.send_json(
                     {

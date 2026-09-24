@@ -30,7 +30,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="flex items-center space-x-2 max-w-3xl justify-center mx-auto px-2 sm:px-4 shadow-xl border border-gray-300 p-3 sm:p-4 mb-3 rounded-3xl">
+    <div className="flex items-center space-x-2 max-w-2xl justify-center mx-auto px-2 sm:px-4 shadow-xl border border-gray-300 p-3 sm:p-4 mb-3 rounded-3xl">
       <input
         type="text"
         value={message}
@@ -49,7 +49,7 @@ export default function ChatInput({
       {loading ? (
         <button
           onClick={handleStop}
-          className="w-9 h-9 rounded-full transition-colors flex items-center justify-center bg-red-500 text-white hover:bg-red-600"
+          className="w-9 h-9 rounded-full transition-colors flex items-center justify-center bg-black text-white hover:bg-gray-800"
           title="Stop generation"
         >
           <Square size={14} fill="currentColor" />

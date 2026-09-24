@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useCallback, useRef, useState } from "react";
 import MessageList from "@/app/components/chat/MessageList";
 import PromptChips from "@/app/components/chat/PromptChips";
 import ChatInput from "@/app/components/chat/ChatInput";
@@ -31,6 +31,8 @@ function ChatPageContent() {
     status: webSocketStatus,
     messages: webSocketMessages,
     sendMessage: sendWebSocketMessage,
+    streamingContent,
+    clearStreamingContent,
   } = useChatWebSocket(selectedConversationId);
   const searchParams = useSearchParams();
   const [inputMessage, setInputMessage] = useState("");
@@ -59,6 +61,34 @@ function ChatPageContent() {
   }>({ isOpen: false, conversationId: null, currentTitle: "" });
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Nothing said yet in this conversation: show the starters instead of a
+  // transcript, laid out to fit the pane rather than scroll.
+  const showEmptyState =
+    !(messagesLoading && selectedConversationId) && displayMessages.length === 0;
+
+  // Keep the newest message in view. `stickToBottom` stays true while the
+  // reader is at the end of the conversation and flips off the moment they
+  // scroll up to re-read something, so new replies never yank them away from
+  // what they're reading.
+  const scrollAreaRef = useRef<HTMLElement>(null);
+  const stickToBottomRef = useRef(true);
+
+  const handleMessagesScroll = () => {
+    const area = scrollAreaRef.current;
+    if (!area) return;
+
+    const distanceFromBottom =
+      area.scrollHeight - area.scrollTop - area.clientHeight;
+    stickToBottomRef.current = distanceFromBottom < 120;
+  };
+
+  const scrollToLatest = useCallback((behavior: ScrollBehavior) => {
+    const area = scrollAreaRef.current;
+    if (!area) return;
+
+    area.scrollTo({ top: area.scrollHeight, behavior });
+  }, []);
+
   const articleIdParam = searchParams.get("articleId");
 
   const articleId = articleIdParam
@@ -77,6 +107,32 @@ function ChatPageContent() {
       setSelectedArticles([article]);
     }
   }, [article]);
+
+  // A new message (or the thinking indicator) grows the transcript past the
+  // bottom of the viewport — follow it down, unless the reader has scrolled
+  // up on purpose.
+  useEffect(() => {
+    if (!stickToBottomRef.current) return;
+
+    scrollToLatest("smooth");
+  }, [displayMessages.length, loading, streamingContent.length, scrollToLatest]);
+
+  // Opening a different conversation should start at the newest message with
+  // no visible travel, and always re-arms following. With nothing to follow
+  // there's nothing to scroll to — jumping to the bottom of the empty state
+  // would just push its heading off the top of the screen.
+  useEffect(() => {
+    stickToBottomRef.current = true;
+
+    if (!displayMessages.length) return;
+
+    scrollToLatest("auto");
+  }, [
+    selectedConversationId,
+    messagesLoading,
+    displayMessages.length,
+    scrollToLatest,
+  ]);
 
   useEffect(() => {
 
@@ -109,6 +165,7 @@ function ChatPageContent() {
       ? latestMessage.role
       : "assistant",
     content: latestMessage.content ?? "",
+    sources: (latestMessage.sources ?? []) as Message["sources"],
     created_at: latestMessage.created_at,
   };
 
@@ -125,6 +182,9 @@ function ChatPageContent() {
       return [...oldMessages, aiMessage];
     },
   );
+  // Swap the streamed text for the saved message in one commit, so the
+  // answer never blinks out between the last token and the stored copy.
+  clearStreamingContent();
   setPendingResponse(null);
   setLoading(false);
 
@@ -132,10 +192,18 @@ function ChatPageContent() {
   webSocketMessages,
   selectedConversationId,
   queryClient,
+  clearStreamingContent,
 ]);
 
   const handleSend = async (message: string) => {
     if (!message.trim()) return;
+
+    // Sending is an explicit "I want to see what happens next", so follow the
+    // transcript down again even if the reader had scrolled up.
+    stickToBottomRef.current = true;
+
+    // Never let the previous answer's tail linger under the new question.
+    clearStreamingContent();
 
     // Create conversation if none exists
     let conversationId = selectedConversationId;
@@ -730,9 +798,22 @@ function ChatPageContent() {
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto pb-40 pt-8 flex flex-col px-4 sm:px-6 lg:px-8">
+        <main
+          ref={scrollAreaRef}
+          onScroll={handleMessagesScroll}
+          // The transcript needs room to clear the sticky composer, but the
+          // empty state should simply sit in the space available rather than
+          // pushing itself past the fold.
+          className={`flex-1 overflow-y-auto flex flex-col px-4 sm:px-6 lg:px-8 ${
+            showEmptyState ? "py-4" : "pb-40 pt-8"
+          }`}
+        >
           <h1 className="sr-only">AI Chat - Ask Newsbit About Today&apos;s News</h1>
-          <div className="max-w-4xl mx-auto w-full">
+          <div
+            className={`max-w-4xl mx-auto w-full ${
+              showEmptyState ? "flex flex-1 items-center justify-center" : ""
+            }`}
+          >
             {messagesLoading && selectedConversationId ? (
               <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
                 <div className="flex flex-col items-center text-center">
@@ -741,15 +822,28 @@ function ChatPageContent() {
                 </div>
               </div>
             ) : displayMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-                <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                    Start a new conversation
+              <div className="flex w-full flex-col items-center justify-center px-4">
+                <div className="mb-6 text-center">
+                  <h2
+                    className="font-(family-name:--font-geist) text-3xl sm:text-4xl tracking-tight"
+                    style={{ color: "#1E1E1E" }}
+                  >
+                    Where should we{" "}
+                    <span className="font-(family-name:--font-fraunces) font-light italic">
+                      start
+                    </span>
+                    ?
                   </h2>
-                  <p className="text-gray-600 max-w-md mx-auto">
-                    Ask questions about news, get summaries, or explore topics with AI assistance.
+
+                  <p
+                    className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed"
+                    style={{ color: "#5B4C3A" }}
+                  >
+                    Ask anything about today&apos;s news — or pick up one of
+                    these threads.
                   </p>
                 </div>
+
                 <div className="w-full max-w-2xl">
                   <PromptChips onSelectPrompt={setInputMessage} />
                 </div>
@@ -757,6 +851,7 @@ function ChatPageContent() {
             ) : (
               <MessageList
                 loading={loading}
+                streamingContent={streamingContent}
                 messages={displayMessages}
                 onLoadingComplete={handleAnimationComplete}
                 onEditMessage={handleEditMessage}

@@ -14,6 +14,7 @@ type ConnectionStatus =
 type ChatMessage = {
   type: string;
   content?: string;
+  sources?: unknown[];
   conversation_id?: number;
   id?: string;
   role?: string;
@@ -28,6 +29,33 @@ export function useChatWebSocket(conversationId: number | null) {
     useState<ConnectionStatus>("disconnected");
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // Text of the answer currently streaming in. Chunks land far faster than
+  // the screen refreshes, so they're accumulated in a ref and published once
+  // per frame — one render per frame instead of one per token.
+  const [streamingContent, setStreamingContent] = useState("");
+  const streamBufferRef = useRef("");
+  const flushHandleRef = useRef<number | null>(null);
+
+  const cancelFlush = useCallback(() => {
+    if (flushHandleRef.current === null) return;
+    cancelAnimationFrame(flushHandleRef.current);
+    flushHandleRef.current = null;
+  }, []);
+
+  const scheduleFlush = useCallback(() => {
+    if (flushHandleRef.current !== null) return;
+    flushHandleRef.current = requestAnimationFrame(() => {
+      flushHandleRef.current = null;
+      setStreamingContent(streamBufferRef.current);
+    });
+  }, []);
+
+  const clearStreamingContent = useCallback(() => {
+    cancelFlush();
+    streamBufferRef.current = "";
+    setStreamingContent("");
+  }, [cancelFlush]);
 
   useEffect(() => {
     if (!conversationId) {
@@ -68,6 +96,22 @@ export function useChatWebSocket(conversationId: number | null) {
               "WebSocket error message:",
               data.content
             );
+            clearStreamingContent();
+            return;
+          }
+
+          // A piece of the answer. These are display-only and must not go
+          // into `messages` — the saved message arrives separately at the end.
+          if (data.type === "chunk") {
+            streamBufferRef.current += data.content ?? "";
+            scheduleFlush();
+            return;
+          }
+
+          // The server abandoned the attempt and is regenerating the answer,
+          // so drop what has been shown so far.
+          if (data.type === "reset") {
+            clearStreamingContent();
             return;
           }
 
@@ -137,8 +181,9 @@ export function useChatWebSocket(conversationId: number | null) {
       }
       socket?.close();
       socketRef.current = null;
+      clearStreamingContent();
     };
-  }, [conversationId]);
+  }, [conversationId, clearStreamingContent, scheduleFlush]);
 
   // Helper to wait for an open connection
   const waitForConnection = useCallback((): Promise<WebSocket> => {
@@ -233,5 +278,7 @@ if (data.type === "message" || data.type === "error") {
     status,
     messages,
     sendMessage,
+    streamingContent,
+    clearStreamingContent,
   };
 }

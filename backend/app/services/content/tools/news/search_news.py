@@ -1,4 +1,5 @@
 from app.models.article import Article
+from app.services.content.tools.news.dedupe import dedupe_articles
 from app.services.core.entities.entity_service import EntityService
 from app.services.infrastructure.ai.embedding_service import (
     SENTENCE_TRANSFORMERS_AVAILABLE,
@@ -90,7 +91,7 @@ def create_search_news_tool(db):
 
         # Format articles as readable text for the LLM
         formatted_results = []
-        for article in articles:
+        for article in dedupe_articles(articles):
             # Handle both dict and Article objects
             if isinstance(article, dict):
                 title = article.get("title", "N/A")

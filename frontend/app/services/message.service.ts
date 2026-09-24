@@ -44,6 +44,7 @@ export async function getMessages(conversationId: number): Promise<Message[]> {
       id: String(msg.id), // Convert numeric ID to string
       role: msg.role,
       content: msg.content,
+      sources: msg.sources ?? [],
     }));
   }
   
@@ -100,5 +101,6 @@ export async function sendMessage(
     id: String(data.id), // Convert numeric ID to string
     role: data.role,
     content: data.content,
+    sources: data.sources ?? [],
   };
 }

@@ -1,4 +1,5 @@
 from app.services.content.news.news_feed_service import NewsFeedService
+from app.services.content.tools.news.dedupe import dedupe_articles
 from langchain_core.tools import tool
 
 # Canonical categories stored in the DB, keyed by lowercased aliases the LLM
@@ -33,15 +34,16 @@ def _canonical_category(category: str) -> str:
 
 
 # The Groq free tier caps tokens-per-minute, and this text is fed straight
-# back into the next LLM call, so keep it compact: a handful of articles with
-# a trimmed summary is enough for a chat answer.
-_MAX_ARTICLES = 6
-_SUMMARY_CHARS = 300
+# back into the next LLM call, so keep it compact. 6 was too few to ever
+# answer "top 10 news" — the product's headline promise — so carry 10 and
+# trim each summary harder to keep the prompt roughly the same size.
+_MAX_ARTICLES = 10
+_SUMMARY_CHARS = 220
 
 
 def _format_articles(articles) -> str:
     rows = []
-    for article in articles[:_MAX_ARTICLES]:
+    for article in dedupe_articles(articles)[:_MAX_ARTICLES]:
         summary = (article.summary or "").strip()
         if len(summary) > _SUMMARY_CHARS:
             summary = summary[:_SUMMARY_CHARS].rsplit(" ", 1)[0] + "…"
