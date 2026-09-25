@@ -1,16 +1,16 @@
 "use client";
-import { Suspense, useCallback, useRef, useState } from "react";
+import { Suspense, useCallback, useMemo, useRef, useState } from "react";
 import MessageList from "@/app/components/chat/MessageList";
 import PromptChips from "@/app/components/chat/PromptChips";
 import ChatInput from "@/app/components/chat/ChatInput";
-import ConversationMenu from "@/app/components/chat/ConversationMenu";
+import ChatSidebar from "@/app/components/chat/ChatSidebar";
 import RenameDialog from "@/app/components/chat/RenameDialog";
 import ThinkingSection from "@/app/components/chat/ThinkingSection";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Message } from "@/types/message";
-import { SquarePen, Pin, PanelLeftOpen, PanelRightOpen, X } from "lucide-react";
+import { PanelLeftOpen, X } from "lucide-react";
 import { useConversations } from "@/app/hooks/useConversations";
 import { useCreateConversation } from "@/app/hooks/useCreateConversation";
 import { useUpdateConversation } from "@/app/hooks/useUpdateConversation";
@@ -22,6 +22,22 @@ import { useSendMessage } from "@/app/hooks/useSendMessage";
 import { generateTitleFromMessage } from "@/app/utils/titleGenerator";
 import { useArticle } from "@/app/hooks/useArticle";
 import { useChatWebSocket } from "@/app/hooks/useChatWebSocket";
+
+const DELETED_PREFIX = "deleted_conversation_";
+
+/** Ids of conversations deleted locally but possibly still returned by the API. */
+function readTombstones(): Set<number> {
+  const tombstoned = new Set<number>();
+  if (typeof window === "undefined") return tombstoned;
+
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (!key?.startsWith(DELETED_PREFIX)) continue;
+    const id = Number(key.slice(DELETED_PREFIX.length));
+    if (!Number.isNaN(id)) tombstoned.add(id);
+  }
+  return tombstoned;
+}
 
 function ChatPageContent() {
   const [selectedConversationId, setSelectedConversationId] = useState<
@@ -40,7 +56,25 @@ function ChatPageContent() {
   const [pendingResponse, setPendingResponse] = useState<Message | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { data: conversations = [] } = useConversations();
+  const { data: conversations = [], isLoading: conversationsLoading } =
+    useConversations();
+  // Deletes are tombstoned in localStorage so a conversation the server has
+  // not dropped yet stays hidden. Read once, when the state initialises.
+  const [deletedIds, setDeletedIds] = useState<Set<number>>(readTombstones);
+
+  const visibleConversations = useMemo(
+    () => conversations.filter((conversation) => !deletedIds.has(conversation.id)),
+    [conversations, deletedIds],
+  );
+
+  // The drawer overlays the transcript on small screens, so acting on a
+  // conversation should hand the screen back. On desktop it is part of the
+  // layout and stays put.
+  const closeSidebarOnMobile = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(min-width: 1024px)").matches) return;
+    setSidebarOpen(false);
+  }, []);
   const { mutateAsync: createConversation } = useCreateConversation();
   const { mutateAsync: updateConversation } = useUpdateConversation();
   const { mutateAsync: pinConversation } = usePinConversation();
@@ -450,6 +484,18 @@ function ChatPageContent() {
     setInputMessage("");
     // Clear any existing abort controller
     abortControllerRef.current = null;
+    closeSidebarOnMobile();
+  };
+
+  const handleSelectConversation = (conversationId: number) => {
+    // Abort any ongoing request when switching conversations
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setSelectedConversationId(conversationId);
+    closeSidebarOnMobile();
   };
 
   const handlePinConversation = (conversationId: number, isPinned: boolean) => {
@@ -507,6 +553,7 @@ function ChatPageContent() {
     if (confirm("Are you sure you want to delete this conversation?")) {
       // Store deleted conversation ID in localStorage
       localStorage.setItem(`deleted_conversation_${conversationId}`, "true");
+      setDeletedIds((previous) => new Set(previous).add(conversationId));
       // Optimistically remove from UI
       const previousConversations = queryClient.getQueryData(["conversations"]) as any[] || [];
       const filtered = previousConversations.filter((conv) => conv.id !== conversationId);
@@ -572,231 +619,34 @@ function ChatPageContent() {
     }
   }, [conversations, queryClient]);
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-10 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <div className="flex h-screen bg-canvas">
+      <ChatSidebar
+        conversations={visibleConversations}
+        isLoading={conversationsLoading}
+        selectedConversationId={selectedConversationId}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onSelectConversation={handleSelectConversation}
+        onCreateConversation={handleCreateConversation}
+        onPinConversation={handlePinConversation}
+        onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
+      />
 
-      {/* Mobile Sidebar */}
-      <aside className={`lg:hidden w-80 border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out h-full z-20 fixed ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-        <header className="p-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center hover:opacity-95 transition-opacity"
-          >
-            <div className="flex items-center gap-2">
-              <img
-                src="/newsbit_logo/logo_without_bg.png"
-                alt="Newsbit Logo"
-                className="h-7 w-7"
-              />
-              <div className="flex flex-col">
-                <span className="text-[15px] font-medium text-gray-900">
-                  Newsbit
-                </span>
-                <span className="text-[11px] text-gray-600">
-                  AI-Powered News
-                </span>
-              </div>
-            </div>
-          </Link>
+      <div className="flex flex-1 flex-col h-full bg-canvas text-gray-900">
+        {/* Reopens the sidebar: always reachable on mobile, and on desktop
+            only while the panel is collapsed. */}
+        <div className={`px-4 pt-4 ${sidebarOpen ? "lg:hidden" : ""}`}>
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open conversations"
+            title="Open conversations"
+            className="rounded-lg p-2 text-gray-500 outline-none transition-colors hover:bg-stone-200/60 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-900/20 active:scale-95"
           >
-            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
-          </button>
-        </header>
-
-        <div className="px-3 py-4">
-          <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-900 transition-colors shadow-md"
-            onClick={handleCreateConversation}
-          >
-            <SquarePen className="h-4 w-4" />
-            New Chat
+            <PanelLeftOpen className="h-[18px] w-[18px]" />
           </button>
         </div>
-
-        <div className="px-3 pb-4">
-          {conversations.length > 0 && (
-            <div className="space-y-1">
-              <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Recent Chats
-              </p>
-              {conversations
-                .slice()
-                .filter((conv) => !localStorage.getItem(`deleted_conversation_${conv.id}`))
-                .sort((a, b) => {
-                  if (a.is_pinned && !b.is_pinned) return -1;
-                  if (!a.is_pinned && b.is_pinned) return 1;
-                  return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-                })
-                .map((conversation) => (
-                  <div
-                    key={conversation.id}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2.5 transition-all group ${selectedConversationId === conversation.id
-                      ? "bg-gray-100 border border-gray-300"
-                      : "hover:bg-gray-100 border border-transparent"
-                      }`}
-                  >
-                    <button
-                      onClick={() => {
-                        // Abort any ongoing request when switching conversations
-                        if (abortControllerRef.current) {
-                          abortControllerRef.current.abort();
-                          abortControllerRef.current = null;
-                        }
-                        setLoading(false);
-                        setSelectedConversationId(conversation.id);
-                      }}
-                      className="flex-1 flex items-center gap-2 text-left truncate"
-                    >
-                      {conversation.is_pinned && <Pin className="h-3.5 w-3.5 text-gray-600 shrink-0" />}
-                      <span className={`truncate text-sm ${selectedConversationId === conversation.id
-                        ? "text-gray-900 font-medium"
-                        : "text-gray-700"
-                        }`}>
-                        {conversation.title}
-                      </span>
-                    </button>
-                    <ConversationMenu
-                      conversation={conversation}
-                      onPin={handlePinConversation}
-                      onRename={handleRenameConversation}
-                      onDelete={handleDeleteConversation}
-                    />
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-      </aside>
-
-      {/* Desktop Sidebar */}
-      <aside className={`hidden lg:block border-r border-gray-200 shrink-0 overflow-y-auto bg-white shadow-sm transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden p-0'
-        }`}>
-        <header className="p-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center hover:opacity-95 transition-opacity"
-          >
-            <div className="flex items-center gap-2">
-              <img
-                src="/newsbit_logo/logo_without_bg.png"
-                alt="Newsbit Logo"
-                className="h-7 w-7"
-              />
-              <div className="flex flex-col">
-                <span className="text-[15px] font-medium text-gray-900">
-                  Newsbit
-                </span>
-                <span className="text-[11px] text-gray-600">
-                  AI-Powered News
-                </span>
-              </div>
-            </div>
-          </Link>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
-          >
-            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
-          </button>
-        </header>
-
-        <div className="px-3 py-4">
-          <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-900 transition-colors shadow-md"
-            onClick={handleCreateConversation}
-          >
-            <SquarePen className="h-4 w-4" />
-            New Chat
-          </button>
-        </div>
-
-        <div className="px-3 pb-4">
-          {conversations.length > 0 && (
-            <div className="space-y-1">
-              <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Recent Chats
-              </p>
-              {conversations
-                .slice()
-                .filter((conv) => !localStorage.getItem(`deleted_conversation_${conv.id}`))
-                .sort((a, b) => {
-                  if (a.is_pinned && !b.is_pinned) return -1;
-                  if (!a.is_pinned && b.is_pinned) return 1;
-                  return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-                })
-                .map((conversation) => (
-                  <div
-                    key={conversation.id}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2.5 transition-all group ${selectedConversationId === conversation.id
-                      ? "bg-gray-100 border border-gray-300"
-                      : "hover:bg-gray-100 border border-transparent"
-                      }`}
-                  >
-                    <button
-                      onClick={() => {
-                        // Abort any ongoing request when switching conversations
-                        if (abortControllerRef.current) {
-                          abortControllerRef.current.abort();
-                          abortControllerRef.current = null;
-                        }
-                        setLoading(false);
-                        setSelectedConversationId(conversation.id);
-                      }}
-                      className="flex-1 flex items-center gap-2 text-left truncate"
-                    >
-                      {conversation.is_pinned && <Pin className="h-3.5 w-3.5 text-gray-600 shrink-0" />}
-                      <span className={`truncate text-sm ${selectedConversationId === conversation.id
-                        ? "text-gray-900 font-medium"
-                        : "text-gray-700"
-                        }`}>
-                        {conversation.title}
-                      </span>
-                    </button>
-                    <ConversationMenu
-                      conversation={conversation}
-                      onPin={handlePinConversation}
-                      onRename={handleRenameConversation}
-                      onDelete={handleDeleteConversation}
-                    />
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-      </aside>
-
-      <div className="flex flex-1 flex-col h-full bg-gray-50 text-gray-900">
-        {/* Mobile menu button */}
-        <div className="lg:hidden px-4 pt-4">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
-          >
-            {sidebarOpen ? <PanelLeftOpen className="h-4 w-4 text-black" /> : <PanelRightOpen className="h-4 w-4 text-black" />}
-          </button>
-        </div>
-
-        {/* Desktop menu button */}
-        {!sidebarOpen && (
-          <div className="hidden lg:flex px-4 pt-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-full transition-all duration-200 ease-in-out active:scale-95"
-            >
-              <PanelRightOpen className="h-4 w-4 text-black" />
-            </button>
-          </div>
-        )}
 
         <main
           ref={scrollAreaRef}
@@ -869,7 +719,7 @@ function ChatPageContent() {
                   {selectedArticles.map((article) => (
                     <div
                       key={article.id}
-                      className="flex items-center gap-2 rounded-full bg-gray-100 border border-gray-300 px-3 py-1.5 text-sm"
+                      className="flex items-center gap-2 rounded-full bg-stone-100 border border-gray-300 px-3 py-1.5 text-sm"
                     >
                       <span className="truncate max-w-xs text-gray-800">
                         {article.title || 'No title available'}
@@ -926,7 +776,7 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center bg-canvas">
           <div className="text-center">
             <div className="relative">
               <div className="h-12 w-12 mx-auto rounded-full border-4 border-gray-200 border-t-black animate-spin" />

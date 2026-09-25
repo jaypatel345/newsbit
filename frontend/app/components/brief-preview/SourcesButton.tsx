@@ -31,7 +31,7 @@ export default function SourcesButton({ sources, onClick, isOpen }: SourcesButto
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg px-3 py-1.5 transition-colors ${isOpen ? 'bg-gray-100' : ''}`}
+      className={`inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 hover:bg-stone-100 rounded-lg px-3 py-1.5 transition-colors ${isOpen ? 'bg-stone-100' : ''}`}
     >
       {/* Stacked source */}
       <div className="flex items-center">
@@ -57,7 +57,7 @@ export default function SourcesButton({ sources, onClick, isOpen }: SourcesButto
         ))}
         {remainingCount > 0 && (
           <div
-            className="relative w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[9px] font-medium text-gray-600"
+            className="relative w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center text-[9px] font-medium text-gray-600"
             style={{ marginLeft: '-8px' }}
           >
             +{remainingCount}

@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import UTC, datetime, timedelta
-from xml.sax.saxutils import escape
 
 from app.core.llm import groq_client02
 from app.models.summary import Summary
@@ -10,6 +9,9 @@ from app.prompts.news import BROADCAST_SCRIPT_PROMPT
 from app.services.infrastructure.voice.reporter import REPORTER_INTRO
 from app.services.infrastructure.voice.tts_service import (
     DEFAULT_VOICE_NAME,
+    PAUSE,
+    PAUSE_LONG,
+    PAUSE_SHORT,
     TTSService,
 )
 from fastapi import HTTPException
@@ -19,7 +21,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
-INTRO = f"{REPORTER_INTRO} Here's today's brief."
+# Anchors introduce themselves, take a beat, then set up the bulletin - so
+# the greeting is two spoken units rather than one run-on line.
+INTRO = f"{REPORTER_INTRO} {PAUSE_SHORT} Here's today's brief."
 
 # The home page's "Today's Brief" card only shows the first 5 bullets
 # (BriefPreview.tsx: `data?.summary?.slice(0, 5)`). Reading more than that
@@ -40,9 +44,9 @@ def _bullet_texts(summary: Summary) -> list[str]:
 
 
 def _plain_segments(summary: Summary) -> list[str]:
-    """Flat fallback script: intro, headline, then each bullet verbatim.
+    """Flat fallback script: headline, then each bullet verbatim.
     Used when the broadcast rewrite is unavailable or fails."""
-    return [INTRO, summary.headline, *_bullet_texts(summary)]
+    return [summary.headline, *_bullet_texts(summary)]
 
 
 async def _broadcast_segments(summary: Summary) -> list[str]:
@@ -68,6 +72,15 @@ async def _broadcast_segments(summary: Summary) -> list[str]:
                     ),
                 },
             ],
+            # A little headroom on temperature keeps the anchor from opening
+            # every story the same way, which is what makes a read sound
+            # synthetic more than the voice itself does.
+            temperature=0.7,
+            # Without this the model occasionally answers in prose, the parse
+            # below throws, and the listener silently gets the raw bullets
+            # read out instead of the broadcast rewrite - the one outcome
+            # that undoes the point of this whole step.
+            response_format={"type": "json_object"},
             max_tokens=2500,
         )
         parsed = json.loads(response.choices[0].message.content)
@@ -78,26 +91,41 @@ async def _broadcast_segments(summary: Summary) -> list[str]:
         ]
         if not segments:
             raise ValueError("Broadcast rewrite returned no segments")
-        return [INTRO, *segments]
+        return segments
     except Exception:
         logger.exception("Broadcast script rewrite failed, using flat script")
         return _plain_segments(summary)
 
 
-def _segments_to_ssml(segments: list[str]) -> str:
-    """Join script segments with a short pause between each and wrap as SSML.
-    Chirp3-HD supports <break> and <prosody> but not <emphasis>.
+def _build_script(segments: list[str]) -> str:
+    """Lay the greeting and story segments out with broadcast breathing.
 
-    Each segment already ends in sentence-final punctuation, which Chirp3-HD
-    pauses on by itself - stacking a full-length <break> on top of that
-    double-pauses and reads as choppy rather than a smooth broadcast flow.
-    Keeping the break short lets it add breathing room between stories
-    without piling onto the natural pause.
+    Chirp3-HD pauses on sentence-final punctuation by itself, but only
+    briefly and identically everywhere, which is what makes a read sound
+    like one long paragraph. Real bulletins are shaped: a long beat after
+    the greeting before the first story, a full breath at each story
+    boundary, and another long beat before the sign-off. These are markup
+    pause tags rather than SSML <break> elements - this voice tier honours
+    the former and silently ignores the latter.
     """
-    body = '<break time="250ms"/>'.join(
-        escape(segment) for segment in segments if segment.strip()
-    )
-    return f"<speak>{body}</speak>"
+    # The rewrite ends on a sign-off segment, but the flat fallback doesn't -
+    # and with a single segment there is no story for a sign-off to close.
+    # Treat the last segment as one only when something precedes it, so the
+    # script never opens on two stacked pauses.
+    if len(segments) > 1:
+        stories, sign_off = segments[:-1], segments[-1]
+    else:
+        stories, sign_off = segments, None
+
+    parts = [INTRO, PAUSE_LONG]
+    for index, story in enumerate(stories):
+        if index:
+            parts.append(PAUSE)
+        parts.append(story)
+    if sign_off:
+        parts.extend([PAUSE_LONG, sign_off])
+
+    return " ".join(part for part in parts if part.strip())
 
 
 class SummaryAudioService:
@@ -152,9 +180,7 @@ class SummaryAudioService:
                 detail="Today's brief has no text to read aloud",
             )
 
-        audio_bytes = await self.tts_service.synthesize_ssml(
-            _segments_to_ssml(segments)
-        )
+        audio_bytes = await self.tts_service.synthesize_script(_build_script(segments))
 
         audio = SummaryAudio(
             summary_id=summary.id,

@@ -37,15 +37,15 @@ export default function TodaysTopStories() {
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                     {/* Image Skeleton */}
                     <div className="w-full lg:w-32 lg:shrink-0 mb-3 lg:mb-0">
-                      <div className="w-full h-40 lg:w-32 lg:h-24 bg-gray-200 rounded-lg animate-pulse" />
+                      <div className="w-full h-40 lg:w-32 lg:h-24 bg-stone-200 rounded-lg animate-pulse" />
                     </div>
 
                     {/* Content Skeleton */}
                     <div className="flex-1 min-w-0 space-y-2">
-                      <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                      <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
+                      <div className="h-4 w-20 bg-stone-200 rounded animate-pulse" />
+                      <div className="h-4 bg-stone-200 rounded animate-pulse" />
+                      <div className="h-4 bg-stone-200 rounded animate-pulse w-3/4" />
+                      <div className="h-3 w-16 bg-stone-200 rounded animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -74,7 +74,7 @@ export default function TodaysTopStories() {
                       src={story.image_url}
                       alt={story.title}
                       domain={story.domain}
-                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-gray-100 transition-transform duration-300 ease-out group-hover:scale-105"
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-stone-100 transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </div>
 
@@ -129,7 +129,7 @@ export default function TodaysTopStories() {
                       src={story.image_url}
                       alt={story.title}
                       domain={story.domain}
-                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-gray-100 transition-transform duration-300 ease-out group-hover:scale-105"
+                      className="w-full h-40 lg:w-32 lg:h-24 object-cover bg-stone-100 transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </div>
 

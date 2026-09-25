@@ -75,13 +75,13 @@ export default function ThinkingTimeline({
           <div key={step} className="transition-all duration-300 ease-in-out">
             {/* Vertical line connecting thinking to first bullet - only for first step */}
             {index === 0 && (
-              <div className="ml-1 w-px h-4 bg-gray-300 mb-0.5 animate-pulse transition-all duration-300" />
+              <div className="ml-1 w-px h-4 bg-stone-300 mb-0.5 animate-pulse transition-all duration-300" />
             )}
 
             <div className="flex items-center gap-3 mt-0.5 min-h-[24px]">
               <div
                 className={`h-2 w-2 rounded-full transition-all duration-300 flex-shrink-0 ${
-                  active ? "bg-black animate-pulse" : "bg-gray-400"
+                  active ? "bg-gray-900 animate-pulse" : "bg-stone-400"
                 }`}
               />
 
@@ -95,7 +95,7 @@ export default function ThinkingTimeline({
             </div>
 
             {index < currentStep && index < STEPS.length - 1 && (
-              <div className="ml-1 w-px h-4 bg-gray-300 my-0.5 animate-pulse transition-all duration-300" />
+              <div className="ml-1 w-px h-4 bg-stone-300 my-0.5 animate-pulse transition-all duration-300" />
             )}
           </div>
         );

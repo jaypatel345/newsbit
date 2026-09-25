@@ -85,7 +85,7 @@ export default function BriefClient({ initialStories }: BriefClientProps = {}) {
   }, [isLoading, data]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-canvas">
       {itemListSchema && (
         <script
           type="application/ld+json"
@@ -126,11 +126,11 @@ export default function BriefClient({ initialStories }: BriefClientProps = {}) {
                 >
                   <div className="flex gap-4 p-5">
                     <div className="flex-1 space-y-3">
-                      <div className="h-3 bg-gray-200 rounded w-1/3" />
-                      <div className="h-4 bg-gray-200 rounded w-full" />
-                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                      <div className="h-3 bg-stone-200 rounded w-1/3" />
+                      <div className="h-4 bg-stone-200 rounded w-full" />
+                      <div className="h-4 bg-stone-200 rounded w-2/3" />
                     </div>
-                    <div className="w-28 sm:w-32 h-24 bg-gray-200 rounded-xl shrink-0" />
+                    <div className="w-28 sm:w-32 h-24 bg-stone-200 rounded-xl shrink-0" />
                   </div>
                 </div>
               ))}

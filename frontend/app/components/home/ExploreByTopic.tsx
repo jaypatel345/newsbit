@@ -59,7 +59,7 @@ export default function ExploreByTopic() {
   };
 
   return (
-    <section id="explore" className="py-16 sm:py-20 md:py-24 bg-white">
+    <section id="explore" className="py-16 sm:py-20 md:py-24 bg-canvas">
       <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 text-center">

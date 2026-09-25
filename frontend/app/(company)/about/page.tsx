@@ -50,7 +50,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-canvas">
         <NavigationBar />
         <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
@@ -153,7 +153,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             Our Principles
           </h2>
-          <div className="bg-gray-50 rounded-2xl p-8">
+          <div className="bg-stone-50 rounded-2xl p-8">
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <span className="text-gray-400 mt-1">•</span>

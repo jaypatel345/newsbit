@@ -58,7 +58,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
             <div
               className={`rounded-2xl p-4 sm:p-5 relative ${
                 message.role === "user"
-                  ? "bg-gray-200 text-gray-900"
+                  ? "bg-stone-200 text-gray-900"
                   : "bg-white border border-gray-200 text-gray-800 shadow-sm"
               }`}
             >
@@ -75,14 +75,14 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={handleCancelEdit}
-                            className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
+                            className="p-2 hover:bg-stone-300 rounded-lg transition-colors"
                             title="Cancel"
                           >
                             <X size={16} />
                           </button>
                           <button
                             onClick={() => handleSaveEdit(message.id)}
-                            className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
+                            className="p-2 hover:bg-stone-300 rounded-lg transition-colors"
                             title="Save"
                           >
                             <Check size={16} />
@@ -144,7 +144,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                     {message.role === "user" && (
                       <button
                         onClick={() => handleEdit(message)}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600 cursor-pointer"
+                        className="p-1.5 hover:bg-stone-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600 cursor-pointer"
                         title="Edit message"
                       >
                         <Edit2 size={14} />
@@ -153,7 +153,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                     {message.content && (
                       <button
                         onClick={() => handleCopy(message.content!)}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600 cursor-pointer"
+                        className="p-1.5 hover:bg-stone-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600 cursor-pointer"
                         title="Copy message"
                       >
                         <Copy size={14} />

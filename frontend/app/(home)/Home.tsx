@@ -15,7 +15,7 @@ import { PromptProvider } from "@/app/context/PromptContext";
 export default function Home() {
   return (
     <PromptProvider>
-      <div className="min-h-screen bg-white text-black overflow-x-hidden">
+      <div className="min-h-screen bg-canvas text-black overflow-x-hidden">
         <NavigationBar />
 
         <main>

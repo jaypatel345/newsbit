@@ -45,7 +45,7 @@ export default function ProductDemo() {
     useState<FeatureType>("explain");
 
   return (
-    <section className="py-16 sm:py-20 md:py-24 bg-white">
+    <section className="py-16 sm:py-20 md:py-24 bg-canvas">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-6 sm:mb-8 max-w-3xl mx-auto text-center">
@@ -72,7 +72,7 @@ export default function ProductDemo() {
                     ${
                       isSelected
                         ? "bg-white text-gray-900 shadow-sm "
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-200/50 cursor-pointer"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-stone-200/50 cursor-pointer"
                     }
                   `}
                 >

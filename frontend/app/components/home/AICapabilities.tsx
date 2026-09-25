@@ -73,7 +73,7 @@ export default function AICapabilities() {
                   key={`${rowIndex}-${promptIndex}`}
                   type="button"
                   onClick={() => sendPrompt(prompt)}
-                  className="group flex w-40 sm:w-48 md:w-56 lg:w-64 shrink-0 items-center gap-2 rounded-lg sm:rounded-xl border border-gray-200 bg-white/90 backdrop-blur-xl px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 text-left text-[11px] sm:text-xs md:text-sm font-medium text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md hover:shadow-gray-900/5 cursor-pointer"
+                  className="group flex w-40 sm:w-48 md:w-56 lg:w-64 shrink-0 items-center gap-2 rounded-lg sm:rounded-xl border border-gray-200 bg-white/90 backdrop-blur-xl px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 text-left text-[11px] sm:text-xs md:text-sm font-medium text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-stone-50 hover:shadow-md hover:shadow-gray-900/5 cursor-pointer"
                 >
                   <Sparkles
                     size={13}

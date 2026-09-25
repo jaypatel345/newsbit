@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/app/hooks/useCategories";
 import TopicCard from "./TopicCard";
 
@@ -30,8 +32,8 @@ export default function TopicsSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-6 animate-pulse">
-              <div className="h-6 w-20 bg-gray-200 rounded mb-3" />
-              <div className="h-4 w-full bg-gray-200 rounded" />
+              <div className="h-6 w-20 bg-stone-200 rounded mb-3" />
+              <div className="h-4 w-full bg-stone-200 rounded" />
             </div>
           ))}
         </div>
@@ -46,6 +48,17 @@ export default function TopicsSection() {
           ))}
         </div>
       )}
+
+      {/* View All Button */}
+      <div className="text-center mt-10 sm:mt-12">
+        <Link
+          href="/explore"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+        >
+          View All Topics
+          <ArrowRight size={16} />
+        </Link>
+      </div>
     </section>
   );
 }

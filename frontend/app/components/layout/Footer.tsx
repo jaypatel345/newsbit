@@ -2,19 +2,13 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-white px-2 sm:px-4">
-      {/* Curved background - matches wattspet.com/footer: border-radius 30vw on the
-          left corners (a big sweeping scoop), 38px on the right corners */}
-      <div
-        className="overflow-hidden bg-gray-100 pt-16 sm:pt-20 md:pt-24 pl-[20vw] sm:pl-[16vw] pr-6 sm:pr-8 lg:pr-10"
-        style={{
-          borderTopLeftRadius: "30vw",
-          borderBottomLeftRadius: "30vw",
-          borderTopRightRadius: "38px",
-          borderBottomRightRadius: "38px",
-        }}
-      >
-      <div className="max-w-300 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-canvas px-2 sm:px-4">
+      {/* Flat panel on the page canvas. The tinted scoop that used to live
+          here needed a 20vw left inset to clear its own curve, which is what
+          pushed every footer row off-centre - so the padding is symmetric
+          now that there is no curve to clear. */}
+      <div className="pt-16 sm:pt-20 md:pt-24 px-6 sm:px-8 lg:px-10">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-12 sm:mb-16">
           {/* Logo / Description / Social Section */}
@@ -188,7 +182,7 @@ export default function Footer() {
       <div className="" />
 
       {/* Bottom Row - Full Width */}
-      <div className="max-w-300 px-4 sm:px-6 lg:px-8 mt-4 sm:mt-5">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-5">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
           <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
             © 2026 Newsbit. All rights reserved.

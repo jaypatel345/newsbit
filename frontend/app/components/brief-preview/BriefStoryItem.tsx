@@ -18,7 +18,7 @@ export default function BriefStoryItem({
   slug,
 }: BriefStoryItemProps) {
   const Content = (
-    <div className="group py-4 border-b last:border-b-0 transition-all duration-200 hover:bg-gray-50 rounded-lg px-3 -mx-3">
+    <div className="group py-4 border-b last:border-b-0 transition-all duration-200 hover:bg-stone-50 rounded-lg px-3 -mx-3">
       {/* Category Badge */}
       <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium mb-2" style={{ backgroundColor: "#F3F4F6", color: "#6B7280" }}>
         <span>{icon}</span>

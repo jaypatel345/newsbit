@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-canvas">
       <NavigationBar />
       <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}

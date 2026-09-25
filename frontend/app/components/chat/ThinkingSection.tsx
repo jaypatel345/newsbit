@@ -57,7 +57,7 @@ export default function ThinkingSection({
         onClick={() => setExpanded((previous) => !previous)}
         aria-expanded={expanded}
         aria-label={expanded ? "Hide thinking timeline" : "Show thinking timeline"}
-        className="group -ml-1 flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-gray-100 cursor-pointer"
+        className="group -ml-1 flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-stone-100 cursor-pointer"
       >
         {isThinking ? (
           <Loader2 className="h-4 w-4 text-black animate-spin" />

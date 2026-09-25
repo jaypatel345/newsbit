@@ -395,7 +395,7 @@ export const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
               overflow: expanded ? "visible" : "hidden",
             }}
             className={cn(
-              "relative w-full bg-gray-100/60 backdrop-blur-xl backdrop-saturate-150 border border-gray-200 focus-within:border-ring/40 focus-within:ring-1 focus-within:ring-ring/20 z-10",
+              "relative w-full bg-white backdrop-blur-xl backdrop-saturate-150 border border-gray-200 focus-within:border-ring/40 focus-within:ring-1 focus-within:ring-ring/20 z-10",
               expanded ? "cursor-text" : "cursor-default"
             )}
           >

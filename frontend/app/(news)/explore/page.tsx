@@ -49,7 +49,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-canvas text-black">
       <NavigationBar />
       <main>
         <ExploreClient

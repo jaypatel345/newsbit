@@ -96,7 +96,7 @@ export default function ReportForm() {
               name="pageUrl"
               value={formData.pageUrl}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+              className="bg-white w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
               placeholder="https://newsbit.in/page"
             />
           </div>
@@ -134,7 +134,7 @@ export default function ReportForm() {
               onChange={handleChange}
               rows={6}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all resize-none"
+              className="bg-white w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all resize-none"
               placeholder="Describe the issue in detail..."
             />
           </div>
@@ -150,7 +150,7 @@ export default function ReportForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+              className="bg-white w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
               placeholder="your@email.com"
             />
             <p className="text-xs text-gray-500 mt-1">

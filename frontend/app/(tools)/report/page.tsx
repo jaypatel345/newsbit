@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function ReportPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-canvas">
       <NavigationBar />
       <div className="max-w-2xl mx-auto px-6 sm:px-8 py-20">
         <ReportForm />

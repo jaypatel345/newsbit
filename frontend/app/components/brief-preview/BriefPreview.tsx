@@ -98,8 +98,8 @@ export default function BriefPreview() {
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-start gap-3 pl-3">
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                    <div className="h-4 bg-stone-200 rounded animate-pulse" />
+                    <div className="h-4 bg-stone-200 rounded animate-pulse w-3/4" />
                   </div>
                 </div>
               ))}
@@ -148,9 +148,9 @@ export default function BriefPreview() {
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+                        className="flex items-center gap-2 p-2 hover:bg-stone-100 rounded-lg transition-colors group"
                       >
-                        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center shrink-0">
                           <img
                             src={`https://www.google.com/s2/favicons?domain=${new URL(source.url).hostname}&sz=24`}
                             alt={source.name}

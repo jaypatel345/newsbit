@@ -5,7 +5,12 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(1 0 0);
+  /* Warm off-white page canvas, used site-wide instead of pure white.
+     Cards and dropdowns stay white so they still read as raised
+     surfaces on top of it. Change it here and it changes everywhere -
+     components reference it as `bg-canvas`, never as a hex literal. */
+  --canvas: #f7f7f4;
+  --background: var(--canvas);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -27,7 +32,8 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --canvas: oklch(0.145 0 0);
+  --background: var(--canvas);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -49,6 +55,7 @@
 }
 
 @theme inline {
+  --color-canvas: var(--canvas);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -87,7 +94,7 @@ body {
   }
 
   body {
-    @apply text-stone-900 bg-white;
+    @apply text-stone-900 bg-canvas;
   }
 
   h1, h2, h3, h4, h5, h6 {

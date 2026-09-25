@@ -76,12 +76,12 @@ export default function StoryGridCard({
         </div>
 
         {/* Right: image */}
-        <div className="w-28 sm:w-32 aspect-square shrink-0 rounded-xl overflow-hidden bg-gray-100">
+        <div className="w-28 sm:w-32 aspect-square shrink-0 rounded-xl overflow-hidden bg-stone-100">
           <ArticleImage
             src={image}
             alt={headline}
             domain={sourceWebsite}
-            className="w-full h-full object-cover bg-gray-100"
+            className="w-full h-full object-cover bg-stone-100"
           />
         </div>
       </div>

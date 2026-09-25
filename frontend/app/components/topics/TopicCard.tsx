@@ -41,7 +41,7 @@ export default function TopicCard({ category }: TopicCardProps) {
             className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
           >
             {/* Left Image */}
-            <div className="w-20 h-20 rounded-xl shrink-0 bg-gray-100 overflow-hidden">
+            <div className="w-20 h-20 rounded-xl shrink-0 bg-stone-100 overflow-hidden">
               <ArticleImage
                 src={article.image_url}
                 alt={article.title}
