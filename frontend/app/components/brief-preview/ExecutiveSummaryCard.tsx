@@ -18,7 +18,7 @@ export default function ExecutiveSummaryCard() {
   return (
     <div
       className="mb-12 rounded-2xl p-8 shadow-sm"
-      style={{ backgroundColor: "#F9FAFB", border: "1px solid #E5E7EB" }}
+      style={{ backgroundColor: "#000000", border: "1px solid #E5E7EB" }}
     >
       {/* Badge */}
       <div className="mb-4">

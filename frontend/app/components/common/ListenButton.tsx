@@ -88,7 +88,7 @@ export default function ListenButton({
 
   const defaultClassName =
     variant === "icon"
-      ? "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 border border-gray-200 shadow-sm text-gray-600 hover:text-gray-900 hover:shadow transition-all disabled:opacity-60 cursor-pointer"
+      ? "inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#F0F0EB] border border-gray-200 text-gray-600 hover:text-gray-900 transition-all disabled:opacity-60 cursor-pointer"
       : "inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-60 cursor-pointer";
 
   return (

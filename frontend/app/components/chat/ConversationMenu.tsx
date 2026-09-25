@@ -64,7 +64,7 @@ export default function ConversationMenu({
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-gray-200 bg-white py-1.5 shadow-xl"
+          className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-gray-200 bg-[#F0F0EB] py-1.5 shadow-xl"
         >
           <button
             onClick={(e) => {

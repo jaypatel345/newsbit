@@ -31,7 +31,7 @@ export default function TopicsSection() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-6 animate-pulse">
+            <div key={i} className="bg-[#F0F0EB] backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-6 animate-pulse">
               <div className="h-6 w-20 bg-stone-200 rounded mb-3" />
               <div className="h-4 w-full bg-stone-200 rounded" />
             </div>

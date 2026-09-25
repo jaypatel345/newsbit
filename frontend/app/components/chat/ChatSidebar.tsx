@@ -138,7 +138,7 @@ export default function ChatSidebar({
         // Widths live in the open/closed branches rather than the shared
         // classes: two `lg:w-*` utilities on one element resolve by Tailwind's
         // own ordering, not by ours, so the panel would never collapse.
-        className={`fixed inset-y-0 left-0 z-30 flex h-full shrink-0 flex-col bg-white transition-[transform,width,opacity] duration-300 ease-out lg:relative lg:z-auto lg:max-w-none lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-30 flex h-full shrink-0 flex-col bg-canvas transition-[transform,width,opacity] duration-300 ease-out lg:relative lg:z-auto lg:max-w-none lg:translate-x-0 ${
           open
             ? "w-[86vw] max-w-[320px] translate-x-0 border-r border-gray-200 lg:w-80 lg:opacity-100"
             : "w-[86vw] max-w-[320px] -translate-x-full border-r border-gray-200 lg:w-0 lg:overflow-hidden lg:border-r-0 lg:opacity-0"
@@ -198,7 +198,7 @@ export default function ChatSidebar({
                   }
                 }}
                 placeholder="Search chats"
-                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-8 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 hover:bg-stone-50 focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-900/10"
+                className="w-full rounded-lg border border-gray-200 bg-canvas py-2 pl-9 pr-8 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 hover:bg-stone-50 focus:border-gray-300 focus:bg-canvas focus:ring-2 focus:ring-gray-900/10"
               />
               {query && (
                 <button
@@ -253,7 +253,7 @@ export default function ChatSidebar({
           ) : (
             sections.map((section) => (
               <section key={section.label} className="pb-1">
-                <h2 className="sticky top-0 z-10 flex items-center gap-1.5 bg-white/95 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 backdrop-blur-sm">
+                <h2 className="sticky top-0 z-10 flex items-center gap-1.5 bg-canvas/95 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 backdrop-blur-sm">
                   {section.label === "Pinned" && (
                     <Pin className="h-3 w-3" aria-hidden />
                   )}

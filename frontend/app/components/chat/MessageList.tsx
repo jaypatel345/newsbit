@@ -59,7 +59,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
               className={`rounded-2xl p-4 sm:p-5 relative ${
                 message.role === "user"
                   ? "bg-stone-200 text-gray-900"
-                  : "bg-white border border-gray-200 text-gray-800 shadow-sm"
+                  : "bg-[#F0F0EB] border border-gray-200 text-gray-800 shadow-sm"
               }`}
             >
                   {message.role === "user" ? (
@@ -68,7 +68,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                         <textarea
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
-                          className="w-full bg-white rounded-lg p-3 text-sm sm:text-base text-gray-900 resize-none outline-none focus:ring-2 focus:ring-gray-300"
+                          className="w-full bg-[#F0F0EB] rounded-lg p-3 text-sm sm:text-base text-gray-900 resize-none outline-none focus:ring-2 focus:ring-gray-300"
                           rows={3}
                           autoFocus
                         />
@@ -170,7 +170,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
       {streamingContent && (
         <div className="flex w-full justify-start">
           <div className="flex flex-col max-w-full sm:max-w-[85%]">
-            <div className="rounded-2xl p-4 sm:p-5 bg-white border border-gray-200 text-gray-800 shadow-sm">
+            <div className="rounded-2xl p-4 sm:p-5 bg-[#F0F0EB] border border-gray-200 text-gray-800 shadow-sm">
               <AssistantContent content={streamingContent} />
             </div>
           </div>

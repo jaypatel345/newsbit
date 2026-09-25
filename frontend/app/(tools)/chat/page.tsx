@@ -619,7 +619,7 @@ function ChatPageContent() {
     }
   }, [conversations, queryClient]);
   return (
-    <div className="flex h-screen bg-canvas">
+    <div className="flex h-screen bg-[#F0F0EB]">
       <ChatSidebar
         conversations={visibleConversations}
         isLoading={conversationsLoading}
@@ -633,7 +633,7 @@ function ChatPageContent() {
         onDeleteConversation={handleDeleteConversation}
       />
 
-      <div className="flex flex-1 flex-col h-full bg-canvas text-gray-900">
+      <div className="flex flex-1 flex-col h-full bg-[#F0F0EB] text-gray-900">
         {/* Reopens the sidebar: always reachable on mobile, and on desktop
             only while the panel is collapsed. */}
         <div className={`px-4 pt-4 ${sidebarOpen ? "lg:hidden" : ""}`}>
@@ -710,7 +710,7 @@ function ChatPageContent() {
           </div>
         </main>
 
-        <footer className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-sm">
+        <footer className="sticky bottom-0 bg-[#F0F0EB]">
           <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4">
             {selectedArticles.length > 0 && (
               <div className="mb-4 space-y-2">
@@ -776,7 +776,7 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-canvas">
+        <div className="min-h-screen flex items-center justify-center bg-[#F0F0EB]">
           <div className="text-center">
             <div className="relative">
               <div className="h-12 w-12 mx-auto rounded-full border-4 border-gray-200 border-t-black animate-spin" />

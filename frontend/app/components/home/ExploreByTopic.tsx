@@ -82,7 +82,7 @@ export default function ExploreByTopic() {
             <button
               key={index}
               onClick={() => handleTopicClick(topic.title)}
-              className="group bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer text-left"
+              className="group bg-[#F0F0EB] border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer text-left"
             >
               {/* Title */}
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">

@@ -42,7 +42,7 @@ export default function StoryGridCard({
   return (
     <div
       onClick={() => router.push(`/chat?articleId=${id}`)}
-      className="h-full flex flex-col rounded-2xl border border-gray-200 bg-white overflow-hidden cursor-pointer"
+      className="h-full flex flex-col rounded-2xl border border-gray-200 bg-[#F0F0EB] overflow-hidden cursor-pointer"
     >
       {/* Top: details on the left, image on the right */}
       <div className="flex-1 flex items-start gap-4 p-5">

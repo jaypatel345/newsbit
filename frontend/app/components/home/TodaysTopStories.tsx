@@ -28,7 +28,7 @@ export default function TodaysTopStories() {
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {[1, 2].map((col) => (
-            <div key={col} className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+            <div key={col} className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
               {[1, 2, 3].map((index) => (
                 <div
                   key={index}
@@ -60,7 +60,7 @@ export default function TodaysTopStories() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Left Column */}
-          <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+          <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(0, 3).map((story, index) => (
               <Link
                 key={story.id}
@@ -115,7 +115,7 @@ export default function TodaysTopStories() {
           </div>
 
           {/* Right Column */}
-          <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+          <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(3, 6).map((story, index) => (
               <Link
                 key={story.id}

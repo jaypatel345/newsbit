@@ -71,7 +71,7 @@ export default function ProductDemo() {
                     flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-300
                     ${
                       isSelected
-                        ? "bg-white text-gray-900 shadow-sm "
+                        ? "bg-[#F0F0EB] text-gray-900 shadow-sm "
                         : "text-gray-600 hover:text-gray-900 hover:bg-stone-200/50 cursor-pointer"
                     }
                   `}
@@ -105,7 +105,7 @@ export default function ProductDemo() {
           </div>
 
           {/* User Prompt Panel (Absolute Positioned on Top Right) */}
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-5 border border-gray-200 shadow-lg w-48 sm:w-56 md:w-xs h-32 sm:h-40 md:h-50 translate-x-1/2 sm:translate-x-1/2">
+          <div className="absolute top-1/2 right-0 -translate-y-1/2 bg-[#F0F0EB] rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-5 border border-gray-200 shadow-lg w-48 sm:w-56 md:w-xs h-32 sm:h-40 md:h-50 translate-x-1/2 sm:translate-x-1/2">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <div className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 bg-gray-900 rounded-full flex items-center justify-center">
                 <span className="text-white text-[9px] sm:text-[10px] md:text-xs font-medium">U</span>

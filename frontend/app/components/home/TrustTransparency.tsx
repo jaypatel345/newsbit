@@ -51,7 +51,7 @@ export default function TrustTransparency() {
             return (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer group"
+                className="bg-[#F0F0EB] border border-gray-200 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer group"
               >
                 {/* Icon */}
                 <div className="mb-4 group-hover:scale-110 transition-transform duration-300">

@@ -12,7 +12,7 @@ export default function TopicCard({ category }: TopicCardProps) {
   const { data: articles, isLoading, error } = useCategoryNews(category);
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+    <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
       {/* Header: Name with Arrow */}
       <Link
         href={`/explore?category=${encodeURIComponent(category)}`}

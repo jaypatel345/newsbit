@@ -58,7 +58,7 @@ export default function WhyNewsbit() {
             return (
               <div
                 key={index}
-                className="group bg-white border border-gray-200 rounded-2xl p-8 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-250 cursor-pointer"
+                className="group bg-[#F0F0EB] border border-gray-200 rounded-2xl p-8 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 transition-all duration-250 cursor-pointer"
               >
                 {/* Icon */}
                 <div className="mb-6 group-hover:scale-110 transition-transform duration-250">

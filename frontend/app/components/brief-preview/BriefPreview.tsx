@@ -80,7 +80,7 @@ export default function BriefPreview() {
       </div>
 
       {/* Hero Card - glass card */}
-      <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+      <div className="relative rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6" style={{ backgroundColor: "#F0F0EB" }}>
           {/* Corner control: listen to today's whole brief read aloud */}
           {!isLoading && !error && (
             <div className="absolute top-[7px] right-3 sm:top-[10px] sm:right-4">
@@ -135,7 +135,7 @@ export default function BriefPreview() {
               {/* Sources Popup - positioned above the button */}
               {showSourcesPopup && (
                 <div
-                  className="absolute bottom-full right-0 mb-2 p-3 bg-white rounded-xl border border-gray-200 shadow-xl shadow-black/5 z-10 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200"
+                  className="absolute bottom-full right-0 mb-2 p-3 bg-[#F0F0EB] rounded-xl border border-gray-200 shadow-xl shadow-black/5 z-10 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-semibold text-gray-900">News Sources</h3>

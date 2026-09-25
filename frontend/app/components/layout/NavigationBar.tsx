@@ -132,7 +132,7 @@ export default function NavigationBar() {
 
                 {/* Dropdown Menu */}
                 {showDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-[#F0F0EB] border border-gray-200 rounded-xl shadow-lg py-2 z-50">
                     <Link
                       href="/chat"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-stone-50 transition-colors"
