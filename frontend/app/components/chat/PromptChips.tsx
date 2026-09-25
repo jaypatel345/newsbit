@@ -51,7 +51,7 @@ export default function PromptChips({ onSelectPrompt }: PromptChipsProps) {
         <button
           key={starter.prompt}
           onClick={() => onSelectPrompt(starter.prompt)}
-          className="group relative overflow-hidden rounded-xl border border-gray-200 bg-[#F0F0EB] p-4 text-left transition-colors duration-200 hover:border-[#8A6A3F]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A6A3F]/30 cursor-pointer"
+          className="group relative overflow-hidden rounded-xl border border-gray-300 bg-[#F0F0EB] p-4 text-left transition-colors duration-200 hover:border-[#8A6A3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A6A3F]/30 cursor-pointer"
         >
           {/* A gold edge that wipes in from the left on hover. */}
           <span

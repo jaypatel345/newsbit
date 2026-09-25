@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Message } from "@/types/message";
-import { PanelLeftOpen, X } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
 import { useConversations } from "@/app/hooks/useConversations";
 import { useCreateConversation } from "@/app/hooks/useCreateConversation";
 import { useUpdateConversation } from "@/app/hooks/useUpdateConversation";
@@ -644,7 +644,7 @@ function ChatPageContent() {
             title="Open conversations"
             className="rounded-lg p-2 text-gray-500 outline-none transition-colors hover:bg-stone-200/60 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-900/20 active:scale-95"
           >
-            <PanelLeftOpen className="h-[18px] w-[18px]" />
+            <ChevronRight className="h-[18px] w-[18px]" />
           </button>
         </div>
 

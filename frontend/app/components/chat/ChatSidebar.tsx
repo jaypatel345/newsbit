@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { MessageSquare, PanelLeftClose, Pin, Search, SquarePen, X } from "lucide-react";
+import { MessageSquare, ChevronLeft, Pin, Search, Plus, X } from "lucide-react";
 import ConversationMenu from "@/app/components/chat/ConversationMenu";
 import { Conversation } from "@/types/conversation";
 
@@ -164,7 +164,7 @@ export default function ChatSidebar({
             title="Collapse sidebar"
             className="shrink-0 rounded-lg p-2 text-gray-500 outline-none transition-colors hover:bg-stone-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-900/20 active:scale-95"
           >
-            <PanelLeftClose className="h-[18px] w-[18px]" />
+            <ChevronLeft className="h-[18px] w-[18px]" />
           </button>
         </header>
 
@@ -175,7 +175,7 @@ export default function ChatSidebar({
             onClick={onCreateConversation}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white outline-none transition-colors hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-gray-900/30 focus-visible:ring-offset-2 active:scale-[0.99]"
           >
-            <SquarePen className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
             New Chat
           </button>
 
@@ -273,7 +273,7 @@ export default function ChatSidebar({
                         )}
                         <div
                           className={`flex items-center gap-1 rounded-lg pl-3 pr-1 transition-colors ${
-                            isActive ? "bg-stone-100" : "hover:bg-stone-100/70"
+                            isActive ? "bg-stone-200" : "hover:bg-stone-200/80"
                           }`}
                         >
                           <button
@@ -287,7 +287,7 @@ export default function ChatSidebar({
                               <Pin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                             )}
                             <span
-                              className={`truncate text-sm ${
+                              className={`truncate text-sm transition-colors ${
                                 isActive
                                   ? "font-medium text-gray-900"
                                   : "text-gray-600 group-hover:text-gray-900"
