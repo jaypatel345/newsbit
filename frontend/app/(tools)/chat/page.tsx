@@ -11,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Message } from "@/types/message";
 import { ChevronRight, X } from "lucide-react";
+import ArticleImage from "@/app/components/common/ArticleImage";
 import { useConversations } from "@/app/hooks/useConversations";
 import { useCreateConversation } from "@/app/hooks/useCreateConversation";
 import { useUpdateConversation } from "@/app/hooks/useUpdateConversation";
@@ -75,6 +76,14 @@ function ChatPageContent() {
     if (window.matchMedia("(min-width: 1024px)").matches) return;
     setSidebarOpen(false);
   }, []);
+
+  // Open is the right default on desktop, where the panel is part of the
+  // layout. On mobile it overlays ~86vw, burying the transcript behind a
+  // drawer nobody asked for - so collapse it once we can read the viewport.
+  // State starts open so the server and first client render agree.
+  useEffect(() => {
+    closeSidebarOnMobile();
+  }, [closeSidebarOnMobile]);
   const { mutateAsync: createConversation } = useCreateConversation();
   const { mutateAsync: updateConversation } = useUpdateConversation();
   const { mutateAsync: pinConversation } = usePinConversation();
@@ -619,7 +628,7 @@ function ChatPageContent() {
     }
   }, [conversations, queryClient]);
   return (
-    <div className="flex h-screen bg-[#F0F0EB]">
+    <div className="flex h-screen bg-canvas">
       <ChatSidebar
         conversations={visibleConversations}
         isLoading={conversationsLoading}
@@ -633,7 +642,7 @@ function ChatPageContent() {
         onDeleteConversation={handleDeleteConversation}
       />
 
-      <div className="flex flex-1 flex-col h-full bg-[#F0F0EB] text-gray-900">
+      <div className="flex flex-1 flex-col h-full bg-canvas text-gray-900">
         {/* Reopens the sidebar: always reachable on mobile, and on desktop
             only while the panel is collapsed. */}
         <div className={`px-4 pt-4 ${sidebarOpen ? "lg:hidden" : ""}`}>
@@ -672,7 +681,7 @@ function ChatPageContent() {
                 </div>
               </div>
             ) : displayMessages.length === 0 ? (
-              <div className="flex w-full flex-col items-center justify-center px-4">
+              <div className="flex w-full flex-col items-center justify-center">
                 <div className="mb-6 text-center">
                   <h2
                     className="font-(family-name:--font-geist) text-3xl sm:text-4xl tracking-tight"
@@ -710,29 +719,49 @@ function ChatPageContent() {
           </div>
         </main>
 
-        <footer className="sticky bottom-0 bg-[#F0F0EB]">
+        <footer className="sticky bottom-0 bg-canvas">
           <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4">
+            {/* Attached context. Reads as a row of source cards sitting on
+                the composer rather than a labelled section: the title is the
+                identity, the publisher is the provenance, and the thumbnail
+                tells you at a glance which article you picked up. */}
             {selectedArticles.length > 0 && (
-              <div className="mb-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Context</p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedArticles.map((article) => (
-                    <div
-                      key={article.id}
-                      className="flex items-center gap-2 rounded-full bg-stone-100 border border-gray-300 px-3 py-1.5 text-sm"
-                    >
-                      <span className="truncate max-w-xs text-gray-800">
-                        {article.title || 'No title available'}
-                      </span>
-                      <button
-                        onClick={() => setSelectedArticles(selectedArticles.filter((a) => a.id !== article.id))}
-                        className="text-gray-500 hover:text-gray-700 transition-colors leading-none"
-                      >
-                        ×
-                      </button>
+              <div className="mx-auto mb-2 flex max-w-2xl flex-wrap gap-2">
+                {selectedArticles.map((article) => (
+                  <div
+                    key={article.id}
+                    className="group relative flex max-w-[280px] items-center gap-2.5 rounded-xl border border-gray-300 bg-[#FDFDFB] py-2 pl-2 pr-8"
+                  >
+                    <ArticleImage
+                      src={article.image_url}
+                      alt=""
+                      domain={article.domain}
+                      className="h-8 w-8 shrink-0 rounded-lg object-cover"
+                    />
+
+                    <div className="min-w-0">
+                      <p className="truncate text-[13px] leading-tight text-gray-900">
+                        {article.title || "Untitled article"}
+                      </p>
+                      <p className="truncate text-[11px] leading-tight text-gray-500">
+                        {article.source_name || article.domain || "Article"}
+                      </p>
                     </div>
-                  ))}
-                </div>
+
+                    <button
+                      type="button"
+                      aria-label={`Remove ${article.title || "article"} from context`}
+                      onClick={() =>
+                        setSelectedArticles(
+                          selectedArticles.filter((a) => a.id !== article.id),
+                        )
+                      }
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 outline-none transition-colors hover:bg-stone-200 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-900/20"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -758,6 +787,13 @@ function ChatPageContent() {
               onSend={handleSend}
               onStop={handleStop}
             />
+
+            {/* Summaries are model-generated, so say so where the answer
+                lands rather than burying it in the terms page. */}
+            <p className="pb-1 text-center text-xs text-gray-500">
+              Newsbit can make mistakes. Check important info against the
+              original source.
+            </p>
           </div>
         </footer>
       </div>
@@ -776,7 +812,7 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#F0F0EB]">
+        <div className="min-h-screen flex items-center justify-center bg-canvas">
           <div className="text-center">
             <div className="relative">
               <div className="h-12 w-12 mx-auto rounded-full border-4 border-gray-200 border-t-black animate-spin" />

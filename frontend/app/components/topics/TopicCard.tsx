@@ -38,7 +38,7 @@ export default function TopicCard({ category }: TopicCardProps) {
           <Link
             key={article.id}
             href={`/explore?category=${encodeURIComponent(category)}#article-${article.id}`}
-            className="flex gap-3 py-3 border-b border-gray-100 last:border-b-0 group"
+            className="flex gap-3 py-3 border-b border-[#E4E0D5] last:border-b-0 group"
           >
             {/* Left Image */}
             <div className="w-20 h-20 rounded-xl shrink-0 bg-stone-100 overflow-hidden">

@@ -32,7 +32,7 @@ export default function TodaysTopStories() {
               {[1, 2, 3].map((index) => (
                 <div
                   key={index}
-                  className={`${index !== 3 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                  className={`${index !== 3 ? "pb-4 sm:pb-6 border-b border-[#E4E0D5] mb-4 sm:mb-6" : ""}`}
                 >
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                     {/* Image Skeleton */}
@@ -65,7 +65,7 @@ export default function TodaysTopStories() {
               <Link
                 key={story.id}
                 href={`/brief#story-${story.id}`}
-                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-[#E4E0D5] mb-4 sm:mb-6" : ""}`}
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}
@@ -120,7 +120,7 @@ export default function TodaysTopStories() {
               <Link
                 key={story.id}
                 href={`/brief#story-${story.id}`}
-                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-gray-100 mb-4 sm:mb-6" : ""}`}
+                className={`group block ${index !== 2 ? "pb-4 sm:pb-6 border-b border-[#E4E0D5] mb-4 sm:mb-6" : ""}`}
               >
                 <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 w-full">
                   {/* Image */}

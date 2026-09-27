@@ -47,11 +47,15 @@ type PromptChipsProps = {
 export default function PromptChips({ onSelectPrompt }: PromptChipsProps) {
   return (
     <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
-      {STARTERS.map((starter) => (
+      {STARTERS.map((starter, index) => (
         <button
           key={starter.prompt}
           onClick={() => onSelectPrompt(starter.prompt)}
-          className="group relative overflow-hidden rounded-xl border border-gray-300 bg-[#F0F0EB] p-4 text-left transition-colors duration-200 hover:border-[#8A6A3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A6A3F]/30 cursor-pointer"
+          // Single column on phones, so all six starters would push the
+          // composer off the fold. Show four there, the full set from sm up.
+          className={`group relative overflow-hidden rounded-2xl border border-gray-300 bg-[#F0F0EB] p-4 text-left transition-colors duration-200 hover:border-[#8A6A3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8A6A3F]/30 cursor-pointer ${
+            index > 3 ? "hidden sm:block" : ""
+          }`}
         >
           {/* A gold edge that wipes in from the left on hover. */}
           <span

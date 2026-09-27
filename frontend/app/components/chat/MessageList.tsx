@@ -56,10 +56,13 @@ export default function MessageList({ messages, loading, streamingContent = "", 
         >
           <div className="flex flex-col max-w-full sm:max-w-[85%] group">
             <div
-              className={`rounded-2xl p-4 sm:p-5 relative ${
+              // Padding lives in the branches, not the shared string: a
+              // one-line question in a chip wants tight vertical rhythm,
+              // while a multi-paragraph answer wants room to breathe.
+              className={`rounded-2xl relative ${
                 message.role === "user"
-                  ? "bg-stone-200 text-gray-900"
-                  : "bg-[#F0F0EB] border border-gray-200 text-gray-800 shadow-sm"
+                  ? "bg-stone-200 text-gray-900 px-4 py-2.5 sm:px-5 sm:py-3"
+                  : "text-gray-800 px-1 pt-4 pb-2 sm:pt-5 sm:pb-2"
               }`}
             >
                   {message.role === "user" ? (
@@ -90,7 +93,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm sm:text-base leading-relaxed">{message.content}</p>
+                      <p className="text-sm sm:text-base leading-normal">{message.content}</p>
                     )
                   ) : (
                     <>
@@ -170,7 +173,7 @@ export default function MessageList({ messages, loading, streamingContent = "", 
       {streamingContent && (
         <div className="flex w-full justify-start">
           <div className="flex flex-col max-w-full sm:max-w-[85%]">
-            <div className="rounded-2xl p-4 sm:p-5 bg-[#F0F0EB] border border-gray-200 text-gray-800 shadow-sm">
+            <div className="rounded-2xl p-4 sm:p-5 text-gray-800">
               <AssistantContent content={streamingContent} />
             </div>
           </div>

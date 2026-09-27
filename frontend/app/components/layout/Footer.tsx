@@ -1,6 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { useRef } from "react";
 
 export default function Footer() {
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  // Feeds the cursor position to the spotlight mask as CSS variables.
+  // Written straight to the node rather than through state - this fires on
+  // every mousemove, and re-rendering the whole footer that often would be
+  // absurd for what is ultimately two custom properties.
+  const trackCursor = (event: React.MouseEvent<HTMLDivElement>) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const bounds = stage.getBoundingClientRect();
+    stage.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
+    stage.style.setProperty("--my", `${event.clientY - bounds.top}px`);
+  };
+
   return (
     <footer className="bg-canvas px-2 sm:px-4">
       {/* Flat panel on the page canvas. The tinted scoop that used to live
@@ -193,14 +211,40 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Big Brand Wordmark */}
-      <div className="mt-10 sm:mt-14 pt-10 sm:pt-16 overflow-hidden select-none pointer-events-none">
-        <p
-          className="text-center font-bold tracking-tight leading-none whitespace-nowrap text-transparent text-[16vw] sm:text-[13vw] lg:text-[9rem] xl:text-[11rem]"
-          style={{ WebkitTextStroke: "1.5px #E5E7EB" }}
-        >
-          NEWSBIT
-        </p>
+      {/* Big Brand Wordmark. Two stacked copies of the same text: a ghost
+          at card colour that is always there, and a darker one on top that
+          a radial mask reveals only around the cursor. The mask follows the
+          pointer, so letters fade up and back down as it sweeps across. */}
+      <div className="mt-10 sm:mt-14 pt-10 sm:pt-16 overflow-hidden select-none">
+        <div ref={stageRef} onMouseMove={trackCursor} className="wordmark-stage relative">
+          <p className="wordmark text-center font-bold tracking-tight leading-none whitespace-nowrap text-transparent text-[16vw] sm:text-[13vw] lg:text-[9rem] xl:text-[11rem]">
+            NEWSBIT
+          </p>
+          <p
+            aria-hidden
+            className="wordmark wordmark-lit absolute inset-0 text-center font-bold tracking-tight leading-none whitespace-nowrap text-transparent text-[16vw] sm:text-[13vw] lg:text-[9rem] xl:text-[11rem]"
+          >
+            NEWSBIT
+          </p>
+        </div>
+        {/* The stroke lives here rather than in a style prop: an inline
+            declaration outranks any class rule, so the lit layer could
+            never override it. */}
+        <style>{`
+          .wordmark {
+            -webkit-text-stroke: 1.5px #F0F0EB;
+          }
+          .wordmark-lit {
+            -webkit-text-stroke-color: #A9A294;
+            opacity: 0;
+            transition: opacity 350ms ease;
+            -webkit-mask-image: radial-gradient(7rem circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,0.4) 45%, transparent 72%);
+            mask-image: radial-gradient(7rem circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,0.4) 45%, transparent 72%);
+          }
+          .wordmark-stage:hover .wordmark-lit {
+            opacity: 1;
+          }
+        `}</style>
       </div>
       </div>
     </footer>

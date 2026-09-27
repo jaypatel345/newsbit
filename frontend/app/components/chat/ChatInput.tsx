@@ -30,7 +30,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="flex items-center space-x-2 max-w-2xl justify-center mx-auto px-2 sm:px-4 bg-canvas border border-gray-300 p-3 sm:p-4 mb-3 rounded-3xl">
+    <div className="flex items-center space-x-2 max-w-2xl justify-center mx-auto bg-[#FDFDFB] border border-gray-300 p-2.5 sm:p-3 mb-3 rounded-3xl">
       <input
         type="text"
         value={message}
@@ -43,13 +43,13 @@ export default function ChatInput({
             handleSend();
           }
         }}
-        className="flex-1 rounded-2xl z-50 bg-canvas border-gray-300 p-2 outline-none text-sm sm:text-base text-gray-800"
+        className="flex-1 rounded-2xl z-50 bg-[#FDFDFB] border-gray-300 px-3 py-1.5 outline-none text-sm sm:text-base text-gray-800"
         disabled={loading}
       />
       {loading ? (
         <button
           onClick={handleStop}
-          className="w-9 h-9 rounded-full transition-colors flex items-center justify-center bg-canvas border border-gray-300 text-gray-900 hover:bg-stone-200"
+          className="w-8 h-8 rounded-full transition-colors flex items-center justify-center bg-[#FDFDFB] border border-gray-300 text-gray-900 hover:bg-stone-200"
           title="Stop generation"
         >
           <Square size={14} fill="currentColor" />
@@ -57,10 +57,10 @@ export default function ChatInput({
       ) : (
         <button
           disabled={!message.trim()}
-          className={`w-9 h-9 rounded-full transition-colors flex items-center justify-center border ${
+          className={`w-8 h-8 rounded-full transition-colors flex items-center justify-center border ${
             message.trim()
               ? "bg-gray-900 border-gray-900 text-white hover:bg-gray-800"
-              : "bg-canvas border-gray-300 text-gray-400 cursor-not-allowed"
+              : "bg-[#F0F0EB] border-gray-300 text-gray-400 cursor-not-allowed"
           }`}
           onClick={handleSend}
         >
