@@ -19,3 +19,23 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   const data = await response.json();
   return data.text as string;
 }
+
+/** Render one line of a chat answer as speech and return it as MP3 audio. */
+export async function synthesizeSpeech(
+  text: string,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  const response = await fetch(`${BASE_URL}/api/v1/voice/speak`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+    signal,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Failed to synthesize speech");
+  }
+
+  return response.blob();
+}

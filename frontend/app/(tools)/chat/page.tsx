@@ -23,6 +23,8 @@ import { useSendMessage } from "@/app/hooks/useSendMessage";
 import { generateTitleFromMessage } from "@/app/utils/titleGenerator";
 import { useArticle } from "@/app/hooks/useArticle";
 import { useChatWebSocket } from "@/app/hooks/useChatWebSocket";
+import { useVoiceSession } from "@/app/hooks/useVoiceSession";
+import VoiceOverlay from "@/app/components/chat/VoiceOverlay";
 
 const DELETED_PREFIX = "deleted_conversation_";
 
@@ -368,6 +370,26 @@ function ChatPageContent() {
     }
   };
 
+  // Text of the newest answer, for the case where it arrived in one piece
+  // over the HTTP fallback and voice mode never saw a stream to read.
+  const latestAnswer = useMemo(() => {
+    for (let index = displayMessages.length - 1; index >= 0; index -= 1) {
+      const message = displayMessages[index];
+      if (message.role === "assistant") return message.content ?? null;
+    }
+    return null;
+  }, [displayMessages]);
+
+  // Voice mode rides on the same pipeline as the typed chat: it speaks the
+  // answer this page is already showing, so it inherits every tool, source
+  // and article attachment the composer has.
+  const voice = useVoiceSession({
+    streamingContent,
+    isAnswering: loading,
+    latestAnswer,
+    onAsk: handleSend,
+  });
+
   const handleStop = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -663,9 +685,11 @@ function ChatPageContent() {
           // The transcript needs room to clear the sticky composer, but the
           // empty state should simply sit in the space available rather than
           // pushing itself past the fold.
+          // Voice mode's panel sits over the bottom of the transcript, so the
+          // newest message needs room to clear it.
           className={`flex-1 overflow-y-auto flex flex-col px-4 sm:px-6 lg:px-8 ${
-            showEmptyState ? "py-4" : "pb-40 pt-8"
-          }`}
+            showEmptyState ? "py-4" : "pt-8"
+          } ${voice.active ? "pb-[30rem]" : showEmptyState ? "" : "pb-40"}`}
         >
           <h1 className="sr-only">AI Chat - Ask Newsbit About Today&apos;s News</h1>
           <div
@@ -780,12 +804,28 @@ function ChatPageContent() {
               </div>
             )}
 
+            {/* A notice that ended voice mode (blocked mic, nobody there)
+                outlives the panel it was raised in, so it is shown here. */}
+            {!voice.active && voice.notice && (
+              <div className="mx-auto mb-2 flex max-w-2xl items-center justify-between rounded-lg border border-[#D9CBB0] bg-[#F7F1E4] p-2">
+                <p className="text-xs text-stone-700">{voice.notice}</p>
+                <button
+                  onClick={voice.dismissNotice}
+                  className="text-xs font-medium text-stone-600 hover:text-stone-900"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             <ChatInput
               message={inputMessage}
               setMessage={setInputMessage}
               loading={loading}
               onSend={handleSend}
               onStop={handleStop}
+              onStartVoice={voice.open}
+              voiceActive={voice.active}
             />
 
             {/* Summaries are model-generated, so say so where the answer
@@ -804,6 +844,19 @@ function ChatPageContent() {
         onConfirm={handleConfirmRename}
         currentTitle={renameDialog.currentTitle}
       />
+
+      {voice.active && (
+        <VoiceOverlay
+          phase={voice.phase}
+          notice={voice.notice}
+          lastHeard={voice.lastHeard}
+          muted={voice.muted}
+          levelRef={voice.levelRef}
+          onClose={voice.close}
+          onToggleMute={voice.toggleMuted}
+          onInterrupt={voice.interrupt}
+        />
+      )}
     </div>
   );
 }
