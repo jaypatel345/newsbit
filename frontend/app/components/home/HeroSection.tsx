@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PromptInput } from "@/components/ui/ai-chat-input";
+import FloatingNews from "@/app/components/home/FloatingNews";
 
 export default function HeroSection() {
   const [inputValue, setInputValue] = useState("");
@@ -16,6 +17,7 @@ export default function HeroSection() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-x-hidden">
+      <FloatingNews />
       <div className="relative z-10 w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-225 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center -translate-y-16 animate-in fade-in duration-700">
         {/* Main Heading */}
         <h1
