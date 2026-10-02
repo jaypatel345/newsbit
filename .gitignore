@@ -58,6 +58,8 @@ logs/
 *.jpg
 *.jpeg
 *.gif
+# ...but not the home hero's tile images, which the app serves.
+!frontend/public/hero/*.jpg
 Screenshot*
 
 # Temporary files
