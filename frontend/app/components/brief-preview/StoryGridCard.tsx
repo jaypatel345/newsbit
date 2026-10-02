@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import ArticleImage from "@/app/components/common/ArticleImage";
 import ListenButton from "@/app/components/common/ListenButton";
+import SummaryBullets from "@/app/components/common/SummaryBullets";
 import { getArticleAudioUrl } from "@/app/services/audio.service";
 import { formatArticleTime } from "@/app/utils/formatTime";
 
@@ -67,12 +68,13 @@ export default function StoryGridCard({
             {headline}
           </h3>
 
-          <p
-            className="text-sm leading-relaxed line-clamp-2"
-            style={{ color: "#5B4C3A" }}
-          >
-            {summary}
-          </p>
+          <SummaryBullets
+            summary={summary}
+            max={3}
+            clampLines={2}
+            className="text-sm leading-relaxed"
+            itemClassName="text-[#5B4C3A]"
+          />
         </div>
 
         {/* Right: image */}

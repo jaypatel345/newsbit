@@ -5,6 +5,7 @@ import ArticleSourceButton from "./ArticleSourceButton";
 import SourcesButton from "./SourcesButton";
 import { SummaryItem } from "@/types/todaySummary";
 import ListenButton from "@/app/components/common/ListenButton";
+import { BulletMarker } from "@/app/components/common/SummaryBullets";
 import { getTodaysBriefAudioUrl } from "@/app/services/audio.service";
 
 export default function BriefPreview() {
@@ -107,10 +108,11 @@ export default function BriefPreview() {
           ) : error ? (
             <div className="text-center py-8 text-gray-500">Unable to load brief at this time.</div>
           ) : (
-            <ul className="text-gray-700 text-sm leading-relaxed mb-2 sm:mb-3 space-y-3 sm:space-y-3.5">
-              {data?.summary?.slice(0, 5).map((item: string | SummaryItem, index: number) => (
-                <li key={index} className={`flex items-start gap-3 pl-3 ${index === 0 ? 'mt-6' : ''}`}>
-                  <div className="flex-1">
+            <ul className="text-gray-700 text-sm leading-relaxed mb-2 sm:mb-3 space-y-3 sm:space-y-3.5 [--bullet-gap:12px] sm:[--bullet-gap:14px]">
+              {data?.summary?.slice(0, 5).map((item: string | SummaryItem, index: number, items) => (
+                <li key={index} className={`relative pl-5 ml-1 ${index === 0 ? 'mt-6' : ''}`}>
+                  <BulletMarker last={index === items.length - 1} />
+                  <div>
                     <span>{typeof item === 'string' ? item : item.text}</span>
                     {typeof item === 'object' && item.article_url && item.source_name && (
                       <ArticleSourceButton articleUrl={item.article_url} sourceName={item.source_name} />
