@@ -23,12 +23,12 @@ const SLOTS: {
   duration: number;
   delay: number;
 }[] = [
-  { position: { top: "17%", left: "7%" }, size: 88, rotate: -6, duration: 7, delay: 0 },
-  { position: { top: "45%", left: "14%" }, size: 72, rotate: 4, duration: 8.5, delay: 1.2 },
-  { position: { top: "68%", left: "5%" }, size: 80, rotate: -3, duration: 7.5, delay: 0.6 },
-  { position: { top: "20%", right: "9%" }, size: 76, rotate: 5, duration: 8, delay: 0.9 },
-  { position: { top: "47%", right: "4%" }, size: 90, rotate: -4, duration: 7.2, delay: 0.3 },
-  { position: { top: "70%", right: "13%" }, size: 70, rotate: 6, duration: 9, delay: 1.5 },
+  { position: { top: "17%", left: "7%" }, size: 56, rotate: -6, duration: 7, delay: 0 },
+  { position: { top: "45%", left: "14%" }, size: 46, rotate: 4, duration: 8.5, delay: 1.2 },
+  { position: { top: "68%", left: "5%" }, size: 52, rotate: -3, duration: 7.5, delay: 0.6 },
+  { position: { top: "20%", right: "9%" }, size: 50, rotate: 5, duration: 8, delay: 0.9 },
+  { position: { top: "47%", right: "4%" }, size: 58, rotate: -4, duration: 7.2, delay: 0.3 },
+  { position: { top: "70%", right: "13%" }, size: 44, rotate: 6, duration: 9, delay: 1.5 },
 ];
 
 // Shown until stories load (or when there are none), so the hero never has
@@ -36,7 +36,7 @@ const SLOTS: {
 const TOPIC_ICONS: LucideIcon[] = [Globe, Cpu, TrendingUp, Landmark, Trophy, Clapperboard];
 
 const TILE_CLASS =
-  "block overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_8px_24px_-8px_rgba(30,30,30,0.18)]";
+  "block overflow-hidden rounded-xl border border-white/80 bg-white shadow-[0_8px_24px_-8px_rgba(30,30,30,0.18)]";
 
 export default function FloatingNews() {
   const { data: stories } = useTopStories(0);
@@ -84,9 +84,9 @@ export default function FloatingNews() {
                     <img
                       src={logo}
                       alt=""
-                      width={22}
-                      height={22}
-                      className="absolute -bottom-1.5 -right-1.5 h-[22px] w-[22px] rounded-full border-2 border-white bg-white object-contain shadow-sm"
+                      width={16}
+                      height={16}
+                      className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[1.5px] border-white bg-white object-contain shadow-sm"
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   )}
@@ -95,9 +95,9 @@ export default function FloatingNews() {
                 <span
                   aria-hidden="true"
                   className={`${TILE_CLASS} flex items-center justify-center text-stone-500`}
-                  style={{ width: slot.size * 0.75, height: slot.size * 0.75 }}
+                  style={{ width: slot.size * 0.85, height: slot.size * 0.85 }}
                 >
-                  <Icon size={slot.size * 0.3} strokeWidth={1.6} />
+                  <Icon size={slot.size * 0.4} strokeWidth={1.6} />
                 </span>
               )}
             </div>
