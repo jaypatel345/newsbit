@@ -1,6 +1,8 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from app.scheduler import scheduler
+from app.services.content.news.summary_audio_service import warm_today_audio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,7 +26,13 @@ async def lifespan(app: FastAPI):
     print("Scheduler started")
     print(scheduler.get_jobs())
 
+    # The 6am pre-warm is skipped whenever the instance was asleep or the run
+    # failed, so cover that on every boot too, without delaying startup.
+    warm_task = asyncio.create_task(warm_today_audio())
+
     yield
+
+    warm_task.cancel()
 
     print("Stopping scheduler...")
     scheduler.shutdown()

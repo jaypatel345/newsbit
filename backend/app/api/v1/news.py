@@ -6,8 +6,11 @@ from app.db.database import get_db
 from app.scheduler import run_news_fetch_job
 from app.services.content.news.news_service import NewsService
 from app.services.content.news.ranking_service import RankingService
-from app.services.content.news.summary_audio_service import SummaryAudioService
-from fastapi import APIRouter, Depends, Header, HTTPException, Response
+from app.services.content.news.summary_audio_service import (
+    SummaryAudioService,
+    warm_today_audio,
+)
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
@@ -29,9 +32,16 @@ async def get_top_stories(db: DbSession, response: Response) -> list[dict[str, A
 
 
 @router.get("/today-summary", response_model=None)
-async def get_today_summary(db: DbSession, response: Response) -> dict[str, Any]:
+async def get_today_summary(
+    db: DbSession, response: Response, background_tasks: BackgroundTasks
+) -> dict[str, Any]:
     service = NewsService(db)
     summary = await service.get_today_summary()
+
+    # The home page loads the brief well before anyone presses "Listen", so
+    # start generating its audio now if it isn't cached - by the time they
+    # click, the ~10-20s LLM + TTS run has usually finished.
+    background_tasks.add_task(warm_today_audio)
 
     # Add caching headers for better performance
     response.headers["Cache-Control"] = "public, max-age=300, s-maxage=300"  # 5 minutes

@@ -41,8 +41,8 @@ interface SummaryBulletsProps {
 const CLAMP = { 1: "line-clamp-1", 2: "line-clamp-2", 3: "line-clamp-3" } as const;
 
 /**
- * Marker for one point: a small bronze diamond with a soft halo, plus a
- * faint thread down to the next point's diamond. Place it inside a
+ * Marker for one point: a small hollow circle (black ring, white centre),
+ * plus a very light thread down to the next point's circle. Place it inside a
  * `relative pl-5` list item. The thread spans the gap between items, which
  * it reads from `--bullet-gap` on the list (default 6px, i.e. space-y-1.5).
  */
@@ -51,12 +51,12 @@ export function BulletMarker({ last = false }: { last?: boolean }) {
     <>
       <span
         aria-hidden="true"
-        className="absolute left-[3px] top-[0.6em] h-[7px] w-[7px] rotate-45 rounded-[2px] bg-linear-to-br from-[#D4B07A] to-[#8A6A3F] shadow-[0_0_0_3px_rgba(138,106,63,0.14)]"
+        className="absolute left-[3px] top-[0.6em] h-[7px] w-[7px] rounded-full border border-black bg-white"
       />
       {!last && (
         <span
           aria-hidden="true"
-          className="absolute left-[6px] top-[calc(0.6em+12px)] bottom-[calc(-0.6em-var(--bullet-gap,6px)+4px)] w-px bg-linear-to-b from-[#8A6A3F]/35 to-[#8A6A3F]/10"
+          className="absolute left-[6px] top-[calc(0.6em+12px)] bottom-[calc(-0.6em-var(--bullet-gap,6px)+4px)] w-px bg-black/15"
         />
       )}
     </>
@@ -64,8 +64,8 @@ export function BulletMarker({ last = false }: { last?: boolean }) {
 }
 
 /**
- * A summary as a short run of points, each marked by a small bronze diamond
- * and joined to the next by a faint thread, so the points read as one story
+ * A summary as a short run of points, each marked by a small hollow circle
+ * and joined to the next by a very light thread, so the points read as one story
  * told in steps.
  */
 export default function SummaryBullets({

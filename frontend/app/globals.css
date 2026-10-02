@@ -124,6 +124,13 @@ body {
     scroll-behavior: smooth;
   }
 
+  /* Lenis (SmoothScroll) eases the window itself, one small scrollTo per
+     frame; CSS smooth scrolling on top would animate each of those steps. */
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -172,32 +179,21 @@ body {
   animation-play-state: paused;
 }
 
+/* Trusted-sources band on the home page (TrustedSources) - same seamless
+   loop as the prompt rows, slower, since it's a backdrop rather than a
+   set of things to click. */
+.animate-sources-marquee {
+  animation: prompt-slide-left 45s linear infinite;
+}
+
+.animate-sources-marquee:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-prompt-slide-left,
-  .animate-prompt-slide-right {
-    animation: none;
-  }
-}
-
-/* Floating news tiles around the home hero (FloatingNews). Each tile sets
-   --float-rotate, plus its own duration and delay so they drift out of sync. */
-@keyframes hero-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(var(--float-rotate, 0deg));
-  }
-  50% {
-    transform: translateY(-12px) rotate(calc(var(--float-rotate, 0deg) * -0.5));
-  }
-}
-
-.animate-hero-float {
-  transform: rotate(var(--float-rotate, 0deg));
-  animation: hero-float 8s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-hero-float {
+  .animate-prompt-slide-right,
+  .animate-sources-marquee {
     animation: none;
   }
 }

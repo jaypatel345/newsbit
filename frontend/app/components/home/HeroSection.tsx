@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PromptInput } from "@/components/ui/ai-chat-input";
 import FloatingNews from "@/app/components/home/FloatingNews";
+import { InfiniteGridBackground } from "@/components/ui/the-infinite-grid";
 import { Reveal } from "@/app/components/motion/Reveal";
 
 export default function HeroSection() {
@@ -17,13 +18,13 @@ export default function HeroSection() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-x-hidden">
+    <InfiniteGridBackground animate={false} spotlight={false} className="min-h-screen flex items-center justify-center overflow-x-hidden">
       {/* Tile frame - centred and lifted by the same -translate-y-16 as the
           content below, so the tiles frame the heading + input instead of the
           viewport. Height is capped by vh so short screens keep the top tiles
           clear of the navbar. */}
       <div className="pointer-events-none absolute inset-0 hidden lg:flex items-center justify-center">
-        <div className="relative w-[calc(100%-3rem)] max-w-295 h-[min(520px,62vh)] -translate-y-16">
+        <div className="relative w-[calc(100%-2rem)] max-w-360 h-[min(520px,62vh)] -translate-y-16">
           <FloatingNews />
         </div>
       </div>
@@ -60,6 +61,6 @@ export default function HeroSection() {
           </div>
         </Reveal>
       </div>
-    </div>
+    </InfiniteGridBackground>
   );
 }

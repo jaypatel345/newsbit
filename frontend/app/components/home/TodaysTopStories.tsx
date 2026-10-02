@@ -14,7 +14,7 @@ export default function TodaysTopStories() {
   const { data: topStories, isLoading, error } = useTopStories(0); // No delay for optimal performance
 
   return (
-    <section className="py-24 sm:py-32 md:py-40">
+    <section id="top-stories" className="scroll-mt-16 py-24 sm:py-32 md:py-40">
       {/* Header */}
       <Reveal className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">

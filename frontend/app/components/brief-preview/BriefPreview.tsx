@@ -85,11 +85,11 @@ export default function BriefPreview() {
       <Reveal delay={0.1} className="relative rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6" style={{ backgroundColor: "#F0F0EB" }}>
           {/* Corner control: listen to today's whole brief read aloud */}
           {!isLoading && !error && (
-            <div className="absolute top-[7px] right-3 sm:top-[10px] sm:right-4">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
               <ListenButton
                 src={getTodaysBriefAudioUrl()}
                 label="today's brief"
-                variant="icon"
+                variant="ai"
               />
             </div>
           )}
@@ -111,7 +111,7 @@ export default function BriefPreview() {
           ) : (
             <ul className="text-gray-700 text-sm leading-relaxed mb-2 sm:mb-3 space-y-3 sm:space-y-3.5 [--bullet-gap:12px] sm:[--bullet-gap:14px]">
               {data?.summary?.slice(0, 5).map((item: string | SummaryItem, index: number, items) => (
-                <li key={index} className={`relative pl-5 ml-1 ${index === 0 ? 'mt-6' : ''}`}>
+                <li key={index} className={`relative pl-5 ml-1 ${index === 0 ? 'mt-8' : ''}`}>
                   <BulletMarker last={index === items.length - 1} />
                   <div>
                     <span>{typeof item === 'string' ? item : item.text}</span>

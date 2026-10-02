@@ -1,6 +1,7 @@
 "use client";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import HeroSection from "@/app/components/home/HeroSection";
+import TrustedSources from "@/app/components/home/TrustedSources";
 import BriefPreview from "@/app/components/brief-preview/BriefPreview";
 import TodaysTopStories from "@/app/components/home/TodaysTopStories";
 import TopicsSection from "@/app/components/topics/TopicsSection";
@@ -15,11 +16,12 @@ import { PromptProvider } from "@/app/context/PromptContext";
 export default function Home() {
   return (
     <PromptProvider>
-      <div className="min-h-screen bg-canvas text-black overflow-x-hidden">
+      <div className="min-h-screen bg-canvas text-black overflow-x-clip">
         <NavigationBar />
 
         <main>
           <HeroSection />
+          <TrustedSources />
 
           {/* Common centered container for Today's Brief, Top Stories, and Topics */}
           <div className="max-w-6xl mx-auto px-4 sm:px-6">

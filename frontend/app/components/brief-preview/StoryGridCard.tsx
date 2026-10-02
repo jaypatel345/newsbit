@@ -2,7 +2,6 @@
 import { useRouter } from "next/navigation";
 import ArticleImage from "@/app/components/common/ArticleImage";
 import ListenButton from "@/app/components/common/ListenButton";
-import SummaryBullets from "@/app/components/common/SummaryBullets";
 import { getArticleAudioUrl } from "@/app/services/audio.service";
 import { formatArticleTime } from "@/app/utils/formatTime";
 
@@ -46,7 +45,7 @@ export default function StoryGridCard({
       className="h-full flex flex-col rounded-2xl border border-gray-200 bg-[#F0F0EB] overflow-hidden cursor-pointer"
     >
       {/* Top: details on the left, image on the right */}
-      <div className="flex-1 flex items-start gap-4 p-5">
+      <div className="relative flex-1 flex items-start gap-4 p-5">
         {/* Left: details */}
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex items-center gap-2 mb-2">
@@ -68,13 +67,9 @@ export default function StoryGridCard({
             {headline}
           </h3>
 
-          <SummaryBullets
-            summary={summary}
-            max={3}
-            clampLines={2}
-            className="text-sm leading-relaxed"
-            itemClassName="text-[#5B4C3A]"
-          />
+          <p className="text-sm leading-relaxed text-[#5B4C3A] line-clamp-3">
+            {summary}
+          </p>
         </div>
 
         {/* Right: image */}

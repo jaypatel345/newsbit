@@ -1,8 +1,10 @@
+import asyncio
 import json
 import logging
 from datetime import UTC, datetime, timedelta
 
 from app.core.llm import groq_client02
+from app.db.database import AsyncSessionLocal
 from app.models.summary import Summary
 from app.models.summary_audio import SummaryAudio
 from app.prompts.news import BROADCAST_SCRIPT_PROMPT
@@ -15,7 +17,7 @@ from app.services.infrastructure.voice.tts_service import (
     TTSService,
 )
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -128,50 +130,49 @@ def _build_script(segments: list[str]) -> str:
     return " ".join(part for part in parts if part.strip())
 
 
-class SummaryAudioService:
-    """Serves cached "listen to today's brief" audio for the home page's
-    daily summary card, generating it once per Summary row and reusing it
-    for every request after that."""
+async def _current_summary(db: AsyncSession) -> Summary | None:
+    cutoff = datetime.now(UTC) - timedelta(hours=24)
+    result = await db.execute(
+        select(Summary)
+        .where(Summary.updated_at >= cutoff)
+        .order_by(Summary.updated_at.desc())
+        .limit(1)
+    )
+    summary = result.scalar_one_or_none()
+    if summary is not None:
+        return summary
 
-    def __init__(self, db: AsyncSession):
-        self.db = db
-        self.tts_service = TTSService()
+    # Fall back to the most recent one regardless of age, matching
+    # NewsService.get_today_summary's behaviour.
+    result = await db.execute(
+        select(Summary).order_by(Summary.updated_at.desc()).limit(1)
+    )
+    return result.scalar_one_or_none()
 
-    async def _get_current_summary(self) -> Summary | None:
-        cutoff = datetime.now(UTC) - timedelta(hours=24)
-        result = await self.db.execute(
-            select(Summary)
-            .where(Summary.updated_at >= cutoff)
-            .order_by(Summary.updated_at.desc())
-            .limit(1)
-        )
-        summary = result.scalar_one_or_none()
-        if summary is not None:
-            return summary
 
-        # Fall back to the most recent one regardless of age, matching
-        # NewsService.get_today_summary's behaviour.
-        result = await self.db.execute(
-            select(Summary).order_by(Summary.updated_at.desc()).limit(1)
-        )
-        return result.scalar_one_or_none()
+async def _has_fresh_audio(db: AsyncSession, summary: Summary) -> bool:
+    # Selects only the timestamp so a warm-up check never pulls the MP3 blob.
+    created_at = await db.scalar(
+        select(SummaryAudio.created_at).where(SummaryAudio.summary_id == summary.id)
+    )
+    return created_at is not None and created_at >= summary.updated_at
 
-    async def get_or_create_audio(self) -> SummaryAudio:
-        summary = await self._get_current_summary()
-        if summary is None:
-            raise HTTPException(status_code=404, detail="No brief available yet")
 
-        cached = await self.db.get(SummaryAudio, summary.id)
-        if cached is not None:
-            if cached.created_at >= summary.updated_at:
-                return cached
-            # The scheduler regenerates the day's Summary row in place (same
-            # id, new headline/bullets) rather than inserting a new row, so
-            # a cache keyed only by summary_id would otherwise keep serving
-            # yesterday's - or this morning's - narration forever. Drop the
-            # stale row and fall through to regenerate.
-            await self.db.delete(cached)
-            await self.db.flush()
+async def _generate_and_store(summary_id: int) -> None:
+    """Build and cache the brief's narration in a session of its own, so the
+    work isn't tied to whichever request happened to start it."""
+    async with AsyncSessionLocal() as db:
+        summary = await db.get(Summary, summary_id)
+        if summary is None or await _has_fresh_audio(db, summary):
+            return
+
+        # The scheduler regenerates the day's Summary row in place (same
+        # id, new headline/bullets) rather than inserting a new row, so
+        # a cache keyed only by summary_id would otherwise keep serving
+        # yesterday's - or this morning's - narration forever. Drop the
+        # stale row before regenerating.
+        await db.execute(delete(SummaryAudio).where(SummaryAudio.summary_id == summary_id))
+        await db.flush()
 
         segments = await _broadcast_segments(summary)
         if not segments:
@@ -180,25 +181,86 @@ class SummaryAudioService:
                 detail="Today's brief has no text to read aloud",
             )
 
-        audio_bytes = await self.tts_service.synthesize_script(_build_script(segments))
+        audio_bytes = await TTSService().synthesize_script(_build_script(segments))
 
-        audio = SummaryAudio(
-            summary_id=summary.id,
-            audio_content=audio_bytes,
-            mime_type="audio/mpeg",
-            voice_name=DEFAULT_VOICE_NAME,
+        db.add(
+            SummaryAudio(
+                summary_id=summary_id,
+                audio_content=audio_bytes,
+                mime_type="audio/mpeg",
+                voice_name=DEFAULT_VOICE_NAME,
+            )
         )
-        self.db.add(audio)
         try:
-            await self.db.commit()
+            await db.commit()
         except IntegrityError:
-            # Another request generated and cached this summary's audio
-            # first - use that instead of erroring out.
-            await self.db.rollback()
-            cached = await self.db.get(SummaryAudio, summary.id)
-            if cached is not None:
-                return cached
-            raise
+            # Another worker process cached this summary's audio first -
+            # theirs is just as good.
+            await db.rollback()
 
-        await self.db.refresh(audio)
-        return audio
+
+# One generation per summary at a time. Without this, a click that lands
+# while the hover prefetch (or a warm-up) is still generating starts a second
+# full LLM + TTS run from scratch instead of waiting on the one already
+# nearly done - which is what made some listens take twice as long.
+_inflight: dict[int, asyncio.Task[None]] = {}
+
+
+def _ensure_generation(summary_id: int) -> asyncio.Task[None]:
+    task = _inflight.get(summary_id)
+    if task is None:
+        task = asyncio.create_task(_generate_and_store(summary_id))
+        _inflight[summary_id] = task
+        task.add_done_callback(lambda _: _inflight.pop(summary_id, None))
+    return task
+
+
+async def warm_today_audio() -> None:
+    """Generate today's brief audio ahead of the first listen if it isn't
+    cached yet. Safe to call often: a cached brief costs one small query."""
+    try:
+        async with AsyncSessionLocal() as db:
+            summary = await _current_summary(db)
+            if summary is None or await _has_fresh_audio(db, summary):
+                return
+            summary_id = summary.id
+        await _ensure_generation(summary_id)
+    except Exception:
+        logger.exception("Failed to warm today's brief audio")
+
+
+class SummaryAudioService:
+    """Serves cached "listen to today's brief" audio for the home page's
+    daily summary card, generating it once per Summary row and reusing it
+    for every request after that."""
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def _fresh_cached(self, summary: Summary) -> SummaryAudio | None:
+        # populate_existing: the row may have been replaced by a generation
+        # running in another session since this one last saw it.
+        cached = await self.db.get(SummaryAudio, summary.id, populate_existing=True)
+        if cached is not None and cached.created_at >= summary.updated_at:
+            return cached
+        return None
+
+    async def get_or_create_audio(self) -> SummaryAudio:
+        summary = await _current_summary(self.db)
+        if summary is None:
+            raise HTTPException(status_code=404, detail="No brief available yet")
+
+        cached = await self._fresh_cached(summary)
+        if cached is not None:
+            return cached
+
+        # Shielded so a listener closing the tab mid-wait doesn't cancel the
+        # generation everyone else waiting on it is about to receive.
+        await asyncio.shield(_ensure_generation(summary.id))
+
+        cached = await self._fresh_cached(summary)
+        if cached is None:
+            raise HTTPException(
+                status_code=502, detail="Couldn't generate today's brief audio"
+            )
+        return cached
