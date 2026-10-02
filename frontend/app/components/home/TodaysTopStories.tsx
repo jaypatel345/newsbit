@@ -1,4 +1,5 @@
 "use client";
+import { Reveal, RevealGroup, RevealItem } from "@/app/components/motion/Reveal";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTopStories } from "@/app/hooks/useTopStories";
@@ -15,14 +16,14 @@ export default function TodaysTopStories() {
   return (
     <section className="py-24 sm:py-32 md:py-40">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 text-center">
+      <Reveal className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
           Top Stories
         </h2>
         <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600">
           AI-selected stories worth your attention today.
         </p>
-      </div>
+      </Reveal>
 
       {/* Stories Grid - 2 columns with 3 items each */}
       {isLoading ? (
@@ -58,9 +59,9 @@ export default function TodaysTopStories() {
           <div className="text-gray-500">Unable to load top stories at this time.</div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <RevealGroup stagger={0.12} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Left Column */}
-          <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+          <RevealItem className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(0, 3).map((story, index) => (
               <Link
                 key={story.id}
@@ -112,10 +113,10 @@ export default function TodaysTopStories() {
                 </div>
               </Link>
             ))}
-          </div>
+          </RevealItem>
 
           {/* Right Column */}
-          <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+          <RevealItem className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
             {topStories.slice(3, 6).map((story, index) => (
               <Link
                 key={story.id}
@@ -159,12 +160,12 @@ export default function TodaysTopStories() {
                 </div>
               </Link>
             ))}
-          </div>
-        </div>
+          </RevealItem>
+        </RevealGroup>
       )}
 
       {/* View All Button */}
-      <div className="text-center">
+      <Reveal className="text-center">
         <Link
           href="/brief"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
@@ -172,7 +173,7 @@ export default function TodaysTopStories() {
           View All Top Stories
           <ArrowRight size={16} />
         </Link>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import NavigationBar from "@/app/components/layout/NavigationBar";
+import { Reveal } from "@/app/components/motion/Reveal";
 import BriefHeader from "@/app/components/brief-preview/BriefHeader";
 import ExecutiveSummaryCard from "@/app/components/brief-preview/ExecutiveSummaryCard";
 import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
@@ -108,14 +109,14 @@ export default function BriefClient({ initialStories }: BriefClientProps = {}) {
           {/* <div className="mb-12 border-t border-gray-200"></div> */}
 
           {/* Top Stories Heading */}
-          <div className="mb-6 sm:mb-8 text-center">
+          <Reveal immediate y={22} className="mb-6 sm:mb-8 text-center">
             <h1 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3">
               Top Stories
             </h1>
             <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-500">
               Today&apos;s most important stories, summarized by AI.
             </p>
-          </div>
+          </Reveal>
 
           {isLoading ? (
             <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
@@ -142,8 +143,9 @@ export default function BriefClient({ initialStories }: BriefClientProps = {}) {
           ) : (
             <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
               {data?.map((story, index) => (
-                <div
+                <Reveal
                   key={story.id}
+                  delay={(index % 2) * 0.08}
                   id={`story-${story.id}`}
                   className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
                     highlightedId === story.id
@@ -162,7 +164,7 @@ export default function BriefClient({ initialStories }: BriefClientProps = {}) {
                     sourceWebsite={story.domain}
                     image={story.image_url}
                   />
-                </div>
+                </Reveal>
               ))}
             </div>
           )}

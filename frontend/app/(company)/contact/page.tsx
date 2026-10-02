@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
+import { Reveal, RevealGroup, RevealItem, RevealSection } from "@/app/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -31,19 +32,19 @@ export default function ContactPage() {
       <NavigationBar />
       <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
-        <div className="mb-16">
+        <Reveal immediate y={22} className="mb-16">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
             Contact Us
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed">
             Have questions, feedback, or partnership ideas? We'd love to hear from you.
           </p>
-        </div>
+        </Reveal>
 
         {/* Contact Cards */}
-        <div className="grid gap-6 mb-16">
+        <RevealGroup stagger={0.1} className="grid gap-6 mb-16">
           {/* Support */}
-          <div className="border border-gray-200 rounded-2xl p-8 hover:border-gray-300 transition-colors">
+          <RevealItem className="border border-gray-200 rounded-2xl p-8 hover:border-gray-300 transition-colors">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
               Support
             </h2>
@@ -56,10 +57,10 @@ export default function ContactPage() {
             >
               support@newsbit.in
             </a>
-          </div>
+          </RevealItem>
 
           {/* Founder */}
-          <div className="border border-gray-200 rounded-2xl p-8 hover:border-gray-300 transition-colors">
+          <RevealItem className="border border-gray-200 rounded-2xl p-8 hover:border-gray-300 transition-colors">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
               Founder
             </h2>
@@ -72,11 +73,11 @@ export default function ContactPage() {
             >
               jaypatel210776@gmail.com
             </a>
-          </div>
-        </div>
+          </RevealItem>
+        </RevealGroup>
 
         {/* Social Links */}
-        <section className="border-t border-gray-200 pt-12 mb-16">
+        <RevealSection className="border-t border-gray-200 pt-12 mb-16">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">
             Follow Us
           </h2>
@@ -115,10 +116,10 @@ export default function ContactPage() {
               LinkedIn
             </a>
           </div>
-        </section>
+        </RevealSection>
 
         {/* Alternative Contact */}
-        <section className="border-t border-gray-200 pt-12">
+        <RevealSection className="border-t border-gray-200 pt-12">
           <p className="text-gray-600 mb-4">
             Prefer to send feedback or report an issue directly?
           </p>
@@ -136,7 +137,7 @@ export default function ContactPage() {
               Report an Issue
             </Link>
           </div>
-        </section>
+        </RevealSection>
       </main>
       <Footer />
     </div>

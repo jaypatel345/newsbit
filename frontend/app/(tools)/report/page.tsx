@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
+import { Reveal } from "@/app/components/motion/Reveal";
 import ReportForm from "./ReportForm";
 
 export const metadata: Metadata = {
@@ -34,7 +35,9 @@ export default function ReportPage() {
     <div className="min-h-screen bg-canvas">
       <NavigationBar />
       <div className="max-w-2xl mx-auto px-6 sm:px-8 py-20">
-        <ReportForm />
+        <Reveal immediate y={22}>
+          <ReportForm />
+        </Reveal>
       </div>
       <Footer />
     </div>

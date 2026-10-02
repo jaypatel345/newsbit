@@ -1,4 +1,5 @@
 "use client";
+import { Reveal } from "@/app/components/motion/Reveal";
 import { useState, useEffect, useRef } from "react";
 import { useTodaySummary } from "@/app/hooks/useTodaySummary";
 import ArticleSourceButton from "./ArticleSourceButton";
@@ -71,17 +72,17 @@ export default function BriefPreview() {
       </div>
 
       {/* Header */}
-      <div className="mb-8 sm:mb-10 text-center">
+      <Reveal className="mb-8 sm:mb-10 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3">
           Today&apos;s Brief
         </h2>
         <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-500">
           Understand today&apos;s biggest stories.
         </p>
-      </div>
+      </Reveal>
 
       {/* Hero Card - glass card */}
-      <div className="relative rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6" style={{ backgroundColor: "#F0F0EB" }}>
+      <Reveal delay={0.1} className="relative rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6" style={{ backgroundColor: "#F0F0EB" }}>
           {/* Corner control: listen to today's whole brief read aloud */}
           {!isLoading && !error && (
             <div className="absolute top-[7px] right-3 sm:top-[10px] sm:right-4">
@@ -194,7 +195,7 @@ export default function BriefPreview() {
               )}
             </div>
           </div>
-        </div>
+        </Reveal>
     </section>
   );
 }

@@ -12,7 +12,7 @@ export default function TopicCard({ category }: TopicCardProps) {
   const { data: articles, isLoading, error } = useCategoryNews(category);
 
   return (
-    <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6">
+    <div className="bg-[#F0F0EB]/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_12px_30px_-12px_rgba(30,30,30,0.18)]">
       {/* Header: Name with Arrow */}
       <Link
         href={`/explore?category=${encodeURIComponent(category)}`}

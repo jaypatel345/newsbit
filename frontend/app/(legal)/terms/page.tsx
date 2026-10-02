@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import NavigationBar from "@/app/components/layout/NavigationBar";
 import Footer from "@/app/components/layout/Footer";
+import { Reveal, RevealSection } from "@/app/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -30,27 +31,27 @@ export default function TermsPage() {
       <NavigationBar />
       <main className="max-w-3xl mx-auto px-6 sm:px-8 py-20">
         {/* Header */}
-        <div className="mb-12">
+        <Reveal immediate y={22} className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-4">
             Terms of Service
           </h1>
           <p className="text-xl text-gray-600">
             Last updated: July 2026
           </p>
-        </div>
+        </Reveal>
 
         {/* Content */}
         <div className="prose prose-gray max-w-none">
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Acceptance of Terms
             </h2>
             <p className="text-gray-600 leading-relaxed">
               By accessing or using Newsbit, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service. We reserve the right to modify these terms at any time, and your continued use of the service constitutes acceptance of any changes.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Use of the Service
             </h2>
@@ -60,9 +61,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               You may not use the service to: distribute spam, attempt to gain unauthorized access, interfere with the service's operation, or use it for any unlawful purpose.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               AI-Generated Responses Disclaimer
             </h2>
@@ -72,9 +73,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               You should not rely solely on AI-generated information for important decisions. Always verify critical information from primary sources and use your own judgment.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               News Accuracy Disclaimer
             </h2>
@@ -84,9 +85,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               We always provide links to original news sources. We encourage you to read the full articles from their original publishers for the most complete and up-to-date information.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               User Responsibilities
             </h2>
@@ -101,9 +102,9 @@ export default function TermsPage() {
               <li>Not use the service to harass, abuse, or harm others</li>
               <li>Respect the intellectual property rights of others</li>
             </ul>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Intellectual Property
             </h2>
@@ -116,9 +117,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               You retain ownership of any content you submit to Newsbit, but you grant us a license to use, store, and process that content to provide and improve our service.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Limitation of Liability
             </h2>
@@ -128,9 +129,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               In no event shall Newsbit's total liability to you for all claims exceed the amount you paid, if any, for using the service during the twelve months preceding the claim.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Service Availability
             </h2>
@@ -140,9 +141,9 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               We reserve the right to modify, suspend, or discontinue the service at any time without prior notice.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Account Termination
             </h2>
@@ -152,27 +153,27 @@ export default function TermsPage() {
             <p className="text-gray-600 leading-relaxed">
               You may terminate your account at any time by contacting us or using the account deletion feature in our service.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Updates and Modifications
             </h2>
             <p className="text-gray-600 leading-relaxed">
               We may update or modify the service, including adding or removing features, at any time. We will notify users of significant changes that affect their use of the service.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Governing Law
             </h2>
             <p className="text-gray-600 leading-relaxed">
               These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which Newsbit is operated, without regard to its conflict of law provisions.
             </p>
-          </section>
+          </RevealSection>
 
-          <section className="mb-10">
+          <RevealSection className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Contact
             </h2>
@@ -182,7 +183,7 @@ export default function TermsPage() {
             <p className="text-gray-600">
               Email: legal@newsbit.in
             </p>
-          </section>
+          </RevealSection>
         </div>
       </main>
       <Footer />

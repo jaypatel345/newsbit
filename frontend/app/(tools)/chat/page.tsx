@@ -25,6 +25,7 @@ import { useArticle } from "@/app/hooks/useArticle";
 import { useChatWebSocket } from "@/app/hooks/useChatWebSocket";
 import { useVoiceSession } from "@/app/hooks/useVoiceSession";
 import VoiceOverlay from "@/app/components/chat/VoiceOverlay";
+import { Reveal } from "@/app/components/motion/Reveal";
 
 const DELETED_PREFIX = "deleted_conversation_";
 
@@ -706,7 +707,7 @@ function ChatPageContent() {
               </div>
             ) : displayMessages.length === 0 ? (
               <div className="flex w-full flex-col items-center justify-center">
-                <div className="mb-6 text-center">
+                <Reveal immediate y={22} className="mb-6 text-center">
                   <h2
                     className="font-(family-name:--font-geist) text-3xl sm:text-4xl tracking-tight"
                     style={{ color: "#1E1E1E" }}
@@ -725,11 +726,11 @@ function ChatPageContent() {
                     Ask anything about today&apos;s news — or pick up one of
                     these threads.
                   </p>
-                </div>
+                </Reveal>
 
-                <div className="w-full max-w-2xl">
+                <Reveal immediate y={22} delay={0.1} className="w-full max-w-2xl">
                   <PromptChips onSelectPrompt={setInputMessage} />
-                </div>
+                </Reveal>
               </div>
             ) : (
               <MessageList
