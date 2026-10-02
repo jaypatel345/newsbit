@@ -13,16 +13,6 @@ const PHASE_LABEL: Record<VoicePhase, string> = {
   speaking: "Speaking",
 };
 
-const PHASE_HINT: Record<VoicePhase, string> = {
-  idle: "The mic is off. Tap below when you want to ask something.",
-  listening: "Just talk. I'll answer out loud when you stop.",
-  transcribing: "Turning what you said into a question.",
-  thinking: "Reading the story and pulling the details together.",
-  // The mic is closed while the answer plays, so cutting in is a button
-  // press rather than simply talking over it.
-  speaking: "Cut in any time with “Ask something else”.",
-};
-
 /** The orb has no "transcribing" look of its own — it's the beat between
  *  hearing you and answering, which reads the same as thinking. */
 function orbStateFor(phase: VoicePhase): OrbState {
@@ -71,14 +61,11 @@ export default function VoiceOverlay({
         className="absolute inset-x-0 bottom-0 h-[26rem] bg-gradient-to-t from-canvas via-canvas/90 to-transparent"
       />
 
-      {/* No shadow on the panel itself — the ball casts the only one, which
-          is what makes it read as the object in front rather than a picture
-          printed on a raised card. */}
-      <div className="pointer-events-auto relative w-full max-w-md rounded-[2rem] border border-[#D9CBB0] bg-[#FDFCF8]/95 p-5 backdrop-blur-sm">
+      <div className="pointer-events-auto relative w-full max-w-xs rounded-3xl border border-black/5 bg-white px-5 pb-4 pt-5 shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]">
         <button
           onClick={onClose}
           aria-label="Close voice mode"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-900"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <X size={16} />
         </button>
@@ -86,33 +73,32 @@ export default function VoiceOverlay({
         <div className="flex flex-col items-center">
           <VoiceOrb state={orbStateFor(phase)} levelRef={levelRef} />
 
-          {/* The canvas now ends just past the halo, so the label needs a
-              gap of its own rather than the negative pull that used to
-              close the empty space under the waveform. */}
           <p
-            className="mt-2 text-sm font-medium text-stone-900"
+            className="mt-3 text-sm font-medium text-gray-900"
             aria-live="polite"
           >
             {muted && phase === "listening" ? "Muted" : PHASE_LABEL[phase]}
           </p>
-          <p className="mt-1 max-w-xs text-center text-xs leading-relaxed text-stone-500">
-            {notice ?? PHASE_HINT[phase]}
-          </p>
+          {notice && (
+            <p className="mt-1 max-w-xs text-center text-xs leading-relaxed text-gray-500">
+              {notice}
+            </p>
+          )}
 
           {lastHeard && phase !== "listening" && (
-            <p className="mt-3 max-w-xs truncate text-center text-xs italic text-stone-400">
+            <p className="mt-2 max-w-xs truncate text-center text-xs text-gray-400">
               “{lastHeard}”
             </p>
           )}
 
-          <div className="mt-5 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2">
             {/* Muting is about what the open mic picks up, so it has no
                 meaning while the mic is shut. */}
             {phase !== "idle" && (
               <button
                 onClick={onToggleMute}
                 aria-pressed={muted}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#D9CBB0] bg-white text-stone-700 transition-colors hover:bg-stone-100"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition-colors hover:bg-gray-100"
                 title={muted ? "Unmute microphone" : "Mute microphone"}
               >
                 {muted ? <MicOff size={17} /> : <Mic size={17} />}
@@ -126,7 +112,7 @@ export default function VoiceOverlay({
             {phase !== "listening" && (
               <button
                 onClick={onInterrupt}
-                className="flex h-11 items-center gap-2 rounded-full bg-[#8A6A3F] px-5 text-sm font-medium text-[#F5E9D2] transition-colors hover:bg-[#755935]"
+                className="flex h-10 items-center gap-2 rounded-full bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
               >
                 {phase === "idle" ? <Mic size={15} /> : <SkipForward size={15} />}
                 {phase === "idle" ? "Ask something" : "Ask something else"}

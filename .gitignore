@@ -53,6 +53,8 @@ logs/
 
 # Screenshots
 *.png
+# ...but not the voice orb's noise texture, which the app serves.
+!frontend/public/orb/perlin-noise.png
 *.jpg
 *.jpeg
 *.gif
