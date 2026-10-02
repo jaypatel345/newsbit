@@ -6,6 +6,7 @@ import StoryGridCard from "@/app/components/brief-preview/StoryGridCard";
 import { useCategories } from "@/app/hooks/useCategories";
 import { Article } from "@/types/article";
 import { useCategoryNews } from "@/app/hooks/useCategoryNews";
+import { Reveal } from "@/app/components/motion/Reveal";
 
 // Categories to exclude from display
 const EXCLUDED_CATEGORIES = ["India", "Nation", "Other"];
@@ -86,7 +87,7 @@ export default function ExploreClient({
       <h1 className="sr-only">Explore News by Category</h1>
 
       {/* Category Navigation Row */}
-      <div className="mb-8 -mx-4 sm:mx-0">
+      <Reveal immediate y={22} className="mb-8 -mx-4 sm:mx-0">
         <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide px-4 sm:px-0">
           {filteredCategories.map((topic: string) => (
             <button
@@ -102,7 +103,7 @@ export default function ExploreClient({
             </button>
           ))}
         </div>
-      </div>
+      </Reveal>
 
       {/* Selected Category Header */}
       {/* <div className="mb-8">
@@ -149,8 +150,9 @@ export default function ExploreClient({
       ) : (
         <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
           {articles.map((article: Article, index: number) => (
-            <div
+            <Reveal
               key={article.id}
+              delay={(index % 2) * 0.08}
               id={`article-${article.id}`}
               className={`scroll-mt-24 sm:scroll-mt-28 rounded-2xl transition-shadow duration-700 ${
                 highlightedId === article.id
@@ -169,7 +171,7 @@ export default function ExploreClient({
                 sourceWebsite={article.url || article.url}
                 image={article.image_url}
               />
-            </div>
+            </Reveal>
           ))}
         </div>
       )}

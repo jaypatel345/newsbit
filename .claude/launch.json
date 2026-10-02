@@ -4,7 +4,10 @@
     {
       "name": "newsbit-frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "cwd": "frontend",
       "port": 3000,
       "autoPort": true
@@ -12,10 +15,27 @@
     {
       "name": "newsbit-frontend-prod",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["next", "start"],
+      "runtimeArgs": [
+        "next",
+        "start"
+      ],
       "cwd": "frontend",
       "port": 3100,
       "autoPort": true
+    },
+    {
+      "name": "newsbit-backend",
+      "runtimeExecutable": "venv/bin/uvicorn",
+      "runtimeArgs": [
+        "app.main:app",
+        "--reload",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8001"
+      ],
+      "cwd": "backend",
+      "port": 8001
     }
   ]
 }

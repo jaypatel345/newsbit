@@ -1,4 +1,5 @@
 "use client";
+import { Reveal, RevealGroup, RevealItem } from "@/app/components/motion/Reveal";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/app/hooks/useCategories";
@@ -18,14 +19,14 @@ export default function TopicsSection() {
   return (
     <section className="py-24 sm:py-32 md:py-40">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 text-center">
+      <Reveal className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
           Topics You May Like
         </h2>
         <p className="text-[14px] sm:text-[15px] md:text-[16px] text-gray-600">
           Explore today's news by category.
         </p>
-      </div>
+      </Reveal>
 
       {/* Topics Grid */}
       {isLoading ? (
@@ -42,15 +43,17 @@ export default function TopicsSection() {
           <p className="text-red-600">Error loading categories</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <RevealGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredCategories?.slice(0, 9).map((category: string) => (
-            <TopicCard key={category} category={category} />
+            <RevealItem key={category}>
+              <TopicCard category={category} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       )}
 
       {/* View All Button */}
-      <div className="text-center mt-10 sm:mt-12">
+      <Reveal className="text-center mt-10 sm:mt-12">
         <Link
           href="/explore"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
@@ -58,7 +61,7 @@ export default function TopicsSection() {
           View All Topics
           <ArrowRight size={16} />
         </Link>
-      </div>
+      </Reveal>
     </section>
   );
 }

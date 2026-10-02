@@ -43,8 +43,10 @@ export default function NavigationBar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        // Once scrolled, a faint hairline is enough to lift the bar off the
+        // content; a gray border plus shadow read heavy over bordered cards.
         scrolled
-          ? "bg-canvas shadow-sm border-b border-gray-200"
+          ? "bg-canvas border-b border-black/5"
           : "bg-canvas border-b border-transparent"
       }`}
     >

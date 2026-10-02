@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Reveal } from "@/app/components/motion/Reveal";
 import Cookies from "js-cookie";
 import { useLogin } from "@/app/hooks/useAuth";
 import { useRouter } from "next/navigation";
@@ -54,7 +55,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-canvas flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left Side - Branding */}
-        <div className="hidden lg:block space-y-8">
+        <Reveal immediate y={22} className="hidden lg:block space-y-8">
           <div>
             <Link
               href="/"
@@ -105,10 +106,10 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
 
         {/* Right Side - Login Form */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-gray-100">
+        <Reveal immediate y={22} delay={0.1} className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-gray-100">
           <div className="mb-8">
             <h2 className="text-3xl font-semibold text-gray-900 mb-2">
               Sign in to your account
@@ -259,7 +260,7 @@ export default function LoginPage() {
               Sign up
             </Link>
           </p>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

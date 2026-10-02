@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   Clapperboard,
   Cpu,
@@ -11,11 +11,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTopStories } from "@/app/hooks/useTopStories";
-import ArticleImage, { getSourceLogoUrl } from "@/app/components/common/ArticleImage";
+import { getSourceLogoUrl } from "@/app/components/common/ArticleImage";
 
-// Hand-placed spots in the hero's side gutters - three per side, staggered so
-// they read as scattered rather than as two columns. Percentages are of the
-// hero box; the centre (heading + input) stays clear.
+// Three tiles per side, laid out as a pair of brackets around the heading:
+// the top and bottom tiles tuck in towards the centre (they sit above and
+// below the text, so they can), the middle ones sit outermost, level with the
+// heading. The right side mirrors the left with small offsets so the frame
+// stays balanced without looking stamped. Percentages are of the frame box in
+// HeroSection, which is centred on the heading + input, not on the viewport.
 const SLOTS: {
   position: CSSProperties;
   size: number;
@@ -23,12 +26,12 @@ const SLOTS: {
   duration: number;
   delay: number;
 }[] = [
-  { position: { top: "17%", left: "7%" }, size: 56, rotate: -6, duration: 7, delay: 0 },
-  { position: { top: "45%", left: "14%" }, size: 46, rotate: 4, duration: 8.5, delay: 1.2 },
-  { position: { top: "68%", left: "5%" }, size: 52, rotate: -3, duration: 7.5, delay: 0.6 },
-  { position: { top: "20%", right: "9%" }, size: 50, rotate: 5, duration: 8, delay: 0.9 },
-  { position: { top: "47%", right: "4%" }, size: 58, rotate: -4, duration: 7.2, delay: 0.3 },
-  { position: { top: "70%", right: "13%" }, size: 44, rotate: 6, duration: 9, delay: 1.5 },
+  { position: { top: "2%", left: "11%" }, size: 56, rotate: -6, duration: 7, delay: 0 },
+  { position: { top: "38%", left: "0%" }, size: 46, rotate: 4, duration: 8.5, delay: 1.2 },
+  { position: { top: "76%", left: "9%" }, size: 52, rotate: -3, duration: 7.5, delay: 0.6 },
+  { position: { top: "4%", right: "9%" }, size: 50, rotate: 5, duration: 8, delay: 0.9 },
+  { position: { top: "36%", right: "0%" }, size: 58, rotate: -4, duration: 7.2, delay: 0.3 },
+  { position: { top: "74%", right: "11%" }, size: 44, rotate: 6, duration: 9, delay: 1.5 },
 ];
 
 // Shown until stories load (or when there are none), so the hero never has
@@ -40,10 +43,17 @@ const TILE_CLASS =
 
 export default function FloatingNews() {
   const { data: stories } = useTopStories(0);
-  const top = (stories ?? []).slice(0, SLOTS.length);
+  // Stories whose photo failed to load. A favicon blown up to tile size reads
+  // as an empty white square, so a failed story gives its slot to the next one
+  // that has a photo rather than falling back the way ArticleImage does.
+  const [failed, setFailed] = useState<Record<string, true>>({});
+
+  const top = (stories ?? [])
+    .filter((story) => story.image_url?.trim() && !failed[story.id])
+    .slice(0, SLOTS.length);
 
   return (
-    <div className="pointer-events-none absolute inset-0 hidden lg:block">
+    <div className="pointer-events-none absolute inset-0">
       {SLOTS.map((slot, i) => {
         const story = top[i];
         const Icon = TOPIC_ICONS[i];
@@ -67,17 +77,20 @@ export default function FloatingNews() {
             >
               {story ? (
                 <Link
+                  key={story.id}
                   href={`/brief#story-${story.id}`}
                   aria-label={story.title}
                   title={story.title}
                   className="pointer-events-auto relative block transition-transform duration-300 hover:scale-110"
                 >
                   <span className={TILE_CLASS} style={{ width: slot.size, height: slot.size }}>
-                    <ArticleImage
-                      src={story.image_url}
+                    <img
+                      src={story.image_url.trim()}
                       alt=""
-                      domain={story.domain}
                       className="h-full w-full object-cover"
+                      onError={() =>
+                        setFailed((prev) => (prev[story.id] ? prev : { ...prev, [story.id]: true }))
+                      }
                     />
                   </span>
                   {logo && (

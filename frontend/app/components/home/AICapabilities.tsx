@@ -1,4 +1,5 @@
 "use client";
+import { Reveal } from "@/app/components/motion/Reveal";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
@@ -38,7 +39,7 @@ export default function AICapabilities() {
   return (
     <section className="py-24 sm:py-32 md:py-40">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 text-center">
+      <Reveal className="mb-6 sm:mb-8 text-center">
         <h2 className="text-[26px] sm:text-[28px] md:text-[30px] font-semibold text-gray-900 mb-3 sm:mb-4">
           Ask Newsbit anything.
         </h2>
@@ -47,10 +48,11 @@ export default function AICapabilities() {
           perspectives, understand context, and explore stories through
           conversation.
         </p>
-      </div>
+      </Reveal>
 
       {/* Prompt Suggestions */}
-      <div
+      <Reveal
+        delay={0.1}
         className="mb-6 sm:mb-8 space-y-2 sm:space-y-3 overflow-hidden"
         style={{
           maskImage:
@@ -85,7 +87,7 @@ export default function AICapabilities() {
             </div>
           </div>
         ))}
-      </div>
+      </Reveal>
     </section>
   );
 }
