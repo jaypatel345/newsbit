@@ -2,6 +2,7 @@ import { Message } from "@/types/message";
 import { ExternalLink, Copy, Edit2, Check, X } from "lucide-react";
 import ThinkingSection from "./ThinkingSection";
 import AssistantContent from "./AssistantContent";
+import SummaryBullets from "@/app/components/common/SummaryBullets";
 import { useState } from "react";
 import { toast } from "sonner";
 import React from "react";
@@ -118,9 +119,11 @@ export default function MessageList({ messages, loading, streamingContent = "", 
                                 {article.title}
                               </h3>
 
-                              <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-3">
-                                {article.summary}
-                              </p>
+                              <SummaryBullets
+                                summary={article.summary}
+                                className="text-sm sm:text-base leading-relaxed mb-3"
+                                itemClassName="text-gray-600"
+                              />
 
                               <a
                                 href={article.url}
